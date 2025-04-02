@@ -6,7 +6,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>RMS Invoice Sending</title>
+  <title>RMS Invoice Dispatcher</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
   <link rel="stylesheet" href="assets/css/style.css" />
@@ -14,7 +14,7 @@
 </head>
 <body>
   <div class="container-fluid mt-4 px-4">
-    <h1 class="text-center mb-3">RMS Invoice Sending</h1>
+    <h1 class="text-center mb-3">RMS Invoice Dispatcher</h1>
 
     <!-- Toggles -->
     <div class="text-center mb-4">
