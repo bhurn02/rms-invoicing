@@ -1,0 +1,6 @@
+[0107/161009.636:ERROR:file_io.cc(90)] ReadExactly: expected 448, observed 0
+[0107/161009.636:ERROR:crash_report_database_win.cc(472)] failed to read records
+[0107/161337.586:ERROR:file_io.cc(90)] ReadExactly: expected 448, observed 0
+[0107/161337.642:ERROR:crash_report_database_win.cc(472)] failed to read records
+[0107/161349.324:ERROR:file_io.cc(90)] ReadExactly: expected 448, observed 0
+[0107/161349.325:ERROR:crash_report_database_win.cc(472)] failed to read records
