@@ -107,4 +107,26 @@ function finddoublequote($pStr) {
 function numberformat($pNum) {
 	return number_format($pNum,2,'.',',');
 }
+
+function mssql_resultset($query,$dsn_name=null) {	
+	$sqlconnect = ($dsn_name)?connectionTo($dsn_name):connection();
+	$resultset = array();
+
+	try {		
+		$process=odbc_exec($sqlconnect, $query);
+		while($record=odbc_fetch_array($process)){
+			$resultset[] = $record;
+		}		
+	} 
+	catch(Exception $e) { 
+		echo "<pre>";
+		print_r($e); 
+		echo "</pre>"; 	    
+	}
+
+	odbc_free_result($process);
+	odbc_close($sqlconnect);
+
+	return $resultset;
+}
  ?>

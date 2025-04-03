@@ -1,5 +1,7 @@
 <?php
 // index.php
+// echo PHP_INT_SIZE === 4 ? "32-bit PHP" : "64-bit PHP";
+// die();
 ?>
 <!DOCTYPE html>
 <html lang="en">

@@ -1,27 +1,22 @@
-<?php 
+<?php
 include("functions.php");
-//access
-$sessUserID = "";
-$sessUserName = "";
-$sessCompanyCode = "";
+require_once 'libs/PHPExcel/Classes/PHPExcel.php';
 
-if (isset($_COOKIE['userid'])) {
-	$sessUserID = $_COOKIE['userid'];
-	$sessUserName = $_COOKIE['username'];
-	$sessCompanyCode = $_COOKIE['company_code'];
-}
+$sessUserID = isset($_COOKIE['userid']) ? $_COOKIE['userid'] : "";
+$sessUserName = isset($_COOKIE['username']) ? $_COOKIE['username'] : "";
+$sessCompanyCode = isset($_COOKIE['company_code']) ? $_COOKIE['company_code'] : "";
+
 if (trim($sessUserID) == "") {
-	echo "<script> parent.frames.location = \"" . "accessnotallowed.htm" .  "\";</script>";
-	exit(); }
-else {
-	$menu_access = menuaccess($_GET["menu_id"],trim($sessUserID));
-	if ($menu_access==0) {
-		echo "<script> parent.frames[2].location = \"" . "accessnotallowed.htm" .  "\";</script>";
-		exit(); 
-	}
+    echo "<script> parent.frames.location = 'accessnotallowed.htm';</script>";
+    exit();
+} else {
+    $menu_access = menuaccess($_GET["menu_id"], trim($sessUserID));
+    if ($menu_access == 0) {
+        echo "<script> parent.frames[2].location = 'accessnotallowed.htm';</script>";
+        exit();
+    }
 }
 
-//end access
 $sqlconnect = connection();
 $strIPAddr = $_SERVER["REMOTE_ADDR"];
 $menu_id = $_GET["menu_id"];
@@ -29,626 +24,307 @@ $menu_id = $_GET["menu_id"];
 $uid = $sessUserID;
 $company_code = $sessCompanyCode;
 
-$strMode = trim($_POST["hidMode"]);
-$strSaveMode = $_POST["hidSaveMode"];
-$dtAsOf = date("m/d/Y",(strtotime(date("m/d/y", time()))+60*60*24*($OFFSET)));	
-$strSearchValue = "";
+$strMode = isset($_POST["hidMode"]) ? trim($_POST["hidMode"]) : "";
+$dtAsOf = isset($_POST["DPC_txtDateFrom"]) ? $_POST["DPC_txtDateFrom"] : date("m/d/Y");
+$strSearchValue = isset($_POST["txtSearchValue"]) ? $_POST["txtSearchValue"] : "";
+
+$tab = isset($_GET['tab']) ? $_GET['tab'] : 'upload';
 
 $strMsg = "";
+$blankWarning = "";
+$previewData = array();
+$strFile = "";
+$searchResults = array();
 
-if ($strMode != "") {	
-	$dtAsOf = $_POST["DPC_txtDateFrom"];
-	$strSortBy = $_POST["cboSortBy"];
-	$strSearchValue = $_POST["txtSearchValue"];
+if ($strMode == "UPLOAD") {
+    $ftp = ftp();
+    $path = $ftp[4];
 
-	//echo $strRealPropertyName;
-	switch ($strMode) {
-		case "SEARCH":						
-			$sqlquery="exec sp_u_UploadAging_Search '" . $dtAsOf . "','" . $strSortBy . "','" . $strSearchValue . "'";	
-			$process=odbc_exec($sqlconnect, $sqlquery);
-			//echo $sqlquery;
-			break;
-		
-		case "UPLOAD":
-			$sqlquery="exec sp_u_UploadAgingHeader_CheckIfAlertSent '" . $dtAsOf . "'";	
-			$process=odbc_exec($sqlconnect, $sqlquery);
-			//echo $sqlquery;
-			if (odbc_fetch_row($process)) {
-					if (odbc_result($process,"x") == 1) 
-						$strMsg = odbc_result($process,"msg");
-			}
-			
-			if ($strMsg == "") {
-				//$strFile = "D:\System\RMS Apartment System\docs\RMS Accounts Receivable Aging Schedule September 2012.xlsx";
-				//$dsnExcel = "Driver={Microsoft Excel Driver (*.xls, *.xlsx, *.xlsm, *.xlsb)};DBQ=" . $strFile . ";";
-				//$sqlconnectExcel=odbc_connect($dsnExcel,"","");
-				$ftp = ftp();
-				$host = $ftp[1];
-				$usr = $ftp[2];
-				$pwd = $ftp[3];
-				$path = $ftp[4];
-				//$strFile = "D:\\System\\RMS Apartment System\\docs\\RMS Accounts Receivable Aging Schedule September 2012.xlsx";
-				$strFile = $path . $_POST["txtFile"];
-				$connection=New COM("ADODB.Connection");
-				$processExcel = New COM("ADODB.Recordset");
-				//$dsnExcel = "Provider=Microsoft.ACE.OLEDB.12.0;Data Source=" . $strFile . ";Extended Properties=\"Excel 12.0;HDR=YES;\"";
-				$dsnExcel = "Provider=Microsoft.ACE.OLEDB.12.0;Data Source=" . $strFile . ";Extended Properties=Excel 12.0;";
+    if (isset($_FILES["txtFile"]) && $_FILES["txtFile"]["error"] == UPLOAD_ERR_OK) {
+        $fileName = basename($_FILES["txtFile"]["name"]);
+        $strFile = $path . $fileName;
 
-				$connection->ConnectionString = $dsnExcel;
-				$connection->Open();
-				//exit();
-				//$sqlconnectExcel=odbc_connect($dsnExcel,"","");
-				$sqlquery = "select * from [RMS Aging$]";
-				$processExcel->Open($sqlquery, $connection);
-				//$processExcel=odbc_exec($sqlconnectExcel, $sqlquery);
-				$ctr = 0;
-				$dtNow = date("m/d/y H:i:s", time());	
-				//while(odbc_fetch_row($processExcel)){
-				while (!$processExcel->EOF) {
-					//echo "res"; exit();
-					if ($ctr == 0) {
-						$sqlquery="exec sp_u_UploadAgingHeader_Save 0,'" . $strFile . "','" . $dtAsOf . "','" . $uid . "','" . $company_code . "','" . $strIPAddr . "'";	
-						$process=odbc_exec($sqlconnect, $sqlquery);
-						if(odbc_fetch_row($process)){
-							$hdr_id = odbc_result($process,"wth_hdr_id");
-						}
-					}				
-					if ($ctr > 0) {		
-						//$sqlquery = "exec sp_u_UploadAgingDetail_Save " . $hdr_id . ",'" . replacesinglequote(odbc_result($processExcel,1)) . "','" . replacesinglequote(odbc_result($processExcel,2)) . "','" . replacesinglequote(odbc_result($processExcel,3)) . "','" . odbc_result($processExcel,4) . "',";
-						//$sqlquery = $sqlquery . "'" . odbc_result($processExcel,5) . "','" . odbc_result($processExcel,6) . "','" . odbc_result($processExcel,7) . "',";
-						//$sqlquery = $sqlquery . "'" . odbc_result($processExcel,8) . "','" . odbc_result($processExcel,9) . "','" . odbc_result($processExcel,10) . "','" . odbc_result($processExcel,11) . "',";
-						//$sqlquery = $sqlquery . "'" . odbc_result($processExcel,12) . "','" . replacesinglequote(odbc_result($processExcel,13)) . "','" . replacesinglequote(odbc_result($processExcel,14)) . "'";	
-						//echo $processExcel->fields[0]->value . "res";
-						$col1=$processExcel->fields[0]->value;
-						$col2=$processExcel->fields[1]->value;
-						$col3=$processExcel->fields[2]->value;
-						$col4=$processExcel->fields[3]->value;
-						$col5=$processExcel->fields[4]->value;
-						$col6=$processExcel->fields[5]->value;
-						$col7=$processExcel->fields[6]->value;
-						$col8=$processExcel->fields[7]->value;
-						$col9=$processExcel->fields[8]->value;
-						$col10=$processExcel->fields[9]->value;
-						$col11=$processExcel->fields[10]->value;
-						$col12=$processExcel->fields[11]->value;
-						$col13=$processExcel->fields[12]->value;
-						$col14=$processExcel->fields[13]->value;
-						$col15=$processExcel->fields[14]->value;
-						//echo $col1;
-						if ($col4 == "")
-							$excel_total = 0;
-						else
-							$excel_total = $col4;
-							
-						if ($col5 == "")
-							$excel_current = 0;
-						else
-							$excel_current = $col5;
-							
-						if ($col6 == "")
-							$excel_total_overdue = 0;
-						else
-							$excel_total_overdue = $col6;
-							
-						if ($col7 == "")
-							$excel_1_30 = 0;
-						else
-							$excel_1_30 = $col7;
-							
-						if ($col8 == "")
-							$excel_31_60 = 0;
-						else
-							$excel_31_60 = $col8;
-							
-						if ($col9 == "")
-							$excel_61_90 = 0;
-						else
-							$excel_61_90 = $col9;
-							
-						if ($col10 == "")
-							$excel_91_120 = 0;
-						else
-							$excel_91_120 = $col10;
-							
-						if ($col11 == "")
-							$excel_121_150 = 0;
-						else
-							$excel_121_150 = $col11;
-							
-						if ($col12 == "")
-							$excel_over_151 = 0;
-						else
-							$excel_over_151 = $col12;
-							
-						if ($col13 == "")
-							$excel_write_off = 0;
-						else
-							$excel_write_off = $col13;
-						
-						$sqlquery = "exec sp_u_UploadAgingDetail_Save " . $hdr_id . ",'" . replacesinglequote($col1) . "','" . replacesinglequote($col2) . "','" . replacesinglequote($col3) . "'," . $excel_total . ",";
-						$sqlquery = $sqlquery . "" . $excel_current . "," . $excel_total_overdue . "," . $excel_1_30 . ",";
-						$sqlquery = $sqlquery . "" . $excel_31_60 . "," . $excel_61_90 . "," . $excel_91_120 . "," . $excel_121_150 . ",";
-						$sqlquery = $sqlquery . "" . $excel_over_151 . "," . $excel_write_off . ",'" . replacesinglequote($col14) . "','" . replacesinglequote($col15) . "'";	
-						$processDetail = odbc_exec($sqlconnect, $sqlquery);
-						//echo $col15;	
-//echo $sqlquery;exit();				
-					}
-					//exit();
-					$ctr++;
-					$processExcel->movenext();
-					//echo $processExcel->Fields(0);
-					//echo odbc_result($processExcel,1); 				
-				}
-				if (($ctr-1)< 0) {
-					$ctr = 1;
-				}
-							
-				$strMsg =  "Successfully uploaded " . strval($ctr-1) . " records."; 
-			}
-			break;
-			
-		case "UPLOAD_1":						
-			// FTP access parameters
-			set_time_limit(0);
-			
-			$ftp = ftp();
-			$host = $ftp[1];
-			$usr = $ftp[2];
-			$pwd = $ftp[3];
-			$path = $ftp[4];
-			 
-			// file to move:
-			//$local_file = $_POST["txtFile"];
-			$local_file = $_FILES["txtFile"]["tmp_name"];
-			//$local_file = $_FILES["txtFile"]["name"];
-			//$local_date_file = $signature_path . "\\" . $_POST["hidWONo"] . "-DATE.jpg";
-			
-			//$local_file = $signature_ftp_path. $_POST["hidWONo"] . ".jpg";
-			//$local_date_file = $signature_ftp_path . $_POST["hidWONo"] . "-DATE.jpg";
-			
-			//echo $local_file;
-			//exit();		
-			//if (file_exists($local_file)) {
-				
-				$ftp_path = "RMS-" . str_replace("/","",$dtAsOf) . "-" . str_replace("/","",date("m/d/y/H/i/s", time())) .'.xlsx';
-				//echo $local_file;
-				//echo $_FILES["txtFile"];
-				//echo $ftp_path;
-				//exit();
-				// connect to FTP server (port 21)
-				$conn_id = ftp_connect($host, 21) or die ("Cannot connect to host");
-				 
-				// send access parameters
-				ftp_login($conn_id, $usr, $pwd) or die("Cannot login");
-				
-				// turn on passive mode transfers (some servers need this)
-				ftp_pasv ($conn_id, true);
-				 
-				// upload a file  
-				//echo ftp_put($conn_id, $ftp_path, $local_file, FTP_BINARY) . "res";
-				//ftp_put($conn_id, $ftp_path, $local_file, FTP_BINARY);
-				echo $conn_id; 
-				echo " 2 " . $ftp_path;
-				echo " 3 " . $local_file;
-				die();
-				if (ftp_put($conn_id, $ftp_path, $local_file, FTP_BINARY)) {     
-					//$rename_local_file = $signature_path . "\\" . $_POST["hidWONo"] . "_OK.jpg";
-					//$rename_local_date_file = $signature_path . "\\" . $_POST["hidWONo"] . "-DATE_OK.jpg";
-					
-					//rename($local_file,$rename_local_file);
-					//rename($local_date_file,$rename_local_date_file);
-					$strFile = $path . $ftp_path;
-					//echo $strFile;
-					//die();
-					$dsnExcel = "Driver={Microsoft Excel Driver (*.xls, *.xlsx, *.xlsm, *.xlsb)};DBQ=" . $strFile . ";";
-					$sqlconnectExcel=odbc_connect($dsnExcel,"","");
-					$sqlquery = "select * from [RMS Aging$]";
-					$processExcel=odbc_exec($sqlconnectExcel, $sqlquery);
-					$ctr = 0;
-					$dtNow = date("m/d/y H:i:s", time());	
-					while(odbc_fetch_row($processExcel)){
-						//echo $processExcel->Fields(0);
-						echo odbc_result($processExcel,0); 
-						$ctr++;
-					}
-					
-					//to sort seq by passenger name
-					
-					$strMsg =  "Successfully uploaded " . strval($ctr) . " records.";   
-				} 
-				else {     
-					$strMsg = "There was a problem while uploading the aging report.";     
-				}
-					// check upload status:
-					//print (!$upload) ? 'Cannot upload' : 'Upload complete';
-					//print "\n";
-							 
-				// close the FTP stream
-				ftp_close($conn_id);
-			//}
-			//else {
-			//	$strMsg = "File does not exist.";
-			//}
-			
-			$strMode = "";
-		
-			break;
-	}
-}	
+        if (!move_uploaded_file($_FILES["txtFile"]["tmp_name"], $strFile)) {
+            $strMsg = "Failed to save uploaded file.";
+        } else {
+            try {
+                $inputFileType = PHPExcel_IOFactory::identify($strFile);
+                $objReader = PHPExcel_IOFactory::createReader($inputFileType);
+                $objPHPExcel = $objReader->load($strFile);
+                $sheet = $objPHPExcel->getSheet(0);
+                $highestRow = $sheet->getHighestRow();
 
-//echo $sqlquery;
-if ($strMsg != ""){
-	echo "<script>alert(\"" . $strMsg .  "\");</script>";
-} 
+                for ($row = 2; $row <= $highestRow; $row++) {
+                    $data = $sheet->rangeToArray("A{$row}:O{$row}", null, true, false);
+                    $rowData = $data[0];
 
+                    $col0 = strtolower(trim($rowData[0]));
+                    $col1 = strtolower(trim($rowData[1]));
+                    if ($col0 == "account no." && $col1 == "tenants") continue;
+
+                    $previewData[] = $rowData;
+                }
+
+                $invalidCount = 0;
+                foreach ($previewData as $row) {
+                    $acc = trim($row[0]);
+                    $tenant = trim($row[1]);
+                    if ($acc === "" || $tenant === "") {
+                        $invalidCount++;
+                    }
+                }
+
+                if ($invalidCount > 0) {
+                    $blankWarning = "$invalidCount row" . ($invalidCount > 1 ? "s have" : " has") . " missing Account No. or Tenant Name and will not be saved.";
+                }
+
+            } catch (Exception $e) {
+                $strMsg = "Error reading Excel file: " . $e->getMessage();
+            }
+        }
+    } else {
+        $strMsg = "No file uploaded or upload error.";
+    }
+} elseif ($strMode == "CONFIRM") {
+    $strFile = $_POST['hidUploadedFile'];
+    if (!file_exists($strFile)) {
+        $strMsg = "Uploaded file not found.";
+    } else {
+        try {
+            $inputFileType = PHPExcel_IOFactory::identify($strFile);
+            $objReader = PHPExcel_IOFactory::createReader($inputFileType);
+            $objPHPExcel = $objReader->load($strFile);
+            $sheet = $objPHPExcel->getSheet(0);
+            $highestRow = $sheet->getHighestRow();
+            $ctr = 0;
+            $hdr_id = null;
+
+            for ($row = 2; $row <= $highestRow; $row++) {
+                $data = $sheet->rangeToArray("A{$row}:O{$row}", null, true, false);
+                $rowData = $data[0];
+
+                $col0 = strtolower(trim($rowData[0]));
+                $col1 = strtolower(trim($rowData[1]));
+                if ($col0 == "account no." && $col1 == "tenants") continue;
+
+                $acc = trim($rowData[0]);
+                $tenant = trim($rowData[1]);
+                if ($acc === "" || $tenant === "") continue;
+
+                if ($hdr_id === null) {
+                    $sqlquery = "exec sp_u_UploadAgingHeader_Save 0, '$strFile', '$dtAsOf', '$uid', '$company_code', '$strIPAddr'";
+                    $process = odbc_exec($sqlconnect, $sqlquery);
+                    if (odbc_fetch_row($process)) {
+                        $hdr_id = odbc_result($process, "wth_hdr_id");
+                    }
+                }
+
+                $cols = array();
+                foreach ($rowData as $col) {
+                    $cols[] = ($col === null || trim($col) === "") ? 0 : replacesinglequote($col);
+                }
+
+                while (count($cols) < 15) $cols[] = "";
+
+                $sqlquery = "exec sp_u_UploadAgingDetail_Save $hdr_id, 
+                    '{$cols[0]}', '{$cols[1]}', '{$cols[2]}', {$cols[3]}, {$cols[4]}, {$cols[5]}, {$cols[6]},
+                    {$cols[7]}, {$cols[8]}, {$cols[9]}, {$cols[10]}, {$cols[11]}, {$cols[12]}, 
+                    '{$cols[13]}', '{$cols[14]}'";
+
+                odbc_exec($sqlconnect, $sqlquery);
+                $ctr++;
+            }
+
+            $strMsg = "Successfully uploaded $ctr records.";
+        } catch (Exception $e) {
+            $strMsg = "Error processing file: " . $e->getMessage();
+        }
+    }
+} elseif ($strMode == "SEARCH") {
+    $sqlquery = "exec sp_u_UploadAging_Search '$dtAsOf', 'TENANT', '$strSearchValue'";
+	$searchResults = mssql_resultset($sqlquery);
+    // $process = odbc_exec($sqlconnect, $sqlquery);
+    // while (odbc_fetch_row($process)) {
+    //     $row = array();
+    //     for ($i = 1; $i <= odbc_num_fields($process); $i++) {
+    //         $row[] = odbc_result($process, $i);
+    //     }
+    //     $searchResults[] = $row;
+    // }
+
+	// echo "<pre>";
+	// print_r($searchResults);
+	// echo "</pre>";
+	// die();
+}
 ?>
-<html> 
-<head> 
-<title>UPLOAD AGING REPORT</title> 
-<link rel="stylesheet" href="style.css" type="text/css">
-<link rel="stylesheet" href="buttons.css" type="text/css">
-<link rel="stylesheet" type="text/css" media="screen,projection" href="buttonmenu.css">
-<script type="text/javascript" src="library/datepickercontrol/datepickercontrol.js"></script>
-<link type="text/css" rel="stylesheet" href="library/datepickercontrol/datepickercontrol_green.css">
-</head> 
-<body style="border:1px solid; border-color:gray; border-top:none; border-top-color:none; margin:'0';background-color: #F3F5B4;">
-<form name="frmUploadAging" id="frmUploadAging" method="post">
-	<div class="mainmenu">	
-		<ul>
-			  <li class="li_nc"><a name="MODULE NAME">UPLOAD AGING REPORT
-			  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-			  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Upload & Search Aging Report</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" rel="stylesheet">
+    <style>
+        .invalid-row td { background-color: #ffd6d6 !important; }
+    </style>
+</head>
+<body class="container my-4">
 
-			 </a></li>	
-			  <li class="li_nc"><a href="#" onClick="javascript:cmdSearch_OnClick()">|&nbsp;&nbsp;&nbsp;Search&nbsp;&nbsp;&nbsp;|</a></li>			  			  
-			  <li class="li_nc"><a href="#" onClick="javascript:cmdUpload_OnClick()">Upload&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|</a></li>			  			  
-			  <li class="li_nc"><a href="#" onClick="javascript:cmdClose_OnClick()">Close&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|</a></li>				  
-		</ul>
-	</div>
-	<table>
-		<tr>
-		<td width="10"></td>
-		<td>
-		<table>
-			<tr>
-				<td>
-					<table>
+<h2>Upload & Search Aging Report</h2>
+
+<?php if ($strMsg != ""): ?>
+    <div class="alert alert-info"><?php echo htmlspecialchars($strMsg); ?></div>
+<?php endif; ?>
+
+<?php if ($blankWarning != ""): ?>
+    <div class="alert alert-warning alert-dismissible fade show">
+        <?php echo $blankWarning; ?>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+<?php endif; ?>
+
+<ul class="nav nav-tabs mb-3" id="tabs">
+    <li class="nav-item">
+        <a class="nav-link <?php if ($strMode != 'SEARCH') echo 'active'; ?>" href="#upload" data-bs-toggle="tab">Upload</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link <?php if ($strMode == 'SEARCH') echo 'active'; ?>" href="#search" data-bs-toggle="tab">Search</a>
+    </li>
+</ul>
+
+<div class="tab-content">
+    <!-- Upload Tab -->
+    <div class="tab-pane fade <?php if ($strMode != 'SEARCH') echo 'show active'; ?>" id="upload">
+        <form method="post" enctype="multipart/form-data" class="mb-4">
+            <input type="hidden" name="hidMode" value="UPLOAD">
+            <div class="mb-3">
+                <label class="form-label">Excel File:</label>
+                <input type="file" name="txtFile" accept=".xls,.xlsx" class="form-control"<?php if ($strMode == 'CONFIRM') echo ' disabled'; ?>>
+            </div>
+            <div class="row g-2 mb-3">
+                <div class="col-md-3">
+                    <label class="form-label">As of Date:</label>
+                    <input type="text" id="DPC_txtDateFrom" name="DPC_txtDateFrom" value="<?php echo htmlspecialchars($dtAsOf); ?>" class="form-control" required>
+                </div>
+                <div class="col-md-9 d-flex align-items-end gap-2">
+                    <button type="submit" class="btn btn-primary">Upload</button>
+                    <?php if (count($previewData) > 0): ?>
+                        <button type="submit" name="hidMode" value="CONFIRM" class="btn btn-success">Confirm Upload</button>
+                        <input type="hidden" name="hidUploadedFile" value="<?php echo htmlspecialchars($strFile); ?>">
+                    <?php endif; ?>
+                </div>
+            </div>
+        </form>
+
+        <?php if (count($previewData) > 0): ?>
+            <div class="table-responsive">
+                <table class="table table-bordered table-sm">
+                    <thead class="table-secondary">
+                        <tr>
+                            <th>#</th>
+                            <th>Account No.</th><th>Tenant Name</th><th>Real Property</th><th>Total</th><th>Current</th>
+                            <th>Total Overdue</th><th>From 1 To 30</th><th>From 31 To 60</th><th>From 61 To 90</th>
+                            <th>From 91 To 120</th><th>From 121 To 150</th><th>Over 151</th>
+                            <th>For Write-Off</th><th>Remarks</th><th>Notice No.</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php $i = 1; foreach ($previewData as $row): ?>
+                            <?php
+                                $acc = trim($row[0]);
+                                $tenant = trim($row[1]);
+                                $isInvalid = ($acc === "" || $tenant === "");
+                            ?>
+                            <tr class="<?php echo $isInvalid ? 'invalid-row' : ''; ?>">
+                                <td><?php echo $i++; ?></td>
+                                <?php foreach ($row as $cell): ?>
+                                    <td><?php echo htmlspecialchars($cell); ?></td>
+                                <?php endforeach; ?>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
+        <?php endif; ?>
+    </div>
+
+    <!-- Search Tab -->
+    <div class="tab-pane fade <?php if ($strMode == 'SEARCH') echo 'show active'; ?>" id="search">
+		<form method="post" class="mb-3">
+			<input type="hidden" name="hidMode" value="SEARCH">
+			<div class="row g-3">
+				<div class="col-md-3">
+					<label class="form-label">As of Date:</label>
+					<input type="text" id="searchDate" name="DPC_txtDateFrom" value="<?php echo htmlspecialchars($dtAsOf); ?>" class="form-control" required>
+				</div>
+				<div class="col-md-4">
+					<label class="form-label">Sort By:</label>
+					<select name="cboSortBy" class="form-select">
+						<option value="TENANT"<?php if ($strSortBy == "TENANT") echo " selected"; ?>>Tenant</option>
+						<option value="REAL PROPERTY"<?php if ($strSortBy == "REAL PROPERTY") echo " selected"; ?>>Real Property</option>
+						<option value="SAP ACCOUNT CODE"<?php if ($strSortBy == "SAP ACCOUNT CODE") echo " selected"; ?>>SAP Account Code</option>
+						<option value="NOTICE NO."<?php if ($strSortBy == "NOTICE NO.") echo " selected"; ?>>Notice No.</option>
+					</select>
+				</div>
+				<div class="col-md-3">
+					<label class="form-label">Search Value:</label>
+					<input type="text" name="txtSearchValue" value="<?php echo htmlspecialchars($strSearchValue); ?>" class="form-control">
+				</div>
+				<div class="col-md-2 d-flex align-items-end">
+					<button type="submit" class="btn btn-secondary">Search</button>
+				</div>
+			</div>
+		</form>
+
+
+        <?php if (count($searchResults) > 0): ?>
+            <div class="table-responsive">
+                <table class="table table-bordered table-sm">
+					<thead class="table-secondary">
 						<tr>
-							<td>
-								<table>
-									<tr>
-										<td class="fieldname" align="right">INPUT FILE NAME :<em class="requiredRed">*</em></td>
-										<td width="10"></td>
-										<td><input type=text name="txtFile" id="txtFile" class="values" size="70" value="<?php echo $local_file;?>"></td>
-									</tr>	
-									<tr>
-										<td class="fieldname" align="right">AS OF (mm/dd/yyyy) :<em class="requiredRed">*</em></td>
-										<td width="10"></td>
-										<td><input type=text name="DPC_txtDateFrom" id="DPC_txtDateFrom" class="values" size="20" maxlength="10" value="<?php echo $dtAsOf; ?>"></td>
-									</tr>	
-									<tr>
-										<td class="fieldname" align="right">SEARCH AND SORT BY :</td>
-										<td width="10"></td>
-									  <td>
-											<select name="cboSortBy" id="cboSortBy" class="values">												
-												<?php if ($strSortBy == "" || $strSortBy == "TENANT") {?>
-													<option selected value="TENANT">Tenant</option>
-													<option value="REAL PROPERTY">Real Property</option>													
-													<option value="SAP ACCOUNT CODE">SAP Account Code</option>
-													<option value="NOTICE NO.">Notice No.</option>													
-												<?php } else if ($strSortBy == "REAL PROPERTY") { ?>
-													<option value="TENANT">Tenant</option>
-													<option selected value="REAL PROPERTY">Real Property</option>													
-													<option value="SAP ACCOUNT CODE">SAP Account Code</option>				
-													<option value="NOTICE NO.">Notice No.</option>											
-												<?php } else if ($strSortBy == "SAP ACCOUNT CODE") { ?>
-													<option value="TENANT">Tenant</option>
-													<option value="REAL PROPERTY">Real Property</option>													
-													<option selected value="SAP ACCOUNT CODE">SAP Account Code</option>		
-													<option value="NOTICE NO.">Notice No.</option>		
-												<?php } else { ?>
-													<option value="TENANT">Tenant</option>
-													<option value="REAL PROPERTY">Real Property</option>													
-													<option value="SAP ACCOUNT CODE">SAP Account Code</option>		
-													<option selected value="NOTICE NO.">Notice No.</option>													
-												<?php } ?>
-											</select>
-										</td>
-									</tr>			
-									<tr>
-										<td class="fieldname" align="right">VALUE :</td>
-										<td width="10"></td>
-										<td><input type=text name="txtSearchValue" id="txtSearchValue" class="values" size="50" maxlength="100" value="<?php echo $strSearchValue; ?>" onKeyUp="javascript:txtKeyword_onKeyUp(event)"></td>
-									</tr>				
-									<tr>
-										<td class="fieldname">&nbsp;</td>
-										<td width="10">&nbsp;</td>
-										<td>&nbsp;</td>
-									</tr>																	
-								</table>
-							</td>
-						</tr>						
-					</table>					
-					<table width="3000" style="border:1px solid #556b2f;padding: 30px 10px 5px; width:auto;">
-						<tr height="30">
-							<td width="41" align="center"  class="tablehdr">&nbsp;#&nbsp;
-							</td>
-							<td width="146" align="center"  class="tablehdr">&nbsp;Account No.&nbsp;
-							</td>
-							<td width="101" align="center"  class="tablehdr">&nbsp;Tenant Name&nbsp;
-							</td>													
-							<td width="272" align="center"  class="tablehdr">&nbsp;Real Property&nbsp;
-							</td>							
-							<td width="119" align="center"  class="tablehdr">&nbsp;Total&nbsp;
-							</td>	
-							<td width="119" align="center"  class="tablehdr">&nbsp;Current&nbsp;
-							</td>	
-							<td width="119" align="center"  class="tablehdr">&nbsp;Total Overdue&nbsp;
-							</td>	
-							<td width="119" align="center"  class="tablehdr">&nbsp;From 1 To 30&nbsp;
-							</td>	
-							<td width="119" align="center"  class="tablehdr">&nbsp;From 31 To 60&nbsp;
-							</td>	
-							<td width="119" align="center"  class="tablehdr">&nbsp;From 61 To 90&nbsp;
-							</td>	
-							<td width="119" align="center"  class="tablehdr">&nbsp;From 91 To 120&nbsp;
-							</td>	
-							<td width="119" align="center"  class="tablehdr">&nbsp;From 121 To 150&nbsp;
-							</td>	
-							<td width="119" align="center"  class="tablehdr">&nbsp;Over 151&nbsp;
-							</td>	
-							<td width="119" align="center"  class="tablehdr">&nbsp;For Write-Off&nbsp;
-							</td>	
-							<td width="119" align="center"  class="tablehdr">&nbsp;Remarks&nbsp;
-							</td>	
-							<td width="119" align="center"  class="tablehdr">&nbsp;Notice No.&nbsp;
-							</td>												
-						</tr>	
-						<?php	
-						$ctr = 0;		
-						//echo $sqlquery;
-						while(odbc_fetch_row($process)) {
-							$ctr++;
-							$sap_code = replacedoublequotes(odbc_result($process,"wta_sap_code")); 
-							$tenant_name = replacedoublequotes(odbc_result($process,"wta_tenant_name")); 
-							$real_property = replacedoublequotes(odbc_result($process,"wta_real_property_name")); 
-							if (odbc_result($process,"wta_total_balance")==0)
-								$total_balance = "";
-							else
-								$total_balance = replacedoublequotes(odbc_result($process,"wta_total_balance")); 
-								
-							$gt_total_balance = $gt_total_balance + $total_balance;
-								
-							if (odbc_result($process,"wta_curr_balance")==0)
-								$curr_balance = "";
-							else
-								$curr_balance = replacedoublequotes(odbc_result($process,"wta_curr_balance")); 
-							
-							$gt_curr_balance = $gt_curr_balance + $curr_balance;
-							
-							if (odbc_result($process,"wta_total_overdue")==0)	
-								$total_overdue = "";
-							else	
-								$total_overdue = replacedoublequotes(odbc_result($process,"wta_total_overdue")); 
-								
-							$gt_total_overdue = $gt_total_overdue + $total_overdue;
-								
-							if (odbc_result($process,"wta_aging_1_30")==0)
-								$aging_1_30 = "";
-							else
-								$aging_1_30 = replacedoublequotes(odbc_result($process,"wta_aging_1_30")); 
-								
-							$gt_aging_1_30 = $gt_aging_1_30 + $aging_1_30;
-								
-							if (odbc_result($process,"wta_aging_31_60")==0)
-								$aging_31_60 = "";
-							else
-								$aging_31_60 = replacedoublequotes(odbc_result($process,"wta_aging_31_60")); 
-								
-							$gt_aging_31_60 = $gt_aging_31_60 + $aging_31_60;
-								
-							if (odbc_result($process,"wta_aging_61_90")==0)
-								$aging_61_90 = "";
-							else
-								$aging_61_90 = replacedoublequotes(odbc_result($process,"wta_aging_61_90")); 
-								
-							$gt_aging_61_90 = $gt_aging_61_90 + $aging_61_90;
-							
-							if (odbc_result($process,"wta_aging_91_120")==0)
-								$aging_91_120 = "";
-							else
-								$aging_91_120 = replacedoublequotes(odbc_result($process,"wta_aging_91_120")); 
-							
-							$gt_aging_91_120 = $gt_aging_91_120 + $aging_91_120;
-								
-							if (odbc_result($process,"wta_aging_121_150")==0)
-								$aging_121_150 = "";
-							else
-								$aging_121_150 = replacedoublequotes(odbc_result($process,"wta_aging_121_150")); 
-								
-							$gt_aging_121_150 = $gt_aging_121_150 + $aging_121_150;
-							
-							if (odbc_result($process,"wta_aging_over_151")==0)
-								$aging_over_151 = "";
-							else
-								$aging_over_151 = replacedoublequotes(odbc_result($process,"wta_aging_over_151")); 
-								
-							$gt_aging_over_151 = $gt_aging_over_151 + $aging_over_151;
-								
-							if (odbc_result($process,"wta_write_off")==0)
-								$write_off = "";
-							else
-								$write_off = replacedoublequotes(odbc_result($process,"wta_write_off")); 
-								
-							$gt_write_off = $gt_write_off + $write_off;
-								
-							$remarks = replacedoublequotes(odbc_result($process,"wta_remarks")); 
-							$notice_no = replacedoublequotes(odbc_result($process,"wta_notice_no")); 
-							
-							if ($ctr%2==1) 
-								$rowColor = "98fb98";	
-							else
-								$rowColor = "ffffe0";		
-							
-						?>
-							<tr bgcolor="<?php echo "$rowColor" ?>">
-								<td align="right" class="values"><?php echo "$ctr";?>&nbsp;</td>
-								<td  style="border:1px" class="values">&nbsp;<?php echo "$sap_code";?>&nbsp;
-								</td>
-								<td style="border:1px" class="values">&nbsp;<?php echo "$tenant_name";?>&nbsp;
-								</td>							
-								<td  style="border:1px" class="values">&nbsp;<?php echo "$real_property";?>&nbsp;
-								</td>							
-								<td  style="border:1px" class="values" align="right"><?php echo "$total_balance";?>&nbsp;
-								</td>
-								<td  style="border:1px" class="values" align="right"><?php echo "$curr_balance";?>&nbsp;
-								</td>
-								<td  style="border:1px" class="values" align="right"><?php echo "$total_overdue";?>&nbsp;
-								</td>
-								<td  style="border:1px" class="values" align="right"><?php echo "$aging_1_30";?>&nbsp;
-								</td>
-								<td  style="border:1px" class="values" align="right"><?php echo "$aging_31_60";?>&nbsp;
-								</td>
-								<td  style="border:1px" class="values" align="right"><?php echo "$aging_61_90";?>&nbsp;
-								</td>
-								<td  style="border:1px" class="values" align="right"><?php echo "$aging_91_120";?>&nbsp;
-								</td>
-								<td  style="border:1px" class="values" align="right"><?php echo "$aging_121_150";?>&nbsp;
-								</td>
-								<td  style="border:1px" class="values" align="right"><?php echo "$aging_over_151";?>&nbsp;
-								</td>
-								<td  style="border:1px" class="values">&nbsp;<?php echo "$write_off";?>
-								</td>
-								<td  style="border:1px" class="values">&nbsp;<?php echo "$remarks";?>
-								</td>
-								<td  style="border:1px" class="values">&nbsp;<?php echo "$notice_no";?>
-								</td>
+							<th>#</th>
+							<th>Account No.</th><th>Tenant Name</th><th>Real Property</th><th>Total</th><th>Current</th>
+							<th>Total Overdue</th><th>From 1 To 30</th><th>From 31 To 60</th><th>From 61 To 90</th>
+							<th>From 91 To 120</th><th>From 121 To 150</th><th>Over 151</th>
+							<th>For Write-Off</th><th>Remarks</th><th>Notice No.</th>
+						</tr>
+					</thead>
+                    <tbody>
+						<?php for ($j = 0; $j < count($searchResults); $j++): ?>
+							<tr>
+								<td><?php echo $j + 1; ?></td>
+								<td><?php echo htmlspecialchars($searchResults[$j]['wta_sap_code']); ?></td>
+								<td><?php echo htmlspecialchars($searchResults[$j]['wta_tenant_name']); ?></td>
+								<td><?php echo htmlspecialchars($searchResults[$j]['wta_real_property_name']); ?></td>
+								<td align="right"><?php echo number_format($searchResults[$j]['wta_total_balance'], 2); ?></td>
+								<td align="right"><?php echo number_format($searchResults[$j]['wta_curr_balance'], 2); ?></td>
+								<td align="right"><?php echo number_format($searchResults[$j]['wta_total_overdue'], 2); ?></td>
+								<td align="right"><?php echo number_format($searchResults[$j]['wta_aging_1_30'], 2); ?></td>
+								<td align="right"><?php echo number_format($searchResults[$j]['wta_aging_31_60'], 2); ?></td>
+								<td align="right"><?php echo number_format($searchResults[$j]['wta_aging_61_90'], 2); ?></td>
+								<td align="right"><?php echo number_format($searchResults[$j]['wta_aging_91_120'], 2); ?></td>
+								<td align="right"><?php echo number_format($searchResults[$j]['wta_aging_121_150'], 2); ?></td>
+								<td align="right"><?php echo number_format($searchResults[$j]['wta_aging_over_151'], 2); ?></td>
+								<td align="right"><?php echo number_format($searchResults[$j]['wta_write_off'], 2); ?></td>
+								<td><?php echo htmlspecialchars($searchResults[$j]['wta_remarks']); ?></td>
+								<td><?php echo htmlspecialchars($searchResults[$j]['wta_notice_no']); ?></td>
 							</tr>
-						<?php } 
-							if ($ctr%2==1) 
-								$rowColor = "ffffe0";	
-							else
-								$rowColor = "98fb98";	
-						?>
-							<tr bgcolor="<?php echo "$rowColor" ?>" height="50">
-								<td align="right" class="values">&nbsp;</td>
-								<td  class="values" style="border:1px; color:red; font-size:14px; font-weight:bold">&nbsp;TOTAL
-								</td>
-								<td style="border:1px" class="values">&nbsp;
-								</td>							
-								<td  style="border:1px" class="values">&nbsp;
-								</td>							
-								<td class="values" style="border:1px; color:red; font-size:14px; font-weight:bold" align="right">&nbsp;<?php echo numberformat("$gt_total_balance");?>&nbsp;
-								</td>
-								<td class="values" style="border:1px; color:red; font-size:14px; font-weight:bold" align="right">&nbsp;<?php echo numberformat("$gt_curr_balance");?>&nbsp;
-								</td>
-								<td class="values" style="border:1px; color:red; font-size:14px; font-weight:bold" align="right">&nbsp;<?php echo numberformat("$gt_total_overdue");?>&nbsp;
-								</td>
-								<td class="values" style="border:1px; color:red; font-size:14px; font-weight:bold" align="right">&nbsp;<?php echo numberformat("$gt_aging_1_30");?>&nbsp;
-								</td>
-								<td class="values" style="border:1px; color:red; font-size:14px; font-weight:bold" align="right">&nbsp;<?php echo numberformat("$gt_aging_31_60");?>&nbsp;
-								</td>
-								<td class="values" style="border:1px; color:red; font-size:14px; font-weight:bold" align="right">&nbsp;<?php echo numberformat("$gt_aging_61_90");?>&nbsp;
-								</td>
-								<td class="values" style="border:1px; color:red; font-size:14px; font-weight:bold" align="right">&nbsp;<?php echo numberformat("$gt_aging_91_120");?>&nbsp;
-								</td>
-								<td class="values" style="border:1px; color:red; font-size:14px; font-weight:bold" align="right">&nbsp;<?php echo numberformat("$gt_aging_121_150");?>&nbsp;
-								</td>
-								<td class="values" style="border:1px; color:red; font-size:14px; font-weight:bold" align="right">&nbsp;<?php echo numberformat("$gt_aging_over_151");?>&nbsp;
-								</td>
-								<td class="values" style="border:1px; color:red; font-size:14px; font-weight:bold" align="right">&nbsp;<?php echo numberformat("$gt_write_off");?>&nbsp;
-								</td>
-								<td  style="border:1px" class="values">&nbsp;
-								</td>
-								<td  style="border:1px" class="values">&nbsp;
-								</td>
-							</tr>
-					</table>			
-				</td>
-			</tr>
-		</table>
-		</td>
-		</tr>
-	</table>
-	<input type="hidden" id="hidMode" name="hidMode">
-	<input type="hidden" id="hidSaveMode" name="hidSaveMode" value="<?php echo $strSaveMode; ?>">
-	<input type="hidden" id="hidRowCtr" name="hidRowCtr" value=<?php echo $ctr;?>>
-	<input type="hidden" id="hidCurRow" name="hidCurRow">
-	<input type="hidden" id="hidRealPropertyName" name="hidRealPropertyName" value=<?php echo $strRealPropertyName;?>>
-	<input type="hidden" id="hidDateUploaded" name="hidDateUploaded" value="<?php echo $date_uploaded ; ?>">
-	<input type="hidden" id="hidMenuID" name="hidMenuID" value=<?php echo $menu_id;?>>
-</form>
-</body> 
-</html>
+						<?php endfor; ?>
+						</tbody>
+                </table>
+            </div>
+        <?php elseif ($strMode == 'SEARCH'): ?>
+            <p class="text-muted">No results found.</p>
+        <?php endif; ?>
+    </div>
+</div>
 
-<script language="javascript" src="jsp/function.js"></script>
-<script type="text/javascript">
-function hov(loc,cls) {   
-	if(loc.className)   
-	loc.className=cls;   
-} 
-
-function save_text()
-   {
-   var w = frmUploadAging.cboRealProperty.selectedIndex;
-   frmUploadAging.hidRealPropertyName.value = frmUploadAging.cboRealProperty.options[w].text;
-   cmdSearch_OnClick();
-   }
-
-function txtKeyword_onKeyUp(e) {
-	if (e.keyCode==13) {
-		cmdSearch_OnClick();
-	}
-}
-
-function chkSelectAll_OnClick() {
-	var ctr
-	ctr = frmUploadAging.hidRowCtr.value;
-	for (i=1;i<=ctr;i++) {
-		obj = eval("frmUploadAging.chkSelect" + i);
-		if (frmUploadAging.chkSelectAll.checked == true) {
-			obj.checked = true;
-		}
-		else {
-			obj.checked = false;
-		}
-	}
-}
-
-function cmdSearch_OnClick() {	
-	frmUploadAging.hidMode.value = "SEARCH";
-	frmUploadAging.submit();
-}
-
-function cmdUpload_OnClick() {
-	if (trim(frmUploadAging.txtFile.value) == "") {
-		alert("Select file first")
-		frmUploadAging.txtFile.focus()
-		return false
-	}
-	if (Right(frmUploadAging.txtFile.value,4) != ".xls" && Right(frmUploadAging.txtFile.value,5) != ".xlsx") {
-		alert("Selected file should be in excel format (*.xls or *.xlsx)")
-		frmUploadAging.txtFile.focus()
-		return false
-	}
-	if (frmUploadAging.DPC_txtDateFrom.value == "") {
-		alert("Please provide As Of Date")
-		frmUploadAging.DPC_txtDateFrom.focus()
-		return false
-	}
-	if (frmUploadAging.DPC_txtDateFrom.value != "") {
-		if (isDate(frmUploadAging.DPC_txtDateFrom.value)==false) {
-			frmUploadAging.DPC_txtDateFrom.focus()
-			return false
-		}
-	}
-	frmUploadAging.hidMode.value = "UPLOAD";
-	frmUploadAging.submit();
-}
-
-function cmdClose_OnClick() {
-	parent.frames[2].location = "blank.htm";
-	return false;
-}
-
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script>
+    flatpickr("#DPC_txtDateFrom", { dateFormat: "m/d/Y" });
+    flatpickr("#searchDate", { dateFormat: "m/d/Y" });
 </script>
+</body>
+</html>
