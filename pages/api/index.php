@@ -54,24 +54,23 @@ function BatchGenerateInvoicePdf(){
     // sleep(5);
     /* debuggers side */		
     try {
-        $sqlquery = "SELECT 
-                        ROW_NUMBER() OVER (ORDER BY (SELECT NULL)) AS row_id
-                        ,CAST(CASE WHEN folio_number='N/A' THEN '' ELSE folio_number END AS INT) FolioNo
-                        ,F.folio_invoice_number
-                        -- ,F.folio_date
-                        ,CONVERT(VARCHAR(10),CAST(F.folio_date AS datetime),126) AS folio_date
-                        ,F.folio_guest_name
-                        ,CAST(F.folio_charges AS NUMERIC(18,2)) AS folio_charges
-                        ,CAST(F.folio_tax AS NUMERIC(18,2)) AS folio_tax
-                        ,ABS(CAST(folio_credit AS NUMERIC(18,2))) AS folio_total
-                        ,S.status_color 
-                        ,F.folio_status
-                    FROM UploadedFolios F 
-                    LEFT JOIN Statuses S ON S.status_for='reserve' AND S.status_name=F.folio_status 
-                    WHERE LOWER(folio_status) NOT IN('void','cancel','no show','due out','pos')
-                        AND CONVERT(datetime,folio_date) BETWEEN CONVERT(datetime,'".$return['start_date']."') AND CONVERT(datetime,'".$return['end_date']."') ORDER BY FolioNo";
+        $sqlquery = "sp_u_Send_Invoice_Alert_List";
         // die($sqlquery);
         $results = mssql_resultset($sqlquery);
+
+        foreach ($results as $entry) {            
+            $pdf_file_name = trim($entry['pdf_file_name'] ?? '');
+            $attachment_file = INVOICE_DIRECTORY . $pdf_file_name . '.pdf';
+        
+            $attachment_status = file_exists($attachment_file) ? "Valid" : "Invalid";
+        
+            if (empty($email_add)) {
+                $invalidEmails++;
+            }
+            if (!file_exists($attachment_file)) {
+                $invalidAttachments++;
+            }
+        }
         
     }
     catch(Exception $e) {   
