@@ -4,20 +4,17 @@ require_once("system/mail_smtp.php");
 
 header('Content-Type: application/json');
 
-// ✅ Connect to DB
 $dns = setup_dns(DB_HOST, DB_NAME);
 
-// ✅ Read flags and batch data
 $read_only = isset($_POST['read_only']) ? intval($_POST['read_only']) : 1;
 $batchData = isset($_POST['batch']) ? json_decode($_POST['batch'], true) : [];
 
-// ✅ Setup log file
 $logPath = __DIR__ . '/logs/invoice_send_' . date('Ymd') . '.log';
 if (!file_exists(dirname($logPath))) {
     mkdir(dirname($logPath), 0777, true);
 }
 
-// ✅ Logging helper with safe characters
+// Logging helper
 function log_to_file($message, $path) {
     $clean = preg_replace('/[^\x20-\x7E]/', '', $message);
     $clean = str_replace(["\r", "\n", "\t"], ' ', $clean);
@@ -26,7 +23,6 @@ function log_to_file($message, $path) {
     $clean = trim($clean);
     $timestamped = "[" . date('Y-m-d H:i:s') . "] $clean\n";
 
-    // Prepend by reading + writing
     if (file_exists($path)) {
         $existing = file_get_contents($path);
         file_put_contents($path, $timestamped . $existing);
@@ -35,10 +31,9 @@ function log_to_file($message, $path) {
     }
 }
 
-
-// ✅ Process each invoice record
 $successCount = 0;
 $totalCount = count($batchData);
+$errors = [];
 $hasFailures = false;
 
 foreach ($batchData as $entry) {
@@ -50,24 +45,31 @@ foreach ($batchData as $entry) {
     $email_raw    = trim($entry['email_address']);
     $filepath     = trim($entry['attachment_file'] ?? '');
 
-    // ✅ Parse and validate emails
-    $emails = array_filter(array_map('trim', explode(";", $email_raw)), function ($email) {
-        return filter_var($email, FILTER_VALIDATE_EMAIL);
-    });
+    $original_email = $email_raw;
+    $emails = extract_valid_emails($email_raw);
 
     if (empty($emails)) {
-        log_to_file("[SKIPPED] Invoice $invoice_no - missing or invalid email", $logPath);
+        $msg = "Invoice $invoice_no: Missing or invalid email address.";
+        $errors[] = $msg;
+        log_to_file("[SKIPPED] $msg", $logPath);
         $hasFailures = true;
         continue;
+    }
+
+    if ($email_raw !== implode("; ", $emails)) {
+        $msg = "Invoice $invoice_no: Raw email partially sanitized. Original: [$original_email] → Sanitized: [" . implode("; ", $emails) . "]";
+        $errors[] = $msg;
+        log_to_file("[NOTICE] $msg", $logPath);
     }
 
     if (empty($filepath) || !file_exists($filepath)) {
-        log_to_file("[SKIPPED] Invoice $invoice_no - file not found: $filepath", $logPath);
+        $msg = "Invoice $invoice_no: Attachment file not found at $filepath";
+        $errors[] = $msg;
+        log_to_file("[SKIPPED] $msg", $logPath);
         $hasFailures = true;
         continue;
     }
 
-    // ✅ Prepare attachment
     $filename = basename($filepath);
     $attachments = [[
         'path' => $filepath,
@@ -76,7 +78,6 @@ foreach ($batchData as $entry) {
         'typeencoding' => 'application/octet-stream'
     ]];
 
-    // ✅ Recipients
     $cc = ['rms_sysadmin@tanholdings.com'];
     $bcc = ['aldrich_delossantos@tanholdings.com', 'nat_angeles@tanholdings.com'];
 
@@ -88,11 +89,9 @@ foreach ($batchData as $entry) {
         if ($emailSent) {
             $emailList = implode(";", $emails);
 
-            // ✅ Update invoice status
             $sql1 = "EXEC sp_u_Send_Invoice_Alert_Update @invoice_no='$invoice_no', @email_addr='$emailList'";
             mssql_resultset($sql1, $dns);
 
-            // ✅ Log to alert table
             $sql2 = "EXEC sp_s_EmailAlert_Log 
                 @eal_date_time='" . gmdate('Y-m-d H:i:s') . "', 
                 @eal_alert_type='INVOICE-$invoice_no',
@@ -109,7 +108,9 @@ foreach ($batchData as $entry) {
             log_to_file("[SUCCESS] Invoice $invoice_no sent to $emailList", $logPath);
             $successCount++;
         } else {
-            log_to_file("[FAILED] Invoice $invoice_no - email send failed", $logPath);
+            $msg = "Invoice $invoice_no: Email send failed.";
+            $errors[] = $msg;
+            log_to_file("[FAILED] $msg", $logPath);
             $hasFailures = true;
         }
 
@@ -119,9 +120,15 @@ foreach ($batchData as $entry) {
     }
 }
 
-// ✅ Final response
+if ($read_only && $totalCount > 0) {
+    $delay = rand(1, 5);
+    sleep($delay);
+    log_to_file("[READ-ONLY] Batch delay of {$delay} second(s) applied.", $logPath);
+}
+
 echo json_encode([
     'status' => $hasFailures ? 'partial' : 'success',
     'processed' => $successCount,
-    'total' => $totalCount
+    'total' => $totalCount,
+    'errors' => $errors
 ]);
