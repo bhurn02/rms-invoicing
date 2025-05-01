@@ -294,6 +294,16 @@ $(document).ready(function () {
     sendNextBatch();
   });
 
+  $('#generatePDF').on('click', function () {
+    var ajaxGeneratePDF = fetchData($.param({
+                                        "action": 'batchgenerateinvoicepdf' // INVOICE DETAILS                                                                                
+                                    }), localAPI, "POST");
+       
+    $.when(ajaxGeneratePDF).then(function(response) {
+      console.log(response);
+    });
+  });
+
   $('#cancelProcess').on('click', function () {
     isCancelled = true;
     $('#cancelProcess').prop('disabled', true).text('Cancelling...');
