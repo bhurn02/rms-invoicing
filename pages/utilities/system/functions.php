@@ -341,4 +341,30 @@ function utf8_encode_deep(&$input) {
 	}
 }
 
+/**
+ * Sanitize and extract valid email addresses from a messy string.
+ * Supports multiple delimiters, quotes, CC/BCC prefixes, and parentheses.
+ *
+ * @param string $input Raw email string (comma/semicolon/quoted/CC:/BCC:)
+ * @return array List of valid email addresses
+ */
+function extract_valid_emails($raw) {
+    // Remove quotes, parentheses, and labels like CC, TO, etc.
+    $clean = preg_replace('/[\'"()]/', '', $raw);
+    $clean = preg_replace('/\b(CC|BCC|TO)\s*:?/i', '', $clean);
+
+    // Normalize delimiters
+    $clean = str_replace([';', "\n", "\r"], ',', $clean);
+
+    // Split by commas and validate each
+    $parts = array_map('trim', explode(',', $clean));
+
+    $valid = array_filter($parts, function ($email) {
+        return filter_var($email, FILTER_VALIDATE_EMAIL);
+    });
+
+    return array_values($valid); // Re-index
+}
+
+
 ?>

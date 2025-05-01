@@ -1,0 +1,85 @@
+[2025-04-03 10:37:25] [READ-ONLY] Batch delay of 2 second(s) applied.
+[2025-04-03 10:37:23] [READ-ONLY] Simulated send for invoice FT D 25-04-0019
+[2025-04-03 10:37:23] [READ-ONLY] Simulated send for invoice FT D 25-04-0016
+[2025-04-03 10:37:23] [READ-ONLY] Simulated send for invoice FT D 25-04-0007
+[2025-04-03 10:37:23] [READ-ONLY] Simulated send for invoice FT D 25-04-0004
+[2025-04-03 10:37:23] [READ-ONLY] Simulated send for invoice FT D 25-04-0002
+[2025-04-03 10:37:22] [READ-ONLY] Batch delay of 3 second(s) applied.
+[2025-04-03 10:37:19] [READ-ONLY] Simulated send for invoice FT D 25-04-0001
+[2025-04-03 10:37:19] [READ-ONLY] Simulated send for invoice FT C 25-04-0034
+[2025-04-03 10:37:19] [READ-ONLY] Simulated send for invoice FT C 25-04-0031
+[2025-04-03 10:37:19] [READ-ONLY] Simulated send for invoice FT C 25-04-0028
+[2025-04-03 10:37:19] [READ-ONLY] Simulated send for invoice FT C 25-04-0002
+[2025-04-03 10:37:19] [READ-ONLY] Batch delay of 3 second(s) applied.
+[2025-04-03 10:37:16] [READ-ONLY] Simulated send for invoice FT B 25-04-0018
+[2025-04-03 10:37:16] [READ-ONLY] Simulated send for invoice FT B 25-04-0015
+[2025-04-03 10:37:16] [READ-ONLY] Simulated send for invoice FT B 25-04-0009
+[2025-04-03 10:37:16] [READ-ONLY] Simulated send for invoice FT B 25-04-0001
+[2025-04-03 10:37:16] [READ-ONLY] Simulated send for invoice FT A 25-04-0023
+[2025-04-03 10:37:16] [NOTICE] Invoice FT A 25-04-0023 Raw email partially sanitized. Original ['julietagathamendoza@yahoo.com']  Sanitized [julietagathamendoza@yahoo.com]
+[2025-04-03 10:37:15] [READ-ONLY] Batch delay of 4 second(s) applied.
+[2025-04-03 10:37:11] [READ-ONLY] Simulated send for invoice FT A 25-04-0022
+[2025-04-03 10:37:11] [READ-ONLY] Simulated send for invoice FT A 25-04-0015
+[2025-04-03 10:37:11] [READ-ONLY] Simulated send for invoice FT A 25-04-0010
+[2025-04-03 10:37:11] [READ-ONLY] Simulated send for invoice FT A 25-04-0009
+[2025-04-03 10:37:11] [READ-ONLY] Simulated send for invoice FT A 25-04-0006
+[2025-04-03 09:43:24] [READ-ONLY] Batch delay of 2 second(s) applied.
+[2025-04-03 09:43:22] [READ-ONLY] Simulated send for invoice WT 25-04-0020
+[2025-04-03 09:43:22] [NOTICE] Invoice WT 25-04-0020 Raw email partially sanitized. Original [gzapanta@nmifa.com, magie_chavez@tanholdings.com]  Sanitized [gzapanta@nmifa.com; magie_chavez@tanholdings.com]
+[2025-04-03 09:43:22] [READ-ONLY] Simulated send for invoice WT 25-04-0009
+[2025-04-03 09:43:21] [READ-ONLY] Batch delay of 1 second(s) applied.
+[2025-04-03 09:43:20] [READ-ONLY] Simulated send for invoice WT 25-04-0001
+[2025-04-03 09:43:20] [READ-ONLY] Simulated send for invoice TSL 25-04-0009
+[2025-04-03 09:43:20] [NOTICE] Invoice TSL 25-04-0009 Raw email partially sanitized. Original [asm24@sbcglobal.net, nlimbo.dds@gmail.comCC  (accounting@mdcsaipan.com)]  Sanitized [asm24@sbcglobal.net; nlimbo.dds@gmail.com; accounting@mdcsaipan.com]
+[2025-04-03 09:43:20] [SKIPPED] Invoice TSL 25-04-0001 Attachment file not found at CSystemrmspagesutilitiespdfASSURANCE BROKERS INC. DBA AB RISK SOLUTIONS-INVOICE-TSL 25-04-0001.pdf
+[2025-04-03 09:43:20] [READ-ONLY] Simulated send for invoice SVT 25-04-0023
+[2025-04-03 09:43:20] [READ-ONLY] Simulated send for invoice SVT 25-04-0019
+[2025-04-03 09:43:20] [READ-ONLY] Batch delay of 5 second(s) applied.
+[2025-04-03 09:43:15] [READ-ONLY] Simulated send for invoice OVT 25-04-0005
+[2025-04-03 09:43:15] [READ-ONLY] Simulated send for invoice LNH 25-04-0017
+[2025-04-03 09:43:15] [READ-ONLY] Simulated send for invoice LNH 25-04-0014
+[2025-04-03 09:43:15] [READ-ONLY] Simulated send for invoice LNH 25-04-0009
+[2025-04-03 09:43:15] [READ-ONLY] Simulated send for invoice LNH 25-04-0004
+[2025-04-03 09:43:14] [READ-ONLY] Batch delay of 5 second(s) applied.
+[2025-04-03 09:43:09] [READ-ONLY] Simulated send for invoice LNH 25-04-0001
+[2025-04-03 09:43:09] [READ-ONLY] Simulated send for invoice JPC 25-04-0009
+[2025-04-03 09:43:09] [READ-ONLY] Simulated send for invoice GC B 25-04-0021
+[2025-04-03 09:43:09] [READ-ONLY] Simulated send for invoice GC B 25-04-0020
+[2025-04-03 09:43:09] [READ-ONLY] Simulated send for invoice GC B 25-04-0019
+[2025-04-03 09:43:08] [READ-ONLY] Batch delay of 2 second(s) applied.
+[2025-04-03 09:43:06] [READ-ONLY] Simulated send for invoice GC B 25-04-0018
+[2025-04-03 09:43:06] [READ-ONLY] Simulated send for invoice GC B 25-04-0015
+[2025-04-03 09:43:06] [READ-ONLY] Simulated send for invoice GC B 25-04-0007
+[2025-04-03 09:43:06] [READ-ONLY] Simulated send for invoice GC A 25-04-0018
+[2025-04-03 09:43:06] [READ-ONLY] Simulated send for invoice GC A 25-04-0016
+[2025-04-03 09:43:06] [READ-ONLY] Batch delay of 3 second(s) applied.
+[2025-04-03 09:43:03] [READ-ONLY] Simulated send for invoice GC A 25-04-0010
+[2025-04-03 09:43:03] [READ-ONLY] Simulated send for invoice GC A 25-04-0009
+[2025-04-03 09:43:03] [READ-ONLY] Simulated send for invoice GC A 25-04-0007
+[2025-04-03 09:43:03] [READ-ONLY] Simulated send for invoice GC A 25-04-0002
+[2025-04-03 09:43:03] [READ-ONLY] Simulated send for invoice GC A 25-04-0001
+[2025-04-03 09:43:02] [READ-ONLY] Batch delay of 3 second(s) applied.
+[2025-04-03 09:42:59] [READ-ONLY] Simulated send for invoice FT D 25-04-0019
+[2025-04-03 09:42:59] [READ-ONLY] Simulated send for invoice FT D 25-04-0016
+[2025-04-03 09:42:59] [READ-ONLY] Simulated send for invoice FT D 25-04-0007
+[2025-04-03 09:42:59] [READ-ONLY] Simulated send for invoice FT D 25-04-0004
+[2025-04-03 09:42:59] [READ-ONLY] Simulated send for invoice FT D 25-04-0002
+[2025-04-03 09:42:59] [READ-ONLY] Batch delay of 5 second(s) applied.
+[2025-04-03 09:42:54] [READ-ONLY] Simulated send for invoice FT D 25-04-0001
+[2025-04-03 09:42:54] [READ-ONLY] Simulated send for invoice FT C 25-04-0034
+[2025-04-03 09:42:54] [READ-ONLY] Simulated send for invoice FT C 25-04-0031
+[2025-04-03 09:42:54] [READ-ONLY] Simulated send for invoice FT C 25-04-0028
+[2025-04-03 09:42:54] [READ-ONLY] Simulated send for invoice FT C 25-04-0002
+[2025-04-03 09:42:53] [READ-ONLY] Batch delay of 3 second(s) applied.
+[2025-04-03 09:42:50] [READ-ONLY] Simulated send for invoice FT B 25-04-0018
+[2025-04-03 09:42:50] [READ-ONLY] Simulated send for invoice FT B 25-04-0015
+[2025-04-03 09:42:50] [READ-ONLY] Simulated send for invoice FT B 25-04-0009
+[2025-04-03 09:42:50] [READ-ONLY] Simulated send for invoice FT B 25-04-0001
+[2025-04-03 09:42:50] [READ-ONLY] Simulated send for invoice FT A 25-04-0023
+[2025-04-03 09:42:50] [NOTICE] Invoice FT A 25-04-0023 Raw email partially sanitized. Original ['julietagathamendoza@yahoo.com']  Sanitized [julietagathamendoza@yahoo.com]
+[2025-04-03 09:42:50] [READ-ONLY] Batch delay of 3 second(s) applied.
+[2025-04-03 09:42:47] [READ-ONLY] Simulated send for invoice FT A 25-04-0022
+[2025-04-03 09:42:47] [READ-ONLY] Simulated send for invoice FT A 25-04-0015
+[2025-04-03 09:42:47] [READ-ONLY] Simulated send for invoice FT A 25-04-0010
+[2025-04-03 09:42:47] [READ-ONLY] Simulated send for invoice FT A 25-04-0009
+[2025-04-03 09:42:47] [READ-ONLY] Simulated send for invoice FT A 25-04-0006

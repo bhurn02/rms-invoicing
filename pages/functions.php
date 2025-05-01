@@ -26,8 +26,8 @@ function cn() {
 }
 
 function ftp() {
-	$host = 'thspnws02';
-	$usr = 'thc-spn2\ftp_user';
+	$host = '172.16.33.13';
+	$usr = 'ftp_user';
 	$pwd = '0ftpuse123';
 	$path = 'C:\\system\\rms\\pages\\ftp\\';
 	
@@ -106,5 +106,27 @@ function finddoublequote($pStr) {
 
 function numberformat($pNum) {
 	return number_format($pNum,2,'.',',');
+}
+
+function mssql_resultset($query,$dsn_name=null) {	
+	$sqlconnect = ($dsn_name)?connectionTo($dsn_name):connection();
+	$resultset = array();
+
+	try {		
+		$process=odbc_exec($sqlconnect, $query);
+		while($record=odbc_fetch_array($process)){
+			$resultset[] = $record;
+		}		
+	} 
+	catch(Exception $e) { 
+		echo "<pre>";
+		print_r($e); 
+		echo "</pre>"; 	    
+	}
+
+	odbc_free_result($process);
+	odbc_close($sqlconnect);
+
+	return $resultset;
 }
  ?>

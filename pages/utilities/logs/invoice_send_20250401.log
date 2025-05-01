@@ -1,3 +1,98 @@
+[2025-04-01 16:45:35] [SKIPPED] Invoice WT 25-04-0020 - missing or invalid email
+[2025-04-01 16:45:35] [READ-ONLY] Simulated send for invoice WT 25-04-0009
+[2025-04-01 16:45:34] [READ-ONLY] Simulated send for invoice WT 25-04-0001
+[2025-04-01 16:45:34] [SKIPPED] Invoice TSL 25-04-0009 - missing or invalid email
+[2025-04-01 16:45:34] [SKIPPED] Invoice TSL 25-04-0001 - file not found CSystemrmspagesutilitiespdfASSURANCE BROKERS INC. DBA AB RISK SOLUTIONS-INVOICE-TSL 25-04-0001.pdf
+[2025-04-01 16:45:34] [READ-ONLY] Simulated send for invoice SVT 25-04-0023
+[2025-04-01 16:45:34] [READ-ONLY] Simulated send for invoice SVT 25-04-0019
+[2025-04-01 16:45:34] [READ-ONLY] Simulated send for invoice OVT 25-04-0005
+[2025-04-01 16:45:34] [READ-ONLY] Simulated send for invoice LNH 25-04-0017
+[2025-04-01 16:45:34] [READ-ONLY] Simulated send for invoice LNH 25-04-0014
+[2025-04-01 16:45:34] [READ-ONLY] Simulated send for invoice LNH 25-04-0009
+[2025-04-01 16:45:34] [READ-ONLY] Simulated send for invoice LNH 25-04-0004
+[2025-04-01 16:45:33] [READ-ONLY] Simulated send for invoice LNH 25-04-0001
+[2025-04-01 16:45:33] [READ-ONLY] Simulated send for invoice JPC 25-04-0009
+[2025-04-01 16:45:33] [READ-ONLY] Simulated send for invoice GC B 25-04-0021
+[2025-04-01 16:45:33] [READ-ONLY] Simulated send for invoice GC B 25-04-0020
+[2025-04-01 16:45:33] [READ-ONLY] Simulated send for invoice GC B 25-04-0019
+[2025-04-01 16:45:33] [READ-ONLY] Simulated send for invoice GC B 25-04-0018
+[2025-04-01 16:45:33] [READ-ONLY] Simulated send for invoice GC B 25-04-0015
+[2025-04-01 16:45:33] [READ-ONLY] Simulated send for invoice GC B 25-04-0007
+[2025-04-01 16:45:33] [READ-ONLY] Simulated send for invoice GC A 25-04-0018
+[2025-04-01 16:45:33] [READ-ONLY] Simulated send for invoice GC A 25-04-0016
+[2025-04-01 16:45:32] [READ-ONLY] Simulated send for invoice GC A 25-04-0010
+[2025-04-01 16:45:32] [READ-ONLY] Simulated send for invoice GC A 25-04-0009
+[2025-04-01 16:45:32] [READ-ONLY] Simulated send for invoice GC A 25-04-0007
+[2025-04-01 16:45:32] [READ-ONLY] Simulated send for invoice GC A 25-04-0002
+[2025-04-01 16:45:32] [READ-ONLY] Simulated send for invoice GC A 25-04-0001
+[2025-04-01 16:45:32] [READ-ONLY] Simulated send for invoice FT D 25-04-0019
+[2025-04-01 16:45:32] [READ-ONLY] Simulated send for invoice FT D 25-04-0016
+[2025-04-01 16:45:31] [READ-ONLY] Simulated send for invoice FT D 25-04-0007
+[2025-04-01 16:45:31] [READ-ONLY] Simulated send for invoice FT D 25-04-0004
+[2025-04-01 16:45:31] [READ-ONLY] Simulated send for invoice FT D 25-04-0002
+[2025-04-01 16:45:31] [READ-ONLY] Simulated send for invoice FT D 25-04-0001
+[2025-04-01 16:45:31] [READ-ONLY] Simulated send for invoice FT C 25-04-0034
+[2025-04-01 16:45:31] [READ-ONLY] Simulated send for invoice FT C 25-04-0031
+[2025-04-01 16:45:31] [READ-ONLY] Simulated send for invoice FT C 25-04-0028
+[2025-04-01 16:45:31] [READ-ONLY] Simulated send for invoice FT C 25-04-0002
+[2025-04-01 16:45:30] [READ-ONLY] Simulated send for invoice FT B 25-04-0018
+[2025-04-01 16:45:30] [READ-ONLY] Simulated send for invoice FT B 25-04-0015
+[2025-04-01 16:45:30] [READ-ONLY] Simulated send for invoice FT B 25-04-0009
+[2025-04-01 16:45:30] [READ-ONLY] Simulated send for invoice FT B 25-04-0001
+[2025-04-01 16:45:30] [SKIPPED] Invoice FT A 25-04-0023 - missing or invalid email
+[2025-04-01 16:45:30] [SUCCESS] Invoice WT 25-04-0001 sent to rms_admin@tanholdings.com
+[2025-04-01 16:45:30] [READ-ONLY] Simulated send for invoice FT A 25-04-0022
+[2025-04-01 16:45:30] [READ-ONLY] Simulated send for invoice FT A 25-04-0015
+[2025-04-01 16:45:30] [READ-ONLY] Simulated send for invoice FT A 25-04-0010
+[2025-04-01 16:45:30] [READ-ONLY] Simulated send for invoice FT A 25-04-0009
+[2025-04-01 16:45:30] [READ-ONLY] Simulated send for invoice FT A 25-04-0006
+[2025-04-01 16:45:25] [SENDING] Invoice WT 25-04-0001 to rms_admin@tanholdings.com
+[2025-04-01 16:45:25] [SKIPPED] Invoice TSL 25-04-0009 - missing or invalid email
+[2025-04-01 16:45:25] [SKIPPED] Invoice TSL 25-04-0001 - file not found CSystemrmspagesutilitiespdfASSURANCE BROKERS INC. DBA AB RISK SOLUTIONS-INVOICE-TSL 25-04-0001.pdf
+[2025-04-01 16:45:25] [SUCCESS] Invoice SVT 25-04-0023 sent to rms_admin@tanholdings.com
+[2025-04-01 16:45:20] [SENDING] Invoice SVT 25-04-0023 to rms_admin@tanholdings.com
+[2025-04-01 16:45:20] [SUCCESS] Invoice SVT 25-04-0019 sent to rms_admin@tanholdings.com
+[2025-04-01 16:45:15] [SENDING] Invoice SVT 25-04-0019 to rms_admin@tanholdings.com
+[2025-04-01 16:45:14] [READ-ONLY] Simulated send for invoice OVT 25-04-0005
+[2025-04-01 16:45:14] [READ-ONLY] Simulated send for invoice LNH 25-04-0017
+[2025-04-01 16:45:14] [READ-ONLY] Simulated send for invoice LNH 25-04-0014
+[2025-04-01 16:45:14] [READ-ONLY] Simulated send for invoice LNH 25-04-0009
+[2025-04-01 16:45:14] [READ-ONLY] Simulated send for invoice LNH 25-04-0004
+[2025-04-01 16:45:14] [READ-ONLY] Simulated send for invoice LNH 25-04-0001
+[2025-04-01 16:45:14] [READ-ONLY] Simulated send for invoice JPC 25-04-0009
+[2025-04-01 16:45:14] [READ-ONLY] Simulated send for invoice GC B 25-04-0021
+[2025-04-01 16:45:14] [READ-ONLY] Simulated send for invoice GC B 25-04-0020
+[2025-04-01 16:45:14] [READ-ONLY] Simulated send for invoice GC B 25-04-0019
+[2025-04-01 16:45:13] [READ-ONLY] Simulated send for invoice GC B 25-04-0018
+[2025-04-01 16:45:13] [READ-ONLY] Simulated send for invoice GC B 25-04-0015
+[2025-04-01 16:45:13] [READ-ONLY] Simulated send for invoice GC B 25-04-0007
+[2025-04-01 16:45:13] [READ-ONLY] Simulated send for invoice GC A 25-04-0018
+[2025-04-01 16:45:13] [READ-ONLY] Simulated send for invoice GC A 25-04-0016
+[2025-04-01 16:45:13] [READ-ONLY] Simulated send for invoice GC A 25-04-0010
+[2025-04-01 16:45:13] [READ-ONLY] Simulated send for invoice GC A 25-04-0009
+[2025-04-01 16:45:13] [READ-ONLY] Simulated send for invoice GC A 25-04-0007
+[2025-04-01 16:45:13] [READ-ONLY] Simulated send for invoice GC A 25-04-0002
+[2025-04-01 16:45:13] [READ-ONLY] Simulated send for invoice GC A 25-04-0001
+[2025-04-01 16:45:12] [READ-ONLY] Simulated send for invoice FT D 25-04-0019
+[2025-04-01 16:45:12] [READ-ONLY] Simulated send for invoice FT D 25-04-0016
+[2025-04-01 16:45:12] [READ-ONLY] Simulated send for invoice FT D 25-04-0007
+[2025-04-01 16:45:12] [READ-ONLY] Simulated send for invoice FT D 25-04-0004
+[2025-04-01 16:45:12] [READ-ONLY] Simulated send for invoice FT D 25-04-0002
+[2025-04-01 16:45:12] [READ-ONLY] Simulated send for invoice FT D 25-04-0001
+[2025-04-01 16:45:12] [READ-ONLY] Simulated send for invoice FT C 25-04-0034
+[2025-04-01 16:45:12] [READ-ONLY] Simulated send for invoice FT C 25-04-0031
+[2025-04-01 16:45:12] [READ-ONLY] Simulated send for invoice FT C 25-04-0028
+[2025-04-01 16:45:12] [READ-ONLY] Simulated send for invoice FT C 25-04-0002
+[2025-04-01 16:45:11] [READ-ONLY] Simulated send for invoice FT B 25-04-0018
+[2025-04-01 16:45:11] [READ-ONLY] Simulated send for invoice FT B 25-04-0015
+[2025-04-01 16:45:11] [READ-ONLY] Simulated send for invoice FT B 25-04-0009
+[2025-04-01 16:45:11] [READ-ONLY] Simulated send for invoice FT B 25-04-0001
+[2025-04-01 16:45:11] [SKIPPED] Invoice FT A 25-04-0023 - missing or invalid email
+[2025-04-01 16:45:11] [READ-ONLY] Simulated send for invoice FT A 25-04-0022
+[2025-04-01 16:45:11] [READ-ONLY] Simulated send for invoice FT A 25-04-0015
+[2025-04-01 16:45:11] [READ-ONLY] Simulated send for invoice FT A 25-04-0010
+[2025-04-01 16:45:11] [READ-ONLY] Simulated send for invoice FT A 25-04-0009
+[2025-04-01 16:45:11] [READ-ONLY] Simulated send for invoice FT A 25-04-0006
 [2025-04-01 16:16:02] [SKIPPED] Invoice WT 25-04-0020 - missing or invalid email
 [2025-04-01 16:16:02] [READ-ONLY] Simulated send for invoice WT 25-04-0009
 [2025-04-01 16:16:01] [READ-ONLY] Simulated send for invoice WT 25-04-0001
