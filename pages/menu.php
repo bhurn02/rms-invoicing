@@ -173,7 +173,7 @@ cursor:hand;
 		<div class="buttonschild" align="right" style="width:90%">
 			<a name="TENANT READING" onClick="javascript:change_loc('tenant_reading.php?menu_id=6')" class="submenu" onMouseOver="hov(this,'a submenuhov')" onMouseOut="hov(this,'submenu')">TENANT READING</a>
 			<a name="GENERATE INVOICE" onClick="javascript:change_loc('generate_invoice.php?menu_id=7')" class="submenu" onMouseOver="hov(this,'a submenuhov')" onMouseOut="hov(this,'submenu')">GENERATE INVOICE</a>
-			<a name="INVOICE" onClick="javascript:change_loc('invoice_header.php?menu_id=8')" class="submenu" onMouseOver="hov(this,'a submenuhov')" onMouseOut="hov(this,'submenu')">INVOICE</a>			
+			<a name="INVOICE" onClick="javascript:change_loc('invoice_header.php?menu_id=8')" class="submenu" onMouseOver="hov(this,'a submenuhov')" onMouseOut="hov(this,'submenu')">INVOICE</a>						
 			<a name="SAP_UPLOADING" onClick="javascript:change_loc('sap_uploading.php?menu_id=9')" class="submenu" onMouseOver="hov(this,'a submenuhov')" onMouseOut="hov(this,'submenu')">SAP UPLOADING</a>
 		</div>
 	</div>&nbsp;
@@ -202,6 +202,9 @@ cursor:hand;
 		<div class="buttonschild" align="right" style="width:90%">			
 			<a name="SEND INVOICE" onClick="javascript:change_loc('utility_send_invoice.php?menu_id=22')" class="submenu" onMouseOver="hov(this,'a submenuhov')" onMouseOut="hov(this,'submenu')">INVOICE ALERT</a>
 		</div>
+		<div class="buttonschild" align="right" style="width:90%">			
+			<a name="INVOICE DISPATCHER" onClick="javascript:change_loc('utilities/?menu_id=24')" class="submenu" onMouseOver="hov(this,'a submenuhov')" onMouseOut="hov(this,'submenu')">INVOICE DISPATCHER</a>
+		</div>		
 		<div class="buttonschild" align="right" style="width:90%">			
 			<a name="UNPOST INVOICE" onClick="javascript:change_loc('unpost_invoice.php?menu_id=19')" class="submenu" onMouseOver="hov(this,'a submenuhov')" onMouseOut="hov(this,'submenu')">UNPOST INVOICE</a>
 		</div>
