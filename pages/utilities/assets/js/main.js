@@ -169,6 +169,20 @@ $(function () {
     sendNextBatch();
   });
 
+  $('#GenerateInvoice').on('click', function () {
+    // alert();
+    var ajaxGeneratePDF = fetchData($.param({
+                                        "action": 'batchgenerateinvoicepdf' // INVOICE DETAILS                                                                                
+                                    }), localApi, "POST");
+       
+    $.when(ajaxGeneratePDF).then(function(response) {
+      console.log(response);
+      //disabled generate btn AND REFRESH
+      location.reload(true);
+      
+    });
+  });
+
   $('#cancelProcess').on('click', function () {
     isCancelled = true;
     $(this).prop('disabled', true).text('Cancelling...');
