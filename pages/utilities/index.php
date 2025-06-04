@@ -1,7 +1,10 @@
 <?php
+// phpinfo();
+// exit;
 // index.php
 // echo PHP_INT_SIZE === 4 ? "32-bit PHP" : "64-bit PHP";
 // die();
+require_once("system/functions.php");
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -52,6 +55,7 @@
 
     <!-- Buttons -->
     <div class="d-flex justify-content-center gap-3 mb-4">
+      <button id="GenerateInvoice" class="btn btn-primary btn-lg"><i class="bi bi-gear"></i> Generate Invoice</button>
       <button id="startProcess" class="btn btn-primary btn-lg d-none"><i class="bi bi-send"></i> Send Emails</button>
       <button id="cancelProcess" class="btn btn-secondary btn-lg d-none"><i class="bi bi-x-circle"></i> Cancel</button>
       <button id="refreshRecords" class="btn btn-outline-secondary btn-sm"><i class="bi bi-arrow-clockwise"></i> Refresh</button>
@@ -111,6 +115,20 @@
     <p id="emailDuration" class="fw-bold mt-3 small"></p>
 
     <!-- JS -->
+     <script>
+      var PARENT_URL = "<?php echo PARENT_URL?>";
+      var localApi = PARENT_URL+"api/index.php";
+      console.log(localApi);
+
+      var fetchData = function(query, dataURL, requestType) {
+          // Return the $.ajax promise
+          return $.ajax({
+          url: dataURL,
+          type: requestType,
+          data: query
+      });
+      }
+  </script>
     <script src="assets/js/main.js"></script>
   </div>
 </body>
