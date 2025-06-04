@@ -61,6 +61,13 @@ require_once("system/functions.php");
       <button id="refreshRecords" class="btn btn-outline-secondary btn-sm"><i class="bi bi-arrow-clockwise"></i> Refresh</button>
     </div>
 
+    <!-- Invoice Generation Progress -->
+    <div class="progress mb-3 d-none" id="invoiceProgressContainer">
+      <div id="invoiceProgressBar" class="progress-bar progress-bar-striped progress-bar-animated" style="width: 0%;">0%</div>
+    </div>
+    <p id="invoiceCount" class="fw-bold small d-none"></p>
+    <p id="invoiceDuration" class="fw-bold small"></p>
+
     <!-- Layout -->
     <div class="row">
       <!-- Main Table -->
