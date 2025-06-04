@@ -8,9 +8,9 @@
 define('DEBUG', false );        // Set DEBUG MODE
 define('COMPANY_CODE', 'thc' );        // Set company_code
 define('COMPANY_NAME', 'Tan Holdings Corporation' );        // Set company_code
-define('PARENT_URL', 'http://riza.projects.local/rms/' );        // Set home url
-define('ROOT_URL', 'http://riza.projects.local/rms/utilities/' );        // Set home url
-define('SITE_LOGO', 'http://riza.projects.local/rms/assets/images/thc-logo-icon.png' );        // Set home url
+define('PARENT_URL', 'http://webapps.tanholdings.com/rms/' );        // Set home url
+define('ROOT_URL', 'http://webapps.tanholdings.com/rms/utilities/' );        // Set home url
+define('SITE_LOGO', 'http://webapps.tanholdings.com/rms/assets/images/thc-logo-icon.png' );        // Set home url
 
 // Set Application Name
 define('PARENT_APP_NAME', 'RMS' );
@@ -40,7 +40,6 @@ define('LOCAL_API', ROOT_URL.'api/' );
 define('SAP_DIRECTORY', $_SERVER['APPL_PHYSICAL_PATH'].'sap'.DIRECTORY_SEPARATOR );
 define('LOGS_DIRECTORY', $_SERVER['APPL_PHYSICAL_PATH'].'logs'.DIRECTORY_SEPARATOR );
 define('ATTACHMENT_DIRECTORY', $_SERVER['APPL_PHYSICAL_PATH'].'pdf'.DIRECTORY_SEPARATOR );
-define('INVOICE_DIRECTORY', $_SERVER['APPL_PHYSICAL_PATH'].DIRECTORY_SEPARATOR.'utilities'.DIRECTORY_SEPARATOR.'pdf'.DIRECTORY_SEPARATOR );
 // Include / exclude invalid records from SAP File
 define('SAP_INCLUDE_INVALID', true );
 define('SOURCEAPP', 'WEB' );
@@ -56,7 +55,7 @@ define('TLS_DB_NAME', 'TLSNA_PPPI.dbo.' );
 Set all Database information here.
 */
 // Set your database host
-define('DB_HOST', 'localhost');			
+define('DB_HOST', '172.16.57.10');			
 // Set your database username
 define('DB_USERNAME', 'web_app' ); 
 // Set your database password

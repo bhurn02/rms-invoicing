@@ -3,7 +3,7 @@
 // die();
 // require_once($_SERVER['APPL_PHYSICAL_PATH']."config.php");
 // require_once($_SERVER['APPL_PHYSICAL_PATH']."config.php");
-require_once($_SERVER['APPL_PHYSICAL_PATH']."utilities".DIRECTORY_SEPARATOR."config.php");
+require_once($_SERVER['APPL_PHYSICAL_PATH'].DIRECTORY_SEPARATOR."config.php");
 // require_once($_SERVER['APPL_PHYSICAL_PATH'] . "config.php");
 
 $sessUserID=null;
