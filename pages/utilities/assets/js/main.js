@@ -100,6 +100,8 @@ function generateInvoices() {
   const $btn = $('#GenerateInvoice');
   $btn.prop('disabled', true).html('<i class="bi bi-gear-fill"></i> Generating...');
   
+  $('#startProcess').addClass('d-none');
+  
   // Show progress UI
   $('#invoiceProgressContainer').removeClass('d-none');
   $('#invoiceProgressBar').css('width', '0%').text('Starting...');
@@ -278,6 +280,22 @@ function reloadPendingInvoices() {
       $('#progressBar').removeClass('progress-bar-striped progress-bar-animated').css('width', '100%').text('');
       $('#progressContainer').addClass('d-none');
 
+      // Only show generate invoice and send email button if there are records
+      let hideSend = false;
+      if (res.totalRecords > 0) {
+        if ((res.invalidEmails / res.totalRecords) > 0.1 || (res.invalidAttachments / res.totalRecords) > 0.1) {
+          hideSend = true;
+        }
+      }
+      if (allRecords.length > 0) {
+        $('#GenerateInvoice').removeClass('d-none');
+        if (!hideSend) {
+          $('#startProcess').removeClass('d-none');
+        } else {
+          $('#startProcess').addClass('d-none');
+        }
+      }
+
       res.records.forEach(r => {
         $('#recordTable').append(`
           <tr>
@@ -289,12 +307,6 @@ function reloadPendingInvoices() {
           </tr>
         `);
       });
-
-      // Only show generate invoice and send email button if there are records
-      if (allRecords.length > 0) {
-        $('#GenerateInvoice').removeClass('d-none');
-        $('#startProcess').removeClass('d-none');
-      }
     },
     error: function () {
       const loadEndTime = new Date();
@@ -378,6 +390,22 @@ function reloadPendingInvoicesWithoutLogs() {
       $('#progressBar').removeClass('progress-bar-striped progress-bar-animated').css('width', '100%').text('');
       $('#progressContainer').addClass('d-none');
 
+      // Only show generate invoice and send email button if there are records
+      let hideSend = false;
+      if (res.totalRecords > 0) {
+        if ((res.invalidEmails / res.totalRecords) > 0.1 || (res.invalidAttachments / res.totalRecords) > 0.1) {
+          hideSend = true;
+        }
+      }
+      if (allRecords.length > 0) {
+        $('#GenerateInvoice').removeClass('d-none');
+        if (!hideSend) {
+          $('#startProcess').removeClass('d-none');
+        } else {
+          $('#startProcess').addClass('d-none');
+        }
+      }
+
       res.records.forEach(r => {
         $('#recordTable').append(`
           <tr>
@@ -389,12 +417,6 @@ function reloadPendingInvoicesWithoutLogs() {
           </tr>
         `);
       });
-
-      // Only show generate invoice and send email button if there are records
-      if (allRecords.length > 0) {
-        $('#GenerateInvoice').removeClass('d-none');
-        $('#startProcess').removeClass('d-none');
-      }
     },
     error: function () {
       const loadEndTime = new Date();
@@ -443,6 +465,8 @@ $(function () {
 
   $('#startProcess').on('click', function () {
     $(this).prop('disabled', true).text('Processing...');
+    $('#GenerateInvoice').prop('disabled', true);
+    $('#refreshRecords').prop('disabled', true);
     $('#progressContainer').removeClass('d-none');
     $('#cancelProcess').removeClass('d-none');
     $('#batchLogTable').empty();

@@ -125,8 +125,7 @@ require_once("system/functions.php");
      <script>
       var PARENT_URL = "<?php echo PARENT_URL?>";
       var localApi = PARENT_URL+"api/index.php";
-      console.log(localApi);
-
+            
       var fetchData = function(query, dataURL, requestType) {
           // Return the $.ajax promise
           return $.ajax({
