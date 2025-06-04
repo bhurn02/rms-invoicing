@@ -277,7 +277,8 @@ function reloadPendingInvoices() {
       `);
 
       // Hide progress bar
-      $('#progressBar').removeClass('progress-bar-striped progress-bar-animated').css('width', '100%').text('');
+      $('#progressBar').css('width', '100%').text('');
+      // $('#progressBar').removeClass('progress-bar-striped progress-bar-animated').css('width', '100%').text('');
       $('#progressContainer').addClass('d-none');
 
       // Only show generate invoice and send email button if there are records
@@ -323,7 +324,8 @@ function reloadPendingInvoices() {
         </tr>
       `);
       // Hide progress bar
-      $('#progressBar').removeClass('progress-bar-striped progress-bar-animated').css('width', '100%').text('');
+      $('#progressBar').css('width', '100%').text('');
+      // $('#progressBar').removeClass('progress-bar-striped progress-bar-animated').css('width', '100%').text('');
       $('#progressContainer').addClass('d-none');
       alert('Failed to load records');
     }
@@ -387,7 +389,8 @@ function reloadPendingInvoicesWithoutLogs() {
       `);
 
       // Hide progress bar
-      $('#progressBar').removeClass('progress-bar-striped progress-bar-animated').css('width', '100%').text('');
+      $('#progressBar').css('width', '100%').text('');
+      // $('#progressBar').removeClass('progress-bar-striped progress-bar-animated').css('width', '100%').text('');
       $('#progressContainer').addClass('d-none');
 
       // Only show generate invoice and send email button if there are records
@@ -433,7 +436,8 @@ function reloadPendingInvoicesWithoutLogs() {
         </tr>
       `);
       // Hide progress bar
-      $('#progressBar').removeClass('progress-bar-striped progress-bar-animated').css('width', '100%').text('');
+      $('#progressBar').css('width', '100%').text('');
+      // $('#progressBar').removeClass('progress-bar-striped progress-bar-animated').css('width', '100%').text('');
       $('#progressContainer').addClass('d-none');
       alert('Failed to load records');
     }
