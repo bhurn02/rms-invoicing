@@ -8,9 +8,9 @@
 define('DEBUG', false );        // Set DEBUG MODE
 define('COMPANY_CODE', 'thc' );        // Set company_code
 define('COMPANY_NAME', 'Tan Holdings Corporation' );        // Set company_code
-define('PARENT_URL', 'http://webapps.tanholdings.com/rms/' );        // Set home url
-define('ROOT_URL', 'http://webapps.tanholdings.com/rms/utilities/' );        // Set home url
-define('SITE_LOGO', 'http://webapps.tanholdings.com/rms/assets/images/thc-logo-icon.png' );        // Set home url
+define('PARENT_URL', 'http://aldrich.projects.local/rms/' );        // Set home url
+define('ROOT_URL', 'http://aldrich.projects.local/rms/utilities/' );        // Set home url
+define('SITE_LOGO', 'http://aldrich.projects.local/rms/assets/images/thc-logo-icon.png' );        // Set home url
 
 // Set Application Name
 define('PARENT_APP_NAME', 'RMS' );
