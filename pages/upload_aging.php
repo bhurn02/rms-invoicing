@@ -113,6 +113,7 @@ if ($strMode == "UPLOAD") {
 
                 if ($hdr_id === null) {
                     $sqlquery = "exec sp_u_UploadAgingHeader_Save 0, '$strFile', '$dtAsOf', '$uid', '$company_code', '$strIPAddr'";
+                    // die($sqlquery);
                     $process = odbc_exec($sqlconnect, $sqlquery);
                     if (odbc_fetch_row($process)) {
                         $hdr_id = odbc_result($process, "wth_hdr_id");
@@ -126,11 +127,29 @@ if ($strMode == "UPLOAD") {
 
                 while (count($cols) < 15) $cols[] = "";
 
+                // Ensure numeric values for columns 3-12, convert invalid characters to zero
+                for ($i = 3; $i <= 12; $i++) {
+                    if (isset($cols[$i])) {
+                        $numericValue = $cols[$i];
+                        // Remove any non-numeric characters except decimal point and minus sign
+                        $cleaned = preg_replace('/[^0-9.-]/', '', $numericValue);
+                        // Convert to float and check if it's a valid number
+                        $floatValue = floatval($cleaned);
+                        if (is_numeric($cleaned) && $floatValue >= 0) {
+                            $cols[$i] = $floatValue;
+                        } else {
+                            $cols[$i] = 0; // Convert invalid values like "-" to zero
+                        }
+                    } else {
+                        $cols[$i] = 0;
+                    }
+                }
+
                 $sqlquery = "exec sp_u_UploadAgingDetail_Save $hdr_id, 
                     '{$cols[0]}', '{$cols[1]}', '{$cols[2]}', {$cols[3]}, {$cols[4]}, {$cols[5]}, {$cols[6]},
                     {$cols[7]}, {$cols[8]}, {$cols[9]}, {$cols[10]}, {$cols[11]}, {$cols[12]}, 
                     '{$cols[13]}', '{$cols[14]}'";
-
+                // echo "$sqlquery <br><br>";
                 odbc_exec($sqlconnect, $sqlquery);
                 $ctr++;
             }
