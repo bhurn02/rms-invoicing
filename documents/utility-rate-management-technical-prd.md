@@ -2,20 +2,20 @@
 
 ## Overview
 
-This document outlines the technical implementation of two major enhancements to the RMS (Real Estate Management System) to address manual utility rate management and meter reading processes for properties in the Commonwealth of the Northern Mariana Islands (CNMI). The system is built on PHP 7.2 with MSSQL 2019 database, running on Windows Server 2019 with IIS.
+This document outlines the technical implementation of two major enhancements to the RMS (Real Estate Management System) to address manual utility rate management and meter reading processes for properties. While the system currently serves properties in the Commonwealth of the Northern Mariana Islands (CNMI), these enhancements are designed to be scalable and applicable to any property management location. The system is built on PHP 7.2 with MSSQL 2019 database, running on Windows Server 2019 with IIS.
 
-**Problem Statement**: Current manual processes for utility rate updates and meter readings are time-consuming, error-prone, and inefficient for managing 100+ tenants across CNMI properties.
+**Problem Statement**: Current manual processes for utility rate updates and meter readings are time-consuming, error-prone, and inefficient for managing 100+ tenants across properties.
 
-**Target Users**: RMS administrators, property management staff, and field technicians operating in CNMI.
+**Target Users**: RMS administrators, property management staff, and field technicians operating in any property management location.
 
-**Value Proposition**: Automate repetitive manual processes, reduce errors by 95%, and save 20+ hours per month in operational efficiency for CNMI property management.
+**Value Proposition**: Automate repetitive manual processes, reduce errors by 95%, and save 20+ hours per month in operational efficiency for property management.
 
 ## Core Features
 
 ### Feature 1: Automated Utility Rate Management
 
 **What it does:**
-- Single-point entry interface for Electric/CNMI and LEAC rates
+- Single-point entry interface for Electric and LEAC rates
 - Automatic classification of units as residential/commercial
 - Bulk update functionality for all active tenants
 - Real-time rate application and validation
@@ -29,7 +29,7 @@ This document outlines the technical implementation of two major enhancements to
 **How it works:**
 - New database column `is_residential` in `m_units` table (default: 1)
 - Rate management interface with residential/commercial rate inputs
-- Automated update process for charge codes CUCNF (Electric/CNMI) and CUCF (LEAC)
+- Automated update process for charge codes CUCNF (Electric) and CUCF (LEAC)
 - Integration with existing tenant charge management system
 
 ### Feature 2: Mobile QR Code Meter Reading System
@@ -79,7 +79,7 @@ This document outlines the technical implementation of two major enhancements to
 **Utility Rate Management Flow:**
 1. Admin logs into RMS system
 2. Navigates to Utility Rate Management page
-3. Enters new Electric/CNMI and LEAC rates for residential/commercial
+3. Enters new Electric and LEAC rates for residential/commercial
 4. System validates rates and shows preview of affected tenants
 5. Admin confirms and submits
 6. System automatically updates all active tenant charges
@@ -407,4 +407,4 @@ CREATE TABLE m_meter_qr_codes (
 *Version: 1.0*  
 *Date: January 2025*  
 *System: RMS (Real Estate Management System)*  
-*Location: Commonwealth of the Northern Mariana Islands (CNMI)* 
+*Location: Scalable for any property management location* 

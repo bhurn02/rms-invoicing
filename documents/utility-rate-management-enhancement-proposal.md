@@ -2,12 +2,12 @@
 
 ## Executive Summary
 
-This proposal outlines two critical enhancements to our RMS (Real Estate Management System) that will significantly improve operational efficiency and reduce manual workload for our property management team in the Commonwealth of the Northern Mariana Islands (CNMI).
+This proposal outlines two critical enhancements to our RMS (Real Estate Management System) that will significantly improve operational efficiency and reduce manual workload for our property management team. While the system currently serves properties in the Commonwealth of the Northern Mariana Islands (CNMI), these enhancements are designed to be scalable and applicable to any property management location.
 
 ## Current Challenges
 
 ### 1. Manual Utility Rate Updates
-- **Problem**: Monthly utility rate changes (Electric/CNMI and LEAC rates) require manual updates for each of 100+ active tenants
+- **Problem**: Monthly utility rate changes (Electric and LEAC rates) require manual updates for each of 100+ active tenants
 - **Impact**: 
   - 4-6 hours of manual data entry per month
   - High risk of errors and inconsistencies
@@ -27,7 +27,7 @@ This proposal outlines two critical enhancements to our RMS (Real Estate Managem
 ### Enhancement 1: Automated Utility Rate Management
 
 **What it does:**
-- Single-point entry system for utility rates (Electric/CNMI and LEAC)
+- Single-point entry system for utility rates (Electric and LEAC)
 - Automatic updates to all active tenants based on residential/commercial classification
 - Real-time rate application across the entire tenant portfolio
 
@@ -104,7 +104,7 @@ This proposal outlines two critical enhancements to our RMS (Real Estate Managem
 
 ## Conclusion
 
-These enhancements represent a significant opportunity to modernize our property management operations in CNMI while delivering immediate and measurable benefits. The proposed solutions will:
+These enhancements represent a significant opportunity to modernize our property management operations while delivering immediate and measurable benefits. The proposed solutions will:
 
 1. **Streamline Operations**: Automate repetitive manual processes
 2. **Improve Accuracy**: Reduce human error in data entry
@@ -118,4 +118,4 @@ These enhancements represent a significant opportunity to modernize our property
 *Prepared for Management Review*  
 *Date: January 2025*  
 *System: RMS (Real Estate Management System)*  
-*Location: Commonwealth of the Northern Mariana Islands (CNMI)* 
+*Location: Scalable for any property management location* 

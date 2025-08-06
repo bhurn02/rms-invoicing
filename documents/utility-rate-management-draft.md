@@ -2,7 +2,7 @@ You're a senior business analyst and also a senior full stack developer. I need 
 
 I am planning to add some major enhancement to our current RMS system.
 
-This is an old system built in PHP 5.3 but i was able to add feature using PHP 7.2 (pages/utilities folder).  Currently on a monthly basis before generating invoices for tenant, rms admin will have to input the new Utility / Electric rate (CNMI) and LEAC rate both for commercial and residential as this changes as well on a monthly basis. 
+This is an old system built in PHP 5.3 but i was able to add feature using PHP 7.2 (pages/utilities folder).  Currently on a monthly basis before generating invoices for tenant, rms admin will have to input the new CNMI Electric and LEAC rate both for commercial and residential as this changes as well on a monthly basis. 
 
 1. The issue is that they have to manually locate all active tenant and edit the rate changes which is very tedious specially when there are like 100+ tenants. 
     - m_units table should have new column, is_residential default to 1
