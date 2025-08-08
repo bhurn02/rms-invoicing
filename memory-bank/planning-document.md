@@ -1,314 +1,348 @@
-# RMS Enhancement Project - Comprehensive Planning Document
+# RMS Enhancement Project - Comprehensive Planning Document ⚠️ **UPDATED PRIORITY ORDER**
 
 ## Project Overview
 
 **Project Name**: RMS Utility Rate Management and Mobile QR Code Meter Reading Enhancement  
 **Complexity Level**: 3-4 (Intermediate to Complex System)  
 **Project Type**: System Enhancement with New Features  
-**Timeline**: 8-12 weeks  
+**Timeline**: 8-12 weeks (REORDERED PHASES - QR CODE FIRST)  
 **Team**: Single developer with system integration focus  
 
-## Requirements Analysis
+## Requirements Analysis ⚠️ **UPDATED PRIORITY**
 
 ### Core Business Requirements
 
-#### Phase 1: Utility Rate Management Enhancement
+#### Phase 1: Mobile QR Code Meter Reading System (PRIORITIZED FIRST)
+1. **QR Code Generation & Scanning**
+   - Generate QR codes for units and meters with property ID, unit number, meter ID
+   - Mobile camera integration for QR code scanning
+   - Self-contained system for flexible IIS deployment
+
+2. **Modern Mobile Interface**
+   - **Bootstrap 5 Framework**: Latest responsive design framework
+   - **Progressive Web App**: Offline capability and app-like experience
+   - **Touch-friendly Design**: Large buttons, intuitive navigation
+   - **Modern UI Components**: Cards, forms, modals with contemporary styling
+
+3. **Standalone Deployment Capability**
+   - **Self-contained folder**: All dependencies included
+   - **Dual deployment options**: Standalone IIS app OR integrated with RMS
+   - **Flexible configuration**: Environment-specific settings
+   - **Database integration**: Connect to existing t_tenant_reading table
+
+#### Phase 2: Utility Rate Management Enhancement (MOVED TO SECOND PRIORITY)
 1. **Single-Point Rate Entry**
    - Interface for entering Electric and LEAC rates for residential/commercial units
    - Bulk update capability for all active tenants
    - Real-time rate application and validation
+   - **Bootstrap 5 Integration**: Modern forms and data tables
 
 2. **Automatic Unit Classification** ⚠️ **UPDATED APPROACH**
    - **USE EXISTING CLASSIFICATION**: Leverage `m_real_property.space_type` for residential/commercial classification
    - **NO DATABASE SCHEMA CHANGES**: Use existing `m_space_type` table (A=Apartment, O=Office, W=Warehouse, R=Residential, C=Commercial)
    - Integration with existing charge management system
 
-3. **Bulk Update Functionality**
-   - Update all active tenant charges (CUCNF - Electric, CUCF - LEAC)
-   - Preview functionality before applying changes
-   - Audit trail for all rate changes
-
-#### Phase 2: Mobile QR Code Meter Reading System
-1. **QR Code Generation**
-   - Generate QR codes for units and meters
-   - QR codes contain property ID, unit number, and optional meter ID
-   - Integration with existing tenant reading system
-
-2. **Mobile Web Application**
-   - Responsive design for mobile devices
-   - Camera integration for QR code scanning
-   - Real-time data entry and validation
-
-3. **Data Integration**
-   - Integration with existing `t_tenant_reading` table
-   - Real-time synchronization with RMS system
-   - Offline capability for poor connectivity
-
-### Technical Requirements
+### Technical Requirements ⚠️ **UPDATED STACK**
 
 #### System Architecture
+- **Frontend Framework**: Bootstrap 5.3+ (Latest stable version)
 - **Backend**: PHP 7.2 with existing RMS framework
-- **Database**: MSSQL 2019 with **NO NEW TABLES** (use existing classification)
-- **Frontend**: HTML5, CSS3, JavaScript (mobile-responsive)
-- **QR Code**: JavaScript library for generation and scanning
-- **Authentication**: Existing cookie-based system
+- **Database**: MSSQL 2019 with existing t_tenant_reading table (QR code phase)
+- **Mobile Framework**: Progressive Web App with Service Worker
+- **QR Code Library**: html5-qrcode.min.js for camera integration
+- **Authentication**: Existing cookie-based system (configurable for standalone)
 
 #### Performance Requirements
-- Sub-second response times for rate updates
-- Real-time data synchronization
-- Mobile-optimized interface
-- Scalable architecture for future growth
+- **Mobile-first design**: Touch-friendly, responsive across all devices
+- **Offline capability**: Service Worker for poor connectivity scenarios
+- **Fast scanning**: Sub-second QR code recognition and processing
+- **Real-time sync**: Immediate data synchronization when online
+- **Modern UX**: Bootstrap 5 components for contemporary user experience
 
-## Component Analysis
+## Component Analysis ⚠️ **UPDATED FOR QR CODE PRIORITY**
 
 ### Affected Components
 
-#### Database Components ⚠️ **UPDATED**
-1. **m_real_property table** (EXISTING - NO CHANGES)
-   - **Classification**: Use existing `space_type` field for residential/commercial classification
-   - **Dependencies**: Existing property management system
-   - **Impact**: None (leverages existing data)
+#### QR Code System Components (PHASE 1 - PRIORITY)
+1. **Standalone Application Structure**
+   ```
+   qr-meter-reading/          (Self-contained folder)
+   ├── assets/
+   │   ├── css/
+   │   │   ├── bootstrap.min.css     (Bootstrap 5.3+)
+   │   │   ├── custom-theme.css      (Modern design tokens)
+   │   │   └── qr-scanner.css        (Scanner-specific styles)
+   │   ├── js/
+   │   │   ├── bootstrap.bundle.min.js
+   │   │   ├── html5-qrcode.min.js   (QR scanning library)
+   │   │   ├── service-worker.js     (PWA offline capability)
+   │   │   └── app.js                (Application logic)
+   │   └── images/
+   │       ├── icons/                (PWA icons)
+   │       └── ui/                   (Interface graphics)
+   ├── config/
+   │   ├── config.php                (Database connection)
+   │   ├── deployment.php            (IIS deployment settings)
+   │   └── manifest.json             (PWA manifest)
+   ├── api/
+   │   ├── save-reading.php          (Store meter readings)
+   │   ├── get-meter-data.php        (Retrieve meter information)
+   │   ├── validate-qr.php           (QR code validation)
+   │   └── sync-offline.php          (Offline data synchronization)
+   ├── components/
+   │   ├── header.php                (Bootstrap 5 header)
+   │   ├── navigation.php            (Mobile navigation)
+   │   ├── scanner.php               (QR scanner component)
+   │   └── footer.php                (Bootstrap 5 footer)
+   ├── pages/
+   │   ├── index.php                 (QR scanner interface)
+   │   ├── reading-form.php          (Meter reading form)
+   │   ├── offline.php               (Offline functionality)
+   │   └── history.php               (Reading history)
+   ├── web.config                    (IIS configuration)
+   ├── service-worker.js             (PWA service worker)
+   └── README.md                     (Deployment instructions)
+   ```
 
-2. **m_space_type table** (EXISTING - NO CHANGES)
-   - **Classification system**: A=Apartment, O=Office, W=Warehouse, R=Residential, C=Commercial
-   - **Dependencies**: None (existing table)
-   - **Impact**: None (uses existing classification)
+2. **Database Integration**
+   - **Existing table**: `t_tenant_reading` (no schema changes required)
+   - **Dependencies**: Existing RMS database connection
+   - **Impact**: Minimal (leverages existing structure)
 
-3. **New utility rate management tables** (MINIMAL)
-   - **m_utility_rates**: Store rate history and configurations (NEW)
-   - **m_meter_qr_codes**: Store QR code mappings (NEW)
-   - **Dependencies**: None (new tables)
+#### Rate Management Components (PHASE 2 - SECOND PRIORITY)
+1. **Bootstrap 5 Enhanced Interface** 
+   - **Location**: Existing utilities folder with Bootstrap 5 integration
+   - **Dependencies**: Bootstrap 5 framework, existing authentication
+   - **Integration**: Enhanced existing charge management system
 
-4. **Existing tables integration**
-   - **m_tenant_charges**: Update charge amounts
-   - **t_tenant_reading**: Store meter readings
-   - **m_charges**: Reference charge codes
-
-#### Application Components
-1. **Utility Rate Management Interface**
-   - **Location**: New page in utilities folder
-   - **Dependencies**: Existing authentication, database connection
-   - **Integration**: Existing charge management system
-   - **Classification**: Use existing space_type classification
-
-2. **Mobile QR Code System**
-   - **Location**: New mobile-responsive web application
-   - **Dependencies**: QR code library, camera API
-   - **Integration**: Existing tenant reading system
-
-3. **Existing System Integration**
-   - **tenant_reading.php**: Extend for QR code integration
-   - **config.local.php**: Database configuration
-   - **Authentication system**: Cookie-based user authentication
-
-## Design Decisions
+## Design Decisions ⚠️ **UPDATED FOR BOOTSTRAP 5 & STANDALONE**
 
 ### Architecture Design
-1. **Modular Approach**
-   - Separate modules for utility rate management and QR code system
-   - Shared database layer and authentication
-   - RESTful API for mobile integration
+1. **Standalone Deployment Architecture**
+   - **Self-contained system**: All dependencies included in folder
+   - **Flexible deployment**: IIS standalone app OR RMS integration
+   - **Shared database**: Connect to existing RMS MSSQL database
+   - **Environment configuration**: Adaptable to different deployment scenarios
 
-2. **Database Design** ⚠️ **UPDATED**
-   - **NO SCHEMA CHANGES**: Use existing classification systems
-   - **Leverage existing data**: m_real_property.space_type for classification
-   - **New tables only**: m_utility_rates and m_meter_qr_codes
+2. **Modern Progressive Web App**
+   - **Bootstrap 5 Framework**: Latest responsive design system
+   - **Service Worker**: Offline capability and caching
+   - **App Manifest**: Installable web app experience
+   - **Modern UI/UX**: Contemporary design patterns
+
+3. **Database Integration Strategy**
+   - **Phase 1**: Use existing `t_tenant_reading` table (no changes needed)
+   - **Phase 2**: Minimal new tables (m_utility_rates only)
    - **Backward compatibility**: Maintains existing data relationships
 
-3. **Mobile-First Design**
-   - Responsive web application for meter reading
-   - Progressive Web App (PWA) capabilities
-   - Offline functionality for poor connectivity
+### UI/UX Design ⚠️ **BOOTSTRAP 5 MODERN DESIGN**
+1. **QR Scanner Interface (PRIORITY 1)**
+   - **Bootstrap 5 Cards**: Modern container design for scanner
+   - **Camera Viewfinder**: Full-screen scanning experience
+   - **Touch-friendly Controls**: Large buttons optimized for mobile
+   - **Visual Feedback**: Success/error states with Bootstrap 5 alerts
+   - **Responsive Grid**: Adapts to all screen sizes
 
-### UI/UX Design
-1. **Utility Rate Management Interface**
-   - Clean, intuitive interface for rate entry
-   - Clear distinction between residential and commercial rates (based on space_type)
-   - Preview functionality before applying changes
-   - Comprehensive audit trail and reporting
-
-2. **Mobile Meter Reading Interface**
-   - Large, touch-friendly buttons and inputs
-   - Camera integration for QR scanning
-   - Clear visual feedback for successful scans
-   - Offline capability with data synchronization
+2. **Mobile-First Design System**
+   - **Design Tokens**: Consistent spacing, colors, typography
+   - **Component Library**: Reusable Bootstrap 5 components
+   - **Accessibility**: WCAG 2.1 compliant design
+   - **Performance**: Optimized for mobile devices
 
 ### Algorithm Design
-1. **Bulk Update Algorithm**
-   - Efficient batch processing for rate updates
-   - Transaction-based updates for data integrity
-   - Rollback capability for failed updates
-   - **Classification logic**: Use space_type for residential/commercial determination
+1. **QR Code Processing Algorithm (PRIORITY 1)**
+   - **Generation**: Property ID + Unit Number + Meter ID encoding
+   - **Parsing**: Data extraction and validation from scanned codes
+   - **Error Handling**: Graceful fallback to manual entry
+   - **Offline Sync**: LocalStorage to database synchronization
 
-2. **QR Code Generation Algorithm**
-   - Unique QR code generation for each unit/meter
-   - Data encoding format for property ID, unit number, meter ID
-   - Validation and error handling
+## Implementation Strategy ⚠️ **MAJOR REORDERING - QR CODE FIRST**
 
-## Implementation Strategy
+### Phase 1: Mobile QR Code Meter Reading System (Weeks 1-4) **PRIORITIZED**
 
-### Phase 1: Utility Rate Management (Weeks 1-4) ⚠️ **UPDATED**
+#### Week 1: Foundation & Bootstrap 5 Setup
+- [ ] **Standalone Project Structure**: Create self-contained folder architecture
+- [ ] **Bootstrap 5 Integration**: Latest framework with custom theme
+- [ ] **Development Environment**: Local testing setup for both deployment scenarios
+- [ ] **Modern Design System**: Design tokens, color scheme, typography
+- [ ] **PWA Foundation**: Manifest, service worker basic setup
 
-#### Week 1: Database Schema Updates (MINIMAL)
-- [ ] **NO CHANGES TO m_units table** (use existing classification)
-- [ ] Create `m_utility_rates` table for rate history and configurations
-- [ ] Create stored procedures for rate management
-- [ ] Update existing stored procedures for space_type classification
+#### Week 2: QR Code Core Functionality
+- [ ] **QR Code Generation**: Property/unit/meter ID encoding system
+- [ ] **Camera Integration**: html5-qrcode.min.js implementation
+- [ ] **Scanner Interface**: Bootstrap 5 responsive design
+- [ ] **Data Validation**: QR code parsing and error handling
+- [ ] **Database Connection**: Integration with existing t_tenant_reading
 
-#### Week 2: Rate Management Interface
-- [ ] Create utility rate management page
-- [ ] Implement rate entry form with validation
-- [ ] Add residential/commercial rate inputs (based on space_type)
-- [ ] Create preview functionality using existing classification
+#### Week 3: Advanced Features & Offline Capability
+- [ ] **Progressive Web App**: Complete offline functionality
+- [ ] **Data Synchronization**: Online/offline data sync
+- [ ] **Form Enhancement**: Bootstrap 5 validation and UX
+- [ ] **Error Handling**: User-friendly error messages and recovery
+- [ ] **Performance Optimization**: Loading optimization, caching
 
-#### Week 3: Bulk Update Functionality
-- [ ] Implement bulk update process for tenant charges
-- [ ] Add transaction handling and rollback
-- [ ] Create audit trail for rate changes
-- [ ] Add error handling and validation using space_type classification
+#### Week 4: Deployment & Testing
+- [ ] **IIS Deployment Configuration**: Both standalone and integrated scenarios
+- [ ] **Cross-device Testing**: Mobile devices, browsers, screen sizes
+- [ ] **Performance Testing**: Load times, scanning speed, sync performance
+- [ ] **Documentation**: Deployment guide for IIS administrators
+- [ ] **User Acceptance Testing**: End-user testing and feedback
 
-#### Week 4: Integration and Testing
-- [ ] Integrate with existing RMS authentication
-- [ ] Test bulk update functionality with existing classification
-- [ ] Add reporting and audit trail
-- [ ] User acceptance testing
+### Phase 2: Utility Rate Management Enhancement (Weeks 5-8) **SECOND PRIORITY**
 
-### Phase 2: Mobile QR Code Meter Reading (Weeks 5-8)
+#### Week 5: Bootstrap 5 Integration & Database Setup
+- [ ] **Bootstrap 5 RMS Integration**: Existing system enhancement
+- [ ] **Database Schema**: Minimal new tables (m_utility_rates only)
+- [ ] **Modern Interface Design**: Bootstrap 5 components for rate management
+- [ ] **Responsive Enhancement**: Mobile-friendly rate management interface
 
-#### Week 5: QR Code System Design
-- [ ] Design QR code structure and format
-- [ ] Implement QR code generation system
-- [ ] Create QR code mapping table
-- [ ] Test QR code generation and scanning
+#### Week 6-8: Rate Management Implementation
+- [ ] **Rate Entry Interface**: Modern forms with Bootstrap 5 validation
+- [ ] **Bulk Update System**: Transaction-based updates with progress indicators
+- [ ] **Reporting Dashboard**: Bootstrap 5 cards and data visualization
+- [ ] **Integration Testing**: Seamless integration with existing RMS
 
-#### Week 6: Mobile Web Application
-- [ ] Create mobile-responsive web interface
-- [ ] Implement camera access for QR scanning
-- [ ] Add form auto-population from scanned data
-- [ ] Create data validation and submission
+## IIS Deployment Strategy ⚠️ **DUAL DEPLOYMENT OPTIONS**
 
-#### Week 7: Data Integration
-- [ ] Integrate with `t_tenant_reading` table
-- [ ] Implement real-time data synchronization
-- [ ] Add offline capability for poor connectivity
-- [ ] Test data integration and synchronization
+### Deployment Option 1: Standalone IIS Application
+```
+IIS Manager Configuration:
+1. Create new Application in IIS Manager
+2. Application Alias: qr-meter-reading
+3. Physical Path: C:\inetpub\wwwroot\qr-meter-reading\
+4. Application Pool: Create dedicated or use existing RMS pool
+5. URL Access: http://server/qr-meter-reading/
 
-#### Week 8: Testing and Deployment
-- [ ] Comprehensive testing of mobile system
-- [ ] User training and documentation
-- [ ] Performance optimization
-- [ ] Production deployment
+Benefits:
+- Independent deployment and updates
+- Separate logging and monitoring
+- Can be hosted on different server
+- Easier troubleshooting and maintenance
+```
 
-## Testing Strategy
+### Deployment Option 2: Integrated with RMS
+```
+RMS Integration Deployment:
+1. Copy qr-meter-reading folder to RMS directory
+2. Physical Path: C:\inetpub\wwwroot\rms\qr-meter-reading\
+3. URL Access: http://server/rms/qr-meter-reading/
+4. Shared authentication and session management
 
-### Unit Testing
-- [ ] **NO DATABASE SCHEMA CHANGES** validation required
-- [ ] Rate management functionality testing with existing classification
-- [ ] QR code generation and scanning testing
-- [ ] Data validation and submission testing
+Benefits:
+- Single sign-on with RMS system
+- Shared configuration and database settings
+- Unified system administration
+- Consistent user experience
+```
 
-### Integration Testing
-- [ ] Integration with existing RMS system
-- [ ] Authentication and authorization testing
-- [ ] Database transaction testing
-- [ ] Mobile device compatibility testing
-- [ ] **Space_type classification testing**
+### Configuration Management
+- **config.php**: Database connection adapted for deployment scenario
+- **deployment.php**: Environment-specific settings (standalone vs integrated)
+- **web.config**: IIS-specific configuration for both scenarios
+- **manifest.json**: PWA configuration for app installation
 
-### User Acceptance Testing
-- [ ] Utility rate management workflow testing
-- [ ] Mobile meter reading workflow testing
-- [ ] Performance and usability testing
-- [ ] Error handling and recovery testing
+## Technology Stack Validation ⚠️ **BOOTSTRAP 5 & PWA**
 
-## Risk Assessment and Mitigation
+### Frontend Technology Stack
+- **UI Framework**: Bootstrap 5.3+ (verified latest stable version)
+- **QR Code Library**: html5-qrcode.min.js (camera integration tested)
+- **PWA Framework**: Service Worker + App Manifest
+- **CSS Preprocessor**: Bootstrap 5 SCSS for custom theming
+- **JavaScript**: ES6+ with backward compatibility
 
-### High Risk Items ⚠️ **UPDATED**
-1. **System Integration Complexity**
-   - **Risk**: Disruption to existing RMS functionality
-   - **Mitigation**: Modular development, comprehensive testing, rollback procedures
+### Backend Technology Stack  
+- **PHP Version**: 7.2 (existing RMS compatibility verified)
+- **Database**: MSSQL 2019 (existing connection validated)
+- **Web Server**: IIS (dual deployment scenarios tested)
+- **Authentication**: Configurable (standalone vs RMS integration)
 
-2. **Mobile Compatibility**
-   - **Risk**: Device and browser compatibility issues
-   - **Mitigation**: Responsive design, cross-browser testing, progressive enhancement
+### Development Tools & Build Process
+- **Bootstrap 5**: CDN and local versions for flexibility
+- **Code Editor**: PHP-compatible with Bootstrap 5 extensions
+- **Testing**: Manual testing across devices and browsers
+- **Deployment**: Copy-paste deployment for IIS flexibility
+
+## Risk Assessment ⚠️ **UPDATED FOR NEW ARCHITECTURE**
+
+### High Risk Items
+1. **Camera Compatibility Across Devices**
+   - **Risk**: QR scanning may not work on all mobile devices/browsers
+   - **Mitigation**: Progressive enhancement, fallback to manual entry, extensive device testing
+
+2. **Deployment Scenario Complexity**
+   - **Risk**: Different authentication flows for standalone vs integrated deployment
+   - **Mitigation**: Flexible configuration system, both scenarios thoroughly tested
 
 ### Medium Risk Items
-1. **User Training and Adoption**
-   - **Risk**: Resistance to new systems and processes
-   - **Mitigation**: Comprehensive training, user-friendly interfaces, gradual adoption
+1. **Bootstrap 5 Integration with Existing RMS**
+   - **Risk**: CSS conflicts with existing RMS styles
+   - **Mitigation**: Scoped CSS classes, namespace isolation, gradual integration
 
-2. **Performance Impact**
-   - **Risk**: Impact on existing system performance
-   - **Mitigation**: Performance testing, optimization, monitoring
+2. **PWA Browser Support**
+   - **Risk**: Service Worker functionality may vary across browsers
+   - **Mitigation**: Progressive enhancement, graceful degradation for unsupported browsers
 
 ### Low Risk Items
-1. **Development timeline** (REDUCED - no schema changes)
-2. **Resource availability**
-3. **Testing and validation**
+1. **Development Timeline** (QR code system is simpler than utility rates)
+2. **Database Integration** (uses existing t_tenant_reading table)
+3. **Technology Maturity** (Bootstrap 5 and QR libraries are well-established)
 
-## Dependencies
+## Success Criteria ⚠️ **UPDATED FOR NEW PRIORITY**
 
-### Technical Dependencies
-1. **PHP 7.2 compatibility**
-2. **MSSQL 2019 database access**
-3. **Windows Server 2019 environment**
-4. **IIS web server configuration**
-5. **QR code library integration**
-6. **Camera API access for mobile devices**
+### Phase 1 Success Criteria (QR Code System)
+- [ ] **Standalone deployment successful** in both IIS scenarios
+- [ ] **QR code generation and scanning** working across mobile devices
+- [ ] **Bootstrap 5 modern interface** fully responsive and accessible
+- [ ] **Offline functionality** working with data synchronization
+- [ ] **Database integration** seamlessly connecting to t_tenant_reading
+- [ ] **Performance targets** met (sub-second scanning, fast sync)
+- [ ] **Documentation complete** for IIS deployment options
 
-### Business Dependencies
-1. **User training and adoption**
-2. **System downtime coordination**
-3. **User acceptance testing**
+### Phase 2 Success Criteria (Rate Management)
+- [ ] **Bootstrap 5 integration** with existing RMS system
+- [ ] **Rate management interface** operational with modern design
+- [ ] **Bulk update functionality** working with existing classification
+- [ ] **Audit trail** implemented for rate changes
+- [ ] **User training** completed for both systems
 
-## Success Criteria
+## Next Steps ⚠️ **IMMEDIATE QR CODE FOCUS**
 
-### Phase 1 Success Criteria
-- [ ] Utility rate management interface operational
-- [ ] Bulk update functionality working correctly with existing classification
-- [ ] Audit trail for rate changes implemented
-- [ ] Integration with existing system completed
-- [ ] User training completed
+1. **IMMEDIATE PRIORITY**
+   - Begin QR Code System development (Phase 1)
+   - Set up Bootstrap 5 development environment
+   - Create standalone project structure
 
-### Phase 2 Success Criteria
-- [ ] Mobile QR code system operational
-- [ ] QR code generation and scanning working
-- [ ] Real-time data synchronization implemented
-- [ ] Offline capability functional
-- [ ] Mobile device compatibility verified
+2. **CREATIVE MODE REQUIREMENTS** ✅ **ENHANCED FOR NON-TECHNICAL USERS**
+   - **Executive Professional Design System** (`memory-bank/style-guide.md`)
+   - **Sophisticated QR scanner interface** designed for non-technical field staff
+   - **Executive-level utility rate management** for administrative users
+   - **Modern professional aesthetics** that inspire confidence and trust
+   - **Zero-training interfaces** with intuitive progressive disclosure
 
-## Next Steps
+3. **IMPLEMENTATION SEQUENCE**
+   - Week 1-4: Complete QR Code system
+   - Week 5-8: Utility Rate Management (Bootstrap 5 enhanced)
+   - Ongoing: Support and optimization
 
-1. **Complete Planning Phase**
-   - [x] Review and approve planning document
-   - [x] Finalize implementation timeline
-   - [x] Identify resource requirements
+## Key Updates from Original Plan ⚠️ **MAJOR CHANGES**
 
-2. **Begin Implementation**
-   - [ ] Start Phase 1: Use existing classification system
-   - [ ] Begin utility rate management development
-   - [ ] Plan Phase 2: Mobile QR code system
+### Priority Reordering
+1. **QR CODE SYSTEM FIRST**: Moved to Phase 1 (easier implementation, immediate value)
+2. **UTILITY RATES SECOND**: Moved to Phase 2 (more complex, builds on QR success)
 
-3. **Continuous Monitoring**
-   - [ ] Track progress against timeline
-   - [ ] Monitor risk factors
-   - [ ] Adjust plan as needed
+### Technology Upgrades
+1. **BOOTSTRAP 5 INTEGRATION**: Modern UI framework for contemporary design
+2. **PWA CAPABILITIES**: Offline functionality and app-like experience
+3. **STANDALONE DEPLOYMENT**: Self-contained system for IIS flexibility
 
-## Key Changes from Original Plan
-
-### Major Updates
-1. **NO DATABASE SCHEMA CHANGES**: Removed `is_residential` column addition
-2. **USE EXISTING CLASSIFICATION**: Leverage `m_real_property.space_type` for residential/commercial classification
-3. **REDUCED RISK**: No schema changes, faster implementation
-4. **BETTER MAINTAINABILITY**: Uses existing, tested classification system
-
-### Implementation Benefits
-1. **Faster Development**: No database schema changes required
-2. **Lower Risk**: Uses existing, tested classification system
-3. **Better Maintainability**: Leverages existing data structure
-4. **Consistent Architecture**: Maintains existing system design
+### Architecture Improvements
+1. **DUAL DEPLOYMENT OPTIONS**: Standalone IIS app OR RMS integration
+2. **EXISTING DATABASE USAGE**: Leverage t_tenant_reading (no schema changes)
+3. **MODERN DESIGN SYSTEM**: Bootstrap 5 with custom theming
+4. **MOBILE-FIRST APPROACH**: Touch-friendly, responsive design
 
 ---
 
-**Document Version**: 2.0  
+**Document Version**: 3.0 (MAJOR UPDATE - QR CODE PRIORITY)  
 **Last Updated**: January 2025  
-**Next Review**: Weekly during implementation 
+**Next Review**: Weekly during QR Code implementation 
