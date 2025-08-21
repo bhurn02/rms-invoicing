@@ -15,12 +15,19 @@ $currentCompany = getCurrentCompanyCode();
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <!-- Mobile-specific meta tags for maximum compatibility -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no, viewport-fit=cover">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="QR Scanner">
     <meta name="theme-color" content="#1e40af">
+    <meta name="msapplication-navbutton-color" content="#1e40af">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    
+    <!-- Disable automatic phone number detection -->
+    <meta name="format-detection" content="telephone=no">
+    
     <title>QR Meter Reading System - RMS</title>
     
     <!-- Bootstrap 5.3+ CSS -->
@@ -39,212 +46,355 @@ $currentCompany = getCurrentCompanyCode();
     <!-- Favicon -->
     <link rel="icon" type="image/x-icon" href="assets/images/favicon.ico">
     
-    <!-- Mobile-specific styles -->
+    <!-- Professional Navigation Styling -->
     <style>
-        /* Mobile-specific optimizations */
+        /* Critical iOS fixes */
+        input[type="text"], input[type="email"], input[type="password"], 
+        input[type="number"], input[type="date"], textarea, select {
+            font-size: 16px !important;
+        }
+        
+        html { 
+            overflow-x: hidden;
+            -webkit-text-size-adjust: 100%; 
+        }
+        
+        body { 
+            overflow-x: hidden;
+            -webkit-overflow-scrolling: touch; 
+        }
+        
+        /* Professional User Dropdown */
+        .user-dropdown {
+            position: relative;
+        }
+        
+        .user-dropdown .dropdown-toggle {
+            border: none !important;
+            background: transparent !important;
+            color: white !important;
+            display: flex;
+            align-items: center;
+            padding: 0.5rem 0.75rem;
+            border-radius: 0.375rem;
+            transition: background-color 0.15s ease-in-out;
+        }
+        
+        .user-dropdown .dropdown-toggle:hover,
+        .user-dropdown .dropdown-toggle:focus {
+            background-color: rgba(255, 255, 255, 0.1) !important;
+            box-shadow: none !important;
+        }
+        
+        .user-dropdown .dropdown-toggle::after {
+            margin-left: 0.5rem;
+        }
+        
+        .user-dropdown .dropdown-menu {
+            border: none;
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+            border-radius: 0.5rem;
+            padding: 0.5rem 0;
+            min-width: 200px;
+            margin-top: 0.5rem;
+        }
+        
+        .user-dropdown .dropdown-item {
+            padding: 0.75rem 1.25rem;
+            color: #374151;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            transition: all 0.15s ease-in-out;
+        }
+        
+        .user-dropdown .dropdown-item:hover {
+            background-color: #f8f9fa;
+            color: #1e40af;
+        }
+        
+        .user-dropdown .dropdown-item i {
+            width: 1.25rem;
+            margin-right: 0.75rem;
+            color: #6b7280;
+        }
+        
+        .user-dropdown .dropdown-item:hover i {
+            color: #1e40af;
+        }
+        
+        .user-dropdown .dropdown-divider {
+            margin: 0.5rem 0;
+            border-color: #e5e7eb;
+        }
+        
+        .user-dropdown .dropdown-header {
+            padding: 0.75rem 1.25rem 0.5rem;
+            color: #6b7280;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        
+        /* User avatar styling */
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 0.75rem;
+            font-size: 0.875rem;
+        }
+        
+        /* Tools dropdown */
+        .tools-dropdown .dropdown-menu {
+            border: none;
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+            border-radius: 0.5rem;
+            padding: 0.5rem 0;
+            min-width: 180px;
+        }
+        
+        .tools-dropdown .dropdown-item {
+            padding: 0.75rem 1.25rem;
+            color: #374151;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+        }
+        
+        .tools-dropdown .dropdown-item i {
+            width: 1.25rem;
+            margin-right: 0.75rem;
+            color: #6b7280;
+        }
+        
+        .tools-dropdown .dropdown-item:hover {
+            background-color: #f8f9fa;
+            color: #1e40af;
+        }
+        
+        .tools-dropdown .dropdown-item:hover i {
+            color: #1e40af;
+        }
+        
+        /* Mobile responsive adjustments */
         @media (max-width: 768px) {
-            .navbar-brand {
-                font-size: 1.1rem !important;
+            .user-dropdown .dropdown-menu {
+                min-width: 160px;
+                right: 0;
+                left: auto;
             }
             
-            .navbar-text {
-                font-size: 0.8rem !important;
-            }
-            
-            .card-professional {
-                margin-bottom: 1rem;
-                border-radius: 0.75rem;
-            }
-            
-            .card-professional .card-body {
-                padding: 1rem;
-            }
-            
-            .btn-lg {
-                padding: 0.75rem 1.5rem;
-                font-size: 1rem;
-                min-height: 3rem;
-            }
-            
-            .form-field {
-                font-size: 16px !important; /* Prevents zoom on iOS */
-                padding: 0.75rem;
-                min-height: 3rem;
-            }
-            
-            .table-responsive {
+            .user-dropdown .dropdown-item {
+                padding: 0.625rem 1rem;
                 font-size: 0.875rem;
             }
             
-            .table th,
-            .table td {
-                padding: 0.5rem;
-            }
-            
-            /* Hide footer on mobile to save space */
-            footer {
-                display: none;
-            }
-            
-            /* Optimize scanner viewport for mobile */
-            .qr-viewport {
-                min-height: 250px;
-                max-height: 60vh;
-            }
-            
-            #qr-reader {
-                min-height: 250px;
-                max-height: 60vh;
-            }
-        }
-        
-        /* Touch-friendly buttons */
-        .btn {
-            min-height: 44px; /* iOS minimum touch target */
-            touch-action: manipulation;
-        }
-        
-        /* Prevent text selection on buttons */
-        .btn {
-            -webkit-user-select: none;
-            -moz-user-select: none;
-            -ms-user-select: none;
-            user-select: none;
-        }
-        
-        /* Safe area for notched devices */
-        @supports (padding: max(0px)) {
-            .navbar {
-                padding-left: max(1rem, env(safe-area-inset-left));
-                padding-right: max(1rem, env(safe-area-inset-right));
-            }
-            
-            main {
-                padding-left: max(1rem, env(safe-area-inset-left));
-                padding-right: max(1rem, env(safe-area-inset-right));
+            .user-avatar {
+                width: 28px;
+                height: 28px;
+                margin-right: 0.5rem;
+                font-size: 0.75rem;
             }
         }
     </style>
 </head>
 <body class="bg-light">
-    <!-- Header -->
-    <header class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
-        <div class="container-fluid">
-            <a class="navbar-brand fw-bold" href="#">
-                <i class="bi bi-qr-code me-2"></i>
+    <!-- Professional Navigation with Dropdown Menus -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary sticky-top shadow">
+        <div class="container-fluid px-3">
+            <!-- Brand -->
+            <a class="navbar-brand fw-bold d-flex align-items-center" href="#">
+                <i class="bi bi-qr-code me-2 fs-5"></i>
                 <span class="d-none d-sm-inline">QR Meter Reading System</span>
-                <span class="d-inline d-sm-none">QR Scanner</span>
+                <span class="d-sm-none">QR Scanner</span>
             </a>
-            <div class="navbar-nav ms-auto">
-                <div class="navbar-text text-light me-2 d-none d-md-block">
-                    <i class="bi bi-person-circle me-1"></i>
-                    <?php echo htmlspecialchars($currentUser ?? 'Field Technician'); ?>
+            
+            <!-- Navigation Items -->
+            <div class="d-flex align-items-center ms-auto">
+                
+                <!-- Tools Dropdown -->
+                <div class="dropdown tools-dropdown me-3">
+                    <button class="btn btn-outline-light btn-sm dropdown-toggle" type="button" 
+                            data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="bi bi-tools me-1"></i>
+                        <span class="d-none d-md-inline">Tools</span>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><h6 class="dropdown-header">Development Tools</h6></li>
+                        <li>
+                            <a class="dropdown-item" href="camera-test.html" target="_blank">
+                                <i class="bi bi-camera-video"></i>
+                                Camera Test
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="qr-generator.html" target="_blank">
+                                <i class="bi bi-qr-code"></i>
+                                QR Generator
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="qr-generator-simple.html" target="_blank">
+                                <i class="bi bi-qr-code-scan"></i>
+                                Simple QR Generator
+                            </a>
+                        </li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <a class="dropdown-item" href="qr-test.html" target="_blank">
+                                <i class="bi bi-bug"></i>
+                                QR Test Utility
+                            </a>
+                        </li>
+                    </ul>
                 </div>
-                <div class="navbar-text text-light me-2 d-none d-lg-block">
-                    <i class="bi bi-building me-1"></i>
-                    <?php echo htmlspecialchars($currentCompany ?? 'Company'); ?>
+
+                <!-- User Dropdown -->
+                <div class="dropdown user-dropdown">
+                    <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <div class="user-avatar">
+                            <?php echo strtoupper(substr($currentUser ?? 'U', 0, 1)); ?>
+                        </div>
+                        <div class="d-flex flex-column align-items-start">
+                            <span class="fw-semibold" style="font-size: 0.875rem;">
+                                <?php echo htmlspecialchars($currentUser ?? 'Field Technician'); ?>
+                            </span>
+                            <small class="opacity-75 d-none d-lg-block" style="font-size: 0.75rem;">
+                                <?php echo htmlspecialchars($currentCompany ?? 'Administrator'); ?>
+                            </small>
+                        </div>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><h6 class="dropdown-header">Account Management</h6></li>
+                        <li>
+                            <a class="dropdown-item" href="#">
+                                <i class="bi bi-person"></i>
+                                Edit Account
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="#">
+                                <i class="bi bi-credit-card"></i>
+                                Billing
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="#">
+                                <i class="bi bi-receipt"></i>
+                                Payments
+                            </a>
+                        </li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <a class="dropdown-item" href="auth/logout.php" 
+                               onclick="return confirm('Are you sure you want to logout?');">
+                                <i class="bi bi-box-arrow-right"></i>
+                                Logout
+                            </a>
+                        </li>
+                    </ul>
                 </div>
-                <!-- Debug link - remove in production -->
-                <a href="camera-test.html" class="btn btn-outline-light btn-sm me-2" target="_blank" title="Camera Test">
-                    <i class="bi bi-camera-video"></i>
-                </a>
-                <a href="qr-generator.html" class="btn btn-outline-light btn-sm me-2" target="_blank" title="QR Generator">
-                    <i class="bi bi-qr-code"></i>
-                </a>
-                <a href="qr-generator-simple.html" class="btn btn-outline-light btn-sm me-2" target="_blank" title="Simple QR Generator">
-                    <i class="bi bi-qr-code-scan"></i>
-                </a>
-                <a href="auth/logout.php" class="btn btn-outline-light btn-sm">
-                    <i class="bi bi-box-arrow-right me-1"></i>
-                    <span class="d-none d-sm-inline">Logout</span>
-                    <span class="d-inline d-sm-none">Exit</span>
-                </a>
             </div>
         </div>
-    </header>
+    </nav>
 
-    <!-- Main Content -->
-    <main class="container-fluid py-3">
-        <div class="row justify-content-center">
+    <!-- Main Content - Bootstrap responsive -->
+    <main class="container-fluid p-3 p-md-4">
+        <div class="row justify-content-center g-3">
             <div class="col-12 col-lg-8 col-xl-6">
                 
-                <!-- Welcome Card -->
-                <div class="card card-professional mb-3">
-                    <div class="card-body text-center">
+                <!-- Welcome Card - Bootstrap responsive -->
+                <div class="card shadow-sm border-0 mb-3">
+                    <div class="card-body text-center p-4">
                         <div class="mb-3">
-                            <i class="bi bi-camera-video-fill text-primary" style="font-size: 2.5rem;"></i>
+                            <i class="bi bi-camera-video-fill text-primary display-4"></i>
                         </div>
-                        <h1 class="card-title page-title mb-2">Meter Reading Scanner</h1>
-                        <p class="card-text body-text text-muted">
+                        <h1 class="card-title h3 h2-md mb-2 fw-bold">Meter Reading Scanner</h1>
+                        <p class="card-text text-muted lead-sm">
                             Welcome, <?php echo htmlspecialchars($currentUser ?? 'Field Technician'); ?>! 
                             Scan the QR code on the meter to automatically populate the reading form
                         </p>
                     </div>
                 </div>
 
-                <!-- Scanner Card -->
-                <div class="card card-professional mb-3">
-                    <div class="card-header bg-primary text-white">
-                        <h5 class="card-title mb-0">
-                            <i class="bi bi-qr-code-scan me-2"></i>
+                <!-- Scanner Card - Bootstrap responsive -->
+                <div class="card shadow-sm border-0 mb-3">
+                    <div class="card-header bg-primary text-white border-0 py-3">
+                        <h5 class="card-title mb-0 d-flex align-items-center">
+                            <i class="bi bi-qr-code-scan me-2 fs-5"></i>
                             QR Code Scanner
                         </h5>
                     </div>
-                    <div class="card-body">
-                        <!-- Camera Viewport -->
-                        <div id="qr-reader" class="qr-viewport mb-3"></div>
+                    <div class="card-body p-4">
+                        <!-- Camera Viewport - responsive sizing -->
+                        <div id="qr-reader" class="border border-2 border-light rounded-3 mb-3" 
+                             style="min-height: 250px; max-height: 60vh; background: #f8f9fa;"></div>
                         
-                        <!-- Scanner Controls -->
+                        <!-- Scanner Controls - Bootstrap grid -->
                         <div class="d-grid gap-2">
-                            <button id="start-scanner" class="btn btn-scan-primary btn-lg">
+                            <button id="start-scanner" class="btn btn-primary btn-lg shadow-sm">
                                 <i class="bi bi-camera-fill me-2"></i>
                                 Start Scanner
                             </button>
-                            <button id="stop-scanner" class="btn btn-secondary btn-lg" style="display: none;">
+                            <button id="stop-scanner" class="btn btn-secondary btn-lg shadow-sm" style="display: none;">
                                 <i class="bi bi-stop-circle me-2"></i>
                                 Stop Scanner
                             </button>
                         </div>
                         
                         <!-- Scanner Status -->
-                        <div id="scanner-status" class="alert alert-info mt-3" style="display: none;">
+                        <div id="scanner-status" class="alert alert-info border-0 mt-3 shadow-sm" style="display: none;">
                             <i class="bi bi-info-circle me-2"></i>
                             <span id="status-text">Ready to scan</span>
                         </div>
                     </div>
                 </div>
 
-                <!-- Reading Form Card -->
-                <div id="reading-form-card" class="card card-professional" style="display: none;">
-                    <div class="card-header bg-success text-white">
-                        <h5 class="card-title mb-0">
-                            <i class="bi bi-check-circle me-2"></i>
+                <!-- Reading Form Card - Bootstrap responsive -->
+                <div id="reading-form-card" class="card shadow-sm border-0" style="display: none;">
+                    <div class="card-header bg-success text-white border-0 py-3">
+                        <h5 class="card-title mb-0 d-flex align-items-center">
+                            <i class="bi bi-check-circle me-2 fs-5"></i>
                             Meter Reading Form
                         </h5>
                     </div>
-                    <div class="card-body">
+                    <div class="card-body p-4">
                         <form id="reading-form">
-                            <!-- Property Information -->
-                            <div class="row mb-3">
+                            <!-- Property Information - Bootstrap responsive grid -->
+                            <div class="row g-3 mb-4">
                                 <div class="col-12 col-md-6">
-                                    <label for="property-id" class="form-label field-label">Property ID</label>
-                                    <input type="text" class="form-control form-field" id="property-id" readonly>
+                                    <label for="property-id" class="form-label fw-semibold text-dark">Property ID</label>
+                                    <input type="text" class="form-control form-control-lg border-2" 
+                                           id="property-id" readonly 
+                                           style="font-size: 16px; background-color: #f8f9fa;">
                                 </div>
                                 <div class="col-12 col-md-6">
-                                    <label for="unit-number" class="form-label field-label">Unit Number</label>
-                                    <input type="text" class="form-control form-field" id="unit-number" readonly>
+                                    <label for="unit-number" class="form-label fw-semibold text-dark">Unit Number</label>
+                                    <input type="text" class="form-control form-control-lg border-2" 
+                                           id="unit-number" readonly 
+                                           style="font-size: 16px; background-color: #f8f9fa;">
                                 </div>
                             </div>
                             
-                            <!-- Meter Information -->
-                            <div class="row mb-3">
+                            <!-- Meter Information - Bootstrap responsive grid -->
+                            <div class="row g-3 mb-4">
                                 <div class="col-12 col-md-6">
-                                    <label for="meter-id" class="form-label field-label">Meter ID</label>
-                                    <input type="text" class="form-control form-field" id="meter-id" readonly>
+                                    <label for="meter-id" class="form-label fw-semibold text-dark">Meter ID</label>
+                                    <input type="text" class="form-control form-control-lg border-2" 
+                                           id="meter-id" readonly 
+                                           style="font-size: 16px; background-color: #f8f9fa;">
                                 </div>
                                 <div class="col-12 col-md-6">
-                                    <label for="reading-date" class="form-label field-label">Reading Date</label>
-                                    <input type="date" class="form-control form-field" id="reading-date" required>
+                                    <label for="reading-date" class="form-label fw-semibold text-dark">Reading Date</label>
+                                    <input type="date" class="form-control form-control-lg border-2" 
+                                           id="reading-date" required 
+                                           style="font-size: 16px;">
                                 </div>
                             </div>
                             
@@ -313,14 +463,34 @@ $currentCompany = getCurrentCompanyCode();
         </div>
     </footer>
 
-    <!-- Bootstrap 5.3+ JS -->
+    <!-- Bootstrap 5 JavaScript Bundle with Popper -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     
-    <!-- QR Code Scanner Library -->
+    <!-- QR Code Library -->
     <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
     
     <!-- Custom JavaScript -->
     <script src="assets/js/app.js"></script>
+    
+    <!-- Initialize Bootstrap Dropdowns -->
+    <script>
+        // Initialize Bootstrap dropdowns when DOM is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize all dropdowns
+            var dropdownElementList = [].slice.call(document.querySelectorAll('.dropdown-toggle'));
+            var dropdownList = dropdownElementList.map(function (dropdownToggleEl) {
+                return new bootstrap.Dropdown(dropdownToggleEl);
+            });
+            
+            // Initialize tooltips if any
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl);
+            });
+            
+            console.log('Bootstrap dropdowns initialized:', dropdownList.length);
+        });
+    </script>
     
     <!-- Service Worker Registration -->
     <script>

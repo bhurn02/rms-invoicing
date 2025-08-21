@@ -116,6 +116,6 @@ These enhancements represent a significant opportunity to modernize our property
 ---
 
 *Prepared for Management Review*  
-*Date: January 2025*  
+*Date: August 2025*  
 *System: RMS (Real Estate Management System)*  
 *Location: Scalable for any property management location* 

@@ -405,6 +405,6 @@ CREATE TABLE m_meter_qr_codes (
 
 *Technical PRD - Utility Rate Management Enhancement*  
 *Version: 1.0*  
-*Date: January 2025*  
+*Date: August 2025*  
 *System: RMS (Real Estate Management System)*  
 *Location: Scalable for any property management location* 
