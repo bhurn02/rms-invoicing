@@ -87,6 +87,7 @@
    ├── api/
    │   ├── save-reading.php          (Store meter readings)
    │   ├── get-meter-data.php        (Retrieve meter information)
+   │   ├── get-active-tenants.php    (Retrieve active tenant data for batch QR)
    │   ├── validate-qr.php           (QR code validation)
    │   └── sync-offline.php          (Offline data synchronization)
    ├── components/
@@ -99,13 +100,24 @@
    │   ├── reading-form.php          (Meter reading form)
    │   ├── offline.php               (Offline functionality)
    │   └── history.php               (Reading history)
+   ├── qr-generator.html             (ENHANCED: Individual + Batch QR generation)
+   ├── qr-generator-simple.html     (Simple QR data generator)
+   ├── camera-test.html              (Camera testing utility)
    ├── web.config                    (IIS configuration)
    ├── service-worker.js             (PWA service worker)
    └── README.md                     (Deployment instructions)
    ```
 
-2. **Database Integration**
+2. **Enhanced QR Code Generation System** ⚠️ **NEW REQUIREMENT**
+   - **Individual QR Generation**: Existing functionality for single QR codes
+   - **Batch QR Generation**: New section for bulk generation from active tenants
+   - **Enhanced QR Display**: Include real property name and unit code on printed QRs
+   - **Database Integration**: Direct connection to RMS for active tenant data
+   - **Professional Layout**: Print-optimized design for physical deployment
+
+3. **Database Integration**
    - **Existing table**: `t_tenant_reading` (no schema changes required)
+   - **Additional tables**: `m_tenant`, `m_real_property`, `m_units` for batch QR generation
    - **Dependencies**: Existing RMS database connection
    - **Impact**: Minimal (leverages existing structure)
 
@@ -174,10 +186,13 @@
 - [ ] **Data Validation**: QR code parsing and error handling
 - [ ] **Database Connection**: Integration with existing t_tenant_reading
 
-#### Week 3: Advanced Features & Offline Capability
+#### Week 3: Advanced Features & Enhanced QR Generation ⚠️ **UPDATED**
 - [ ] **Progressive Web App**: Complete offline functionality
 - [ ] **Data Synchronization**: Online/offline data sync
 - [ ] **Form Enhancement**: Bootstrap 5 validation and UX
+- [ ] **Enhanced QR Generator**: Individual + batch generation with property/unit display
+- [ ] **Active Tenant Integration**: Database connection for batch QR generation
+- [ ] **Print Optimization**: Professional layout for physical QR deployment
 - [ ] **Error Handling**: User-friendly error messages and recovery
 - [ ] **Performance Optimization**: Loading optimization, caching
 
@@ -185,6 +200,7 @@
 - [ ] **IIS Deployment Configuration**: Both standalone and integrated scenarios
 - [ ] **Cross-device Testing**: Mobile devices, browsers, screen sizes
 - [ ] **Performance Testing**: Load times, scanning speed, sync performance
+- [ ] **QR Deployment Testing**: Print quality, scan reliability, batch generation workflow
 - [ ] **Documentation**: Deployment guide for IIS administrators
 - [ ] **User Acceptance Testing**: End-user testing and feedback
 
@@ -292,9 +308,13 @@ Benefits:
 ### Phase 1 Success Criteria (QR Code System)
 - [ ] **Standalone deployment successful** in both IIS scenarios
 - [ ] **QR code generation and scanning** working across mobile devices
+- [ ] **Enhanced QR Generator** with batch generation for active tenants operational
+- [ ] **QR Display Enhancement** showing real property name and unit code on printed QRs
+- [ ] **Active Tenant Integration** successfully pulling data from RMS database
 - [ ] **Bootstrap 5 modern interface** fully responsive and accessible
 - [ ] **Offline functionality** working with data synchronization
 - [ ] **Database integration** seamlessly connecting to t_tenant_reading
+- [ ] **Print Quality Verification** QR codes readable at various sizes and printer types
 - [ ] **Performance targets** met (sub-second scanning, fast sync)
 - [ ] **Documentation complete** for IIS deployment options
 

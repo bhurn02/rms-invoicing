@@ -412,3 +412,137 @@ Elegant Teal (Freshness)
 **Created**: August 2025  
 **Purpose**: Modern, sophisticated design system for non-technical users  
 **Framework**: Bootstrap 5 with custom enhancements
+
+---
+
+## 🔔 Alert System - Sweet Alert Professional Theme
+
+### Alert Types & Visual Standards
+```css
+/* Success Alerts - Achievement & Confirmation */
+.swal-success {
+  --swal-icon-color: #059669; /* Success Green */
+  --swal-background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+  --swal-border-color: #059669;
+}
+
+/* Error Alerts - Helpful Guidance */
+.swal-error {
+  --swal-icon-color: #dc2626; /* Professional Error Red */
+  --swal-background: linear-gradient(135deg, #fef2f2 0%, #fecaca 100%);
+  --swal-border-color: #dc2626;
+}
+
+/* Warning Alerts - Important Attention */
+.swal-warning {
+  --swal-icon-color: #d97706; /* Warning Amber */
+  --swal-background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  --swal-border-color: #d97706;
+}
+
+/* Info Alerts - Guidance & Tips */
+.swal-info {
+  --swal-icon-color: #1e40af; /* Primary Blue */
+  --swal-background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+  --swal-border-color: #1e40af;
+}
+
+/* Confirmation Dialogs - Decision Points */
+.swal-question {
+  --swal-icon-color: #1e40af; /* Primary Blue */
+  --swal-background: white;
+  --swal-border-color: #d1d5db;
+}
+```
+
+### Mobile Alert Considerations
+- **Touch Targets**: Minimum 44px height for all buttons
+- **Button Layout**: Full-width stacked buttons on mobile screens
+- **Responsive Text**: Scalable typography (1.25rem title, 1rem content on mobile)
+- **Gesture Support**: Swipe-to-dismiss functionality
+- **Landscape Mode**: Compact layout for reduced screen height
+- **Safe Areas**: Proper margin handling for notched devices
+
+### Alert Usage Guidelines
+
+#### ✅ Preferred Messaging Patterns
+```javascript
+// Success - Clear achievement
+alerts.success(
+  'Reading Submitted Successfully',
+  'Your meter reading has been recorded and sent to the office.'
+);
+
+// Error - Helpful guidance
+alerts.error(
+  'Camera Permission Needed',
+  'To scan QR codes, please allow camera access in your browser settings. You can also enter meter information manually.'
+);
+
+// Warning - Attention without alarm
+alerts.warning(
+  'Network Connection Issue',
+  'Your reading has been saved offline and will be submitted when you reconnect.'
+);
+
+// Confirmation - Clear choices
+alerts.confirm(
+  'Logout Confirmation',
+  'Are you sure you want to logout? Any unsaved work will be lost.',
+  'Yes, Logout',
+  'Stay Logged In'
+);
+```
+
+#### ❌ Avoid These Patterns
+```javascript
+// ❌ Technical jargon
+alerts.error('HTTP 500 Error', 'Server endpoint exception');
+
+// ❌ Vague messaging
+alerts.info('Something happened', 'Please try again');
+
+// ❌ Alarming language
+alerts.warning('CRITICAL ERROR', 'SYSTEM FAILURE DETECTED');
+```
+
+### Implementation Standards
+- **Language**: Non-technical, field technician friendly
+- **Actions**: Always provide clear next steps
+- **Context**: Include relevant help and guidance
+- **Consistency**: Maintain button labeling conventions
+- **Accessibility**: Full keyboard navigation and screen reader support
+
+### Alert Button Standards
+```css
+/* Primary Action Buttons */
+.swal2-confirm {
+  background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+  color: white;
+  border-radius: 0.75rem;
+  min-height: 2.75rem; /* 44px mobile touch target */
+  font-weight: 600;
+  padding: 0.75rem 2rem;
+}
+
+/* Secondary Action Buttons */
+.swal2-cancel {
+  background: white;
+  color: #374151;
+  border: 2px solid #d1d5db;
+  border-radius: 0.75rem;
+  min-height: 2.75rem;
+  font-weight: 500;
+  padding: 0.75rem 2rem;
+}
+
+/* Mobile Responsive Buttons */
+@media (max-width: 768px) {
+  .swal2-confirm,
+  .swal2-cancel {
+    width: 100%;
+    min-height: 3rem; /* Extra generous mobile target */
+    margin: 0;
+  }
+}
+```

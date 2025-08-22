@@ -44,3 +44,5 @@ IIS
 PHP 7.2
 MSSQL 2019
 use Bootstrap 5 with modern design
+
+I will also need a qr code generator for all the active tenant. and improve qr code to include in the printed qr code the real property and unit code. add it in qr-generator.html there should be additional section to batch generate depending on the selected active tenants from a table.
