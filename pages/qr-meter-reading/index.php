@@ -310,13 +310,13 @@ $currentCompany = getCurrentCompanyCode();
             <div class="col-12 col-lg-8 col-xl-6">
                 
                 <!-- Welcome Card - Bootstrap responsive -->
-                <div class="card shadow-sm border-0 mb-3">
+                <div class="card card-professional shadow-sm border-0 mb-3">
                     <div class="card-body text-center p-4">
                         <div class="mb-3">
                             <i class="bi bi-camera-video-fill text-primary display-4"></i>
                         </div>
-                        <h1 class="card-title h3 h2-md mb-2 fw-bold">Meter Reading Scanner</h1>
-                        <p class="card-text text-muted lead-sm">
+                        <h1 class="card-title page-title mb-2">Meter Reading Scanner</h1>
+                        <p class="card-text body-text text-muted">
                             Welcome, <?php echo htmlspecialchars($currentUser ?? 'Field Technician'); ?>! 
                             Scan the QR code on the meter to automatically populate the reading form
                         </p>
@@ -324,7 +324,7 @@ $currentCompany = getCurrentCompanyCode();
                 </div>
 
                 <!-- Scanner Card - Bootstrap responsive -->
-                <div class="card shadow-sm border-0 mb-3">
+                <div class="card card-professional shadow-sm border-0 mb-3">
                     <div class="card-header bg-primary text-white border-0 py-3">
                         <h5 class="card-title mb-0 d-flex align-items-center">
                             <i class="bi bi-qr-code-scan me-2 fs-5"></i>
@@ -332,13 +332,12 @@ $currentCompany = getCurrentCompanyCode();
                         </h5>
                     </div>
                     <div class="card-body p-4">
-                        <!-- Camera Viewport - responsive sizing -->
-                        <div id="qr-reader" class="border border-2 border-light rounded-3 mb-3" 
-                             style="min-height: 250px; max-height: 60vh; background: #f8f9fa;"></div>
+                        <!-- Camera Viewport - proper QR scanner styling -->
+                        <div id="qr-reader" class="qr-viewport mb-3"></div>
                         
                         <!-- Scanner Controls - Bootstrap grid -->
                         <div class="d-grid gap-2">
-                            <button id="start-scanner" class="btn btn-primary btn-lg shadow-sm">
+                            <button id="start-scanner" class="btn btn-scan-primary btn-lg shadow-sm">
                                 <i class="bi bi-camera-fill me-2"></i>
                                 Start Scanner
                             </button>
@@ -357,7 +356,7 @@ $currentCompany = getCurrentCompanyCode();
                 </div>
 
                 <!-- Reading Form Card - Bootstrap responsive -->
-                <div id="reading-form-card" class="card shadow-sm border-0" style="display: none;">
+                <div id="reading-form-card" class="card card-professional shadow-sm border-0" style="display: none;">
                     <div class="card-header bg-success text-white border-0 py-3">
                         <h5 class="card-title mb-0 d-flex align-items-center">
                             <i class="bi bi-check-circle me-2 fs-5"></i>
@@ -369,32 +368,28 @@ $currentCompany = getCurrentCompanyCode();
                             <!-- Property Information - Bootstrap responsive grid -->
                             <div class="row g-3 mb-4">
                                 <div class="col-12 col-md-6">
-                                    <label for="property-id" class="form-label fw-semibold text-dark">Property ID</label>
-                                    <input type="text" class="form-control form-control-lg border-2" 
-                                           id="property-id" readonly 
-                                           style="font-size: 16px; background-color: #f8f9fa;">
+                                    <label for="property-id" class="form-label field-label">Property ID</label>
+                                    <input type="text" class="form-control form-field" 
+                                           id="property-id" readonly>
                                 </div>
                                 <div class="col-12 col-md-6">
-                                    <label for="unit-number" class="form-label fw-semibold text-dark">Unit Number</label>
-                                    <input type="text" class="form-control form-control-lg border-2" 
-                                           id="unit-number" readonly 
-                                           style="font-size: 16px; background-color: #f8f9fa;">
+                                    <label for="unit-number" class="form-label field-label">Unit Number</label>
+                                    <input type="text" class="form-control form-field" 
+                                           id="unit-number" readonly>
                                 </div>
                             </div>
                             
                             <!-- Meter Information - Bootstrap responsive grid -->
                             <div class="row g-3 mb-4">
                                 <div class="col-12 col-md-6">
-                                    <label for="meter-id" class="form-label fw-semibold text-dark">Meter ID</label>
-                                    <input type="text" class="form-control form-control-lg border-2" 
-                                           id="meter-id" readonly 
-                                           style="font-size: 16px; background-color: #f8f9fa;">
+                                    <label for="meter-id" class="form-label field-label">Meter ID</label>
+                                    <input type="text" class="form-control form-field" 
+                                           id="meter-id" readonly>
                                 </div>
                                 <div class="col-12 col-md-6">
-                                    <label for="reading-date" class="form-label fw-semibold text-dark">Reading Date</label>
-                                    <input type="date" class="form-control form-control-lg border-2" 
-                                           id="reading-date" required 
-                                           style="font-size: 16px;">
+                                    <label for="reading-date" class="form-label field-label">Reading Date</label>
+                                    <input type="date" class="form-control form-field" 
+                                           id="reading-date" required>
                                 </div>
                             </div>
                             
