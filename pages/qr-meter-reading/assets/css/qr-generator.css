@@ -1,0 +1,333 @@
+/* Enhanced QR Code Generator - Professional Styles */
+
+body {
+    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    min-height: 100vh;
+}
+
+/* Executive Professional Navigation */
+.nav-pills-executive .nav-link {
+    color: #374151;
+    font-weight: 500;
+    padding: 0.75rem 1.5rem;
+    margin-right: 0.5rem;
+    border-radius: 0.75rem;
+    border: 2px solid transparent;
+    transition: all 0.2s ease-in-out;
+}
+
+.nav-pills-executive .nav-link:hover {
+    color: #1e40af;
+    background-color: rgba(59, 130, 246, 0.1);
+    border-color: rgba(59, 130, 246, 0.2);
+}
+
+.nav-pills-executive .nav-link.active {
+    background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+    color: white;
+    box-shadow: 0 4px 14px 0 rgba(30, 64, 175, 0.2);
+}
+
+/* Professional Card Styling */
+.generator-card {
+    background: white;
+    border-radius: 1rem;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    border: 1px solid rgba(243, 244, 246, 0.8);
+    margin-bottom: 2rem;
+    transition: all 0.3s ease-in-out;
+}
+
+.generator-card:hover {
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    transform: translateY(-2px);
+}
+
+.generator-card .card-header {
+    background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+    color: white;
+    border-radius: 1rem 1rem 0 0;
+    padding: 1.5rem 2rem;
+    border: none;
+}
+
+.generator-card .card-body {
+    padding: 2rem;
+}
+
+/* Professional QR Display */
+.professional-qr {
+    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+    border: 2px solid #e5e7eb;
+    border-radius: 1rem;
+    padding: 1rem;
+    text-align: center;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease-in-out;
+    max-width: 400px;
+    margin: 0 auto 1.5rem auto;
+    display: flex;
+    flex-direction: column;
+    min-height: 380px;
+}
+
+.professional-qr:hover {
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+}
+
+.qr-code-container {
+    margin: 1rem 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 320px;
+    flex: 1;
+}
+
+/* Batch QR Specific Styling */
+.batch-qr {
+    min-height: 300px;
+}
+
+.batch-qr .qr-code-container {
+    min-height: 200px;
+}
+
+.batch-qr-header h5 {
+    color: #1e40af;
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+    font-size: 0.9rem;
+}
+
+.batch-qr-header p {
+    color: #6b7280;
+    font-size: 0.8rem;
+    margin-bottom: 0.5rem;
+}
+
+.qr-code-container canvas {
+    max-width: 100%;
+    max-height: 320px;
+    width: auto !important;
+    height: auto !important;
+}
+
+.qr-footer {
+    margin-top: 1rem;
+}
+
+.scan-instruction {
+    color: #374151;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+}
+
+.qr-data {
+    color: #6b7280;
+    font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, monospace;
+    font-size: 0.875rem;
+}
+
+/* Professional Form Styling */
+.form-control {
+    border: 2px solid #e5e7eb;
+    border-radius: 0.75rem;
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+    transition: all 0.2s ease-in-out;
+}
+
+.form-control:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    background-color: #fafbfc;
+}
+
+.form-label {
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 0.5rem;
+}
+
+/* Professional Button Styling */
+.btn-primary {
+    background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+    border: none;
+    border-radius: 0.75rem;
+    padding: 0.75rem 2rem;
+    font-weight: 600;
+    box-shadow: 0 4px 14px 0 rgba(30, 64, 175, 0.2);
+    transition: all 0.2s ease-in-out;
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px 0 rgba(30, 64, 175, 0.3);
+}
+
+.btn-secondary {
+    background: white;
+    color: #374151;
+    border: 2px solid #d1d5db;
+    border-radius: 0.75rem;
+    padding: 0.75rem 2rem;
+    font-weight: 500;
+    transition: all 0.2s ease-in-out;
+}
+
+.btn-secondary:hover {
+    border-color: #1e40af;
+    color: #1e40af;
+    box-shadow: 0 4px 14px 0 rgba(30, 64, 175, 0.1);
+}
+
+/* Batch Generation Interface */
+.tenant-selection-interface {
+    background: white;
+    border-radius: 1rem;
+    padding: 2rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    margin-bottom: 2rem;
+}
+
+.tenant-selection-table {
+    border-radius: 0.75rem;
+    overflow: hidden;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.tenant-selection-table th {
+    background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+    color: white;
+    font-weight: 600;
+    padding: 1rem;
+    border: none;
+}
+
+.tenant-selection-table td {
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid #e5e7eb;
+    vertical-align: middle;
+}
+
+.tenant-selection-table tbody tr:hover {
+    background-color: rgba(59, 130, 246, 0.05);
+}
+
+/* QR Scanner Test Styling */
+.scanner-container {
+    background: white;
+    border-radius: 1rem;
+    padding: 2rem;
+    text-align: center;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+#qr-reader {
+    width: 100%;
+    max-width: 500px;
+    margin: 0 auto;
+    border-radius: 0.75rem;
+    overflow: hidden;
+}
+
+/* Progress Bar Styling */
+.progress {
+    height: 0.75rem;
+    border-radius: 0.5rem;
+    background-color: #e5e7eb;
+}
+
+.progress-bar {
+    background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+    border-radius: 0.5rem;
+}
+
+/* Alert Styling */
+.alert {
+    border: none;
+    border-radius: 0.75rem;
+    padding: 1rem 1.5rem;
+}
+
+.alert-success {
+    background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+    border-left: 4px solid #059669;
+    color: #065f46;
+}
+
+.alert-danger {
+    background: linear-gradient(135deg, #fef2f2 0%, #fecaca 100%);
+    border-left: 4px solid #dc2626;
+    color: #991b1b;
+}
+
+.alert-info {
+    background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+    border-left: 4px solid #1e40af;
+    color: #1e3a8a;
+}
+
+/* Print Media Styles */
+@media print {
+    .professional-qr {
+        width: 60mm;
+        height: 80mm;
+        border: 2px solid #1e40af;
+        border-radius: 8px;
+        padding: 3mm;
+        margin: 10mm;
+        background: white;
+        page-break-inside: avoid;
+        display: inline-block;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+    
+    .qr-code-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin: 1mm 0;
+        flex: 1;
+    }
+    
+    .qr-code-container canvas {
+        width: 50mm !important;
+        height: 50mm !important;
+        max-width: 50mm !important;
+        max-height: 50mm !important;
+    }
+    
+    .qr-footer {
+        font-size: 8pt;
+        color: #666;
+        margin-top: 2mm;
+    }
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+    .generator-card .card-body {
+        padding: 1rem;
+    }
+    
+    .nav-pills-executive .nav-link {
+        padding: 0.5rem 1rem;
+        margin-right: 0.25rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .professional-qr {
+        padding: 1rem;
+    }
+    
+    .tenant-selection-interface {
+        padding: 1rem;
+    }
+}
