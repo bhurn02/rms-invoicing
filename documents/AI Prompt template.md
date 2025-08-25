@@ -6,6 +6,8 @@ create a copy pastable plain text not .md git commit summary of what we accompli
 
 I will git commit our changes so far. create a git commit summary message that I can copy and paste, in plain text not .md,  of what we've accomplished since start of this conversation
 
+I will git commit our changes so far. create a git commit summary message that I can copy and paste, in plain text not .md,  of what we've accomplished so far. here's my last git commit:
+
 
 Tech Specs:
 Windows Server 2019

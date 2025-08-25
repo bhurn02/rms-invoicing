@@ -56,10 +56,10 @@ try {
                 AND t.building_code = u.building_code
                 AND t.unit_no = u.unit_no
             WHERE ISNULL(t.terminated, 'N') = 'N'
-                AND t.tenant_code IS NOT NULL
-                AND t.tenant_name IS NOT NULL
-                AND t.real_property_code IS NOT NULL
-                AND t.unit_no IS NOT NULL";
+                AND ISNULL(t.tenant_code,'') <> ''
+                AND ISNULL(t.tenant_name,'') <> ''
+                AND ISNULL(t.real_property_code,'')<>''
+                AND ISNULL(t.unit_no,'')<>''";
     
     $params = array();
     
