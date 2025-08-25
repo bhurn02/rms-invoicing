@@ -4,7 +4,9 @@
  * Provides session management and authentication checks
  */
 
-session_start();
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
 /**
  * Check if user is authenticated
@@ -19,7 +21,7 @@ function isAuthenticated() {
  * @return string|null
  */
 function getCurrentUserId() {
-    return $_SESSION['qr_user_id'] ?? null;
+    return isset($_SESSION['qr_user_id']) ? $_SESSION['qr_user_id'] : null;
 }
 
 /**
@@ -27,7 +29,7 @@ function getCurrentUserId() {
  * @return string|null
  */
 function getCurrentUsername() {
-    return $_SESSION['qr_username'] ?? null;
+    return isset($_SESSION['qr_username']) ? $_SESSION['qr_username'] : null;
 }
 
 /**
@@ -35,7 +37,7 @@ function getCurrentUsername() {
  * @return string|null
  */
 function getCurrentCompanyCode() {
-    return $_SESSION['qr_company_code'] ?? null;
+    return isset($_SESSION['qr_company_code']) ? $_SESSION['qr_company_code'] : null;
 }
 
 /**
@@ -107,15 +109,13 @@ function getUserInfo($userId = null) {
     }
     
     try {
-        require_once '../config/config.php';
-        $pdo = getDatabaseConnection();
+        // Database class should already be loaded from the calling script
+        $db = Database::getInstance();
         
-        // Query user information (adjust table name as needed)
-        $sql = "SELECT userid, username, fullname, email FROM s_users WHERE userid = ?";
-        $stmt = $pdo->prepare($sql);
-        $stmt->execute([$userId]);
-        
-        return $stmt->fetch();
+        // Query user information using correct column names from s_users table
+        $sql = "SELECT user_id, last_name, first_name, middle_initial, group_code, is_active FROM s_users WHERE user_id = ?";
+        $result = $db->querySingle($sql, [$userId]);
+        return $result;
     } catch (Exception $e) {
         error_log("Error getting user info: " . $e->getMessage());
         return null;
@@ -138,13 +138,40 @@ function hasPermission($action) {
  * @return array
  */
 function getSessionInfo() {
-    return [
+    return array(
         'user_id' => getCurrentUserId(),
         'username' => getCurrentUsername(),
         'company_code' => getCurrentCompanyCode(),
-        'login_time' => $_SESSION['qr_login_time'] ?? null,
-        'ip_address' => $_SESSION['qr_ip_address'] ?? null,
+        'login_time' => isset($_SESSION['qr_login_time']) ? $_SESSION['qr_login_time'] : null,
+        'ip_address' => isset($_SESSION['qr_ip_address']) ? $_SESSION['qr_ip_address'] : null,
         'session_age' => isset($_SESSION['qr_login_time']) ? time() - $_SESSION['qr_login_time'] : null
-    ];
+    );
+}
+
+/**
+ * Log activity for audit trail
+ * @param string $action
+ * @param string $description
+ */
+function logActivity($action, $description = '') {
+    $logFile = __DIR__ . '/../logs/activity.log';
+    $timestamp = date('Y-m-d H:i:s');
+    $userId = getCurrentUserId() ? getCurrentUserId() : 'unknown';
+    $username = getCurrentUsername() ? getCurrentUsername() : 'unknown';
+    $ip = isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : 'unknown';
+    
+    $logEntry = "[{$timestamp}] [{$userId}/{$username}] [{$ip}] {$action}";
+    if ($description) {
+        $logEntry .= " - {$description}";
+    }
+    $logEntry .= PHP_EOL;
+    
+    // Ensure logs directory exists
+    $logDir = dirname($logFile);
+    if (!is_dir($logDir)) {
+        mkdir($logDir, 0755, true);
+    }
+    
+    file_put_contents($logFile, $logEntry, FILE_APPEND | LOCK_EX);
 }
 ?>

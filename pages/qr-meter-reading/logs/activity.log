@@ -16,3 +16,17 @@
 2025-08-22 17:02:42 - QR System Login - User dev1 logged in successfully from ::1
 2025-08-22 17:04:08 - QR System Logout - User DEV1 logged out from ::1
 2025-08-25 09:16:54 - QR System Login - User dev1 logged in successfully from ::1
+2025-08-25 14:16:36 - Retrieved 300 active tenants for QR generation - 
+2025-08-25 14:16:37 - Retrieved 300 active tenants for QR generation - 
+[2025-08-25 15:09:13] [unknown/unknown] [unknown] Debug test completed successfully
+[2025-08-25 15:10:48] [unknown/unknown] [unknown] Test log entry
+[2025-08-25 15:14:11] [DEV1/Aldrich] [::1] Retrieved 300 active tenants for QR generation
+[2025-08-25 15:14:14] [DEV1/Aldrich] [::1] Retrieved 300 active tenants for QR generation
+[2025-08-25 15:20:11] [unknown/unknown] [::1] Retrieved 300 active tenants for QR generation
+[2025-08-25 15:20:17] [unknown/unknown] [::1] Retrieved 300 active tenants for QR generation
+[2025-08-25 15:22:04] [unknown/unknown] [::1] Retrieved 300 active tenants for QR generation
+[2025-08-25 15:22:16] [unknown/unknown] [::1] Retrieved tenant details for T000001668
+[2025-08-25 15:26:01] [DEV1/Aldrich] [::1] Retrieved 300 active tenants for QR generation
+[2025-08-25 15:26:02] [DEV1/Aldrich] [::1] Retrieved 300 active tenants for QR generation
+[2025-08-25 15:26:39] [unknown/unknown] [::1] Retrieved 300 active tenants for QR generation
+[2025-08-25 15:28:03] [unknown/unknown] [::1] Retrieved 300 active tenants for QR generation

@@ -293,6 +293,11 @@
                     this.stream = null;
                 }
 
+                if (this.videoElement) {
+                    this.videoElement.srcObject = null;
+                    this.videoElement = null;
+                }
+
                 const viewport = document.getElementById('camera-viewport');
                 viewport.innerHTML = `
                     <div class="text-center">
@@ -312,6 +317,13 @@
         // Initialize camera test when page loads
         document.addEventListener('DOMContentLoaded', () => {
             window.cameraTest = new CameraTest();
+        });
+
+        // Stop camera when page is unloaded
+        window.addEventListener('beforeunload', () => {
+            if (window.cameraTest) {
+                window.cameraTest.stopCamera();
+            }
         });
     </script>
 </body>

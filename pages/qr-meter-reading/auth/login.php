@@ -18,9 +18,9 @@ $success_message = '';
 
 // Handle login form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $username = trim($_POST['username'] ?? '');
-    $password = trim($_POST['password'] ?? '');
-    $company = trim($_POST['company'] ?? '');
+    $username = trim(isset($_POST['username']) ? $_POST['username'] : '');
+    $password = trim(isset($_POST['password']) ? $_POST['password'] : '');
+    $company = trim(isset($_POST['company']) ? $_POST['company'] : '');
     
     if (empty($username) || empty($password) || empty($company)) {
         $error_message = 'Please fill in all required fields.';
@@ -37,14 +37,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if ($result && isset($result['x']) && $result['x'] == '1') {
                 // Login successful
                 $_SESSION['qr_user_id'] = strtoupper($username);
-                $_SESSION['qr_username'] = $result['username'] ?? $username;
+                $_SESSION['qr_username'] = isset($result['username']) ? $result['username'] : $username;
                 $_SESSION['qr_company_code'] = $company;
                 $_SESSION['qr_login_time'] = time();
                 $_SESSION['qr_ip_address'] = $_SERVER['REMOTE_ADDR'];
                 
                 // Set cookies for compatibility with existing RMS system
                 setcookie("userid", strtoupper($username), 0, "/");
-                setcookie("username", $result['username'] ?? $username, 0, "/");
+                setcookie("username", isset($result['username']) ? $result['username'] : $username, 0, "/");
                 setcookie("company_code", $company, 0, "/");
                 
                 // Log successful login

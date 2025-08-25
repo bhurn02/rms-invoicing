@@ -204,7 +204,7 @@
                                                         <th>Property</th>
                                                         <th>Unit</th>
                                                         <th>Tenant Name</th>
-                                                        <th>Status</th>
+                                                        <th>Tenant Code</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody id="tenant-list">
@@ -405,17 +405,26 @@
                 generateBatchQR();
             });
 
-            // Tab switching events
-            document.querySelectorAll('[data-bs-toggle="pill"]').forEach(tab => {
-                tab.addEventListener('shown.bs.tab', function(event) {
-                    const targetTab = event.target.getAttribute('data-bs-target');
-                    if (targetTab === '#batch-generator') {
-                        loadActiveTenants();
-                    } else if (targetTab === '#scanner-test') {
+                    // Tab switching events
+        document.querySelectorAll('[data-bs-toggle="pill"]').forEach(tab => {
+            tab.addEventListener('shown.bs.tab', function(event) {
+                const targetTab = event.target.getAttribute('data-bs-target');
+                if (targetTab === '#batch-generator') {
+                    loadActiveTenants();
+                } else if (targetTab === '#scanner-test') {
+                    // Don't automatically stop scanner when switching to scanner tab
+                    // Only stop if scanner is already running
+                    if (html5QrcodeScanner && html5QrcodeScanner.isScanning) {
                         stopScanner();
                     }
-                });
+                } else {
+                    // Stop scanner when switching to other tabs
+                    if (html5QrcodeScanner && html5QrcodeScanner.isScanning) {
+                        stopScanner();
+                    }
+                }
             });
+        });
         }
 
         // Individual QR Code Generation
@@ -549,24 +558,21 @@
                     tenant_name: 'John Doe',
                     real_property_code: 'PROP1',
                     real_property_name: 'Main Building Complex',
-                    unit_no: 'UNIT001',
-                    status: 'ACTIVE'
+                    unit_no: 'UNIT001'
                 },
                 {
                     tenant_code: 'T002',
                     tenant_name: 'Jane Smith',
                     real_property_code: 'PROP1',
                     real_property_name: 'Main Building Complex',
-                    unit_no: 'UNIT002',
-                    status: 'ACTIVE'
+                    unit_no: 'UNIT002'
                 },
                 {
                     tenant_code: 'T003',
                     tenant_name: 'Bob Johnson',
                     real_property_code: 'PROP2',
                     real_property_name: 'Secondary Complex',
-                    unit_no: 'UNIT101',
-                    status: 'ACTIVE'
+                    unit_no: 'UNIT101'
                 }
             ];
 
@@ -628,7 +634,7 @@
                 </td>
                 <td><span class="badge bg-primary">${tenant.unit_no}</span></td>
                 <td>${tenant.tenant_name}</td>
-                <td><span class="badge bg-success">${tenant.status}</span></td>
+                <td><span class="badge bg-info">${tenant.tenant_code || 'N/A'}</span></td>
             `;
 
             // Add event listener to checkbox
@@ -653,6 +659,7 @@
                 
                 const matchesSearch = !searchTerm || 
                     tenant.tenant_name.toLowerCase().includes(searchTerm) ||
+                    tenant.tenant_code.toLowerCase().includes(searchTerm) ||
                     tenant.real_property_name.toLowerCase().includes(searchTerm) ||
                     tenant.unit_no.toLowerCase().includes(searchTerm);
                 
@@ -852,21 +859,41 @@
                 config,
                 onScanSuccess,
                 onScanFailure
-            ).catch(err => {
+            ).then(() => {
+                // Scanner started successfully
+                console.log('Scanner started successfully');
+            }).catch(err => {
                 console.error('Unable to start scanning:', err);
                 showScannerError('Unable to start camera. Please check permissions and try again.');
+                // Reset UI on error
+                document.getElementById('qr-reader').style.display = 'none';
+                document.getElementById('scanner-controls').style.display = 'block';
+                document.getElementById('stop-btn').style.display = 'none';
+                html5QrcodeScanner = null;
             });
         }
 
         function stopScanner() {
-            if (html5QrcodeScanner) {
+            if (html5QrcodeScanner && html5QrcodeScanner.isScanning) {
                 html5QrcodeScanner.stop().then(() => {
                     document.getElementById('qr-reader').style.display = 'none';
                     document.getElementById('scanner-controls').style.display = 'block';
                     document.getElementById('stop-btn').style.display = 'none';
+                    html5QrcodeScanner = null;
                 }).catch(err => {
                     console.error('Error stopping scanner:', err);
+                    // Reset UI even if stop fails
+                    document.getElementById('qr-reader').style.display = 'none';
+                    document.getElementById('scanner-controls').style.display = 'block';
+                    document.getElementById('stop-btn').style.display = 'none';
+                    html5QrcodeScanner = null;
                 });
+            } else {
+                // Reset UI if scanner is not running
+                document.getElementById('qr-reader').style.display = 'none';
+                document.getElementById('scanner-controls').style.display = 'block';
+                document.getElementById('stop-btn').style.display = 'none';
+                html5QrcodeScanner = null;
             }
         }
 
@@ -1131,6 +1158,15 @@
                 `;
             };
         }
+
+        // Stop scanner when page is unloaded
+        window.addEventListener('beforeunload', () => {
+            if (html5QrcodeScanner && html5QrcodeScanner.isScanning) {
+                html5QrcodeScanner.stop().catch(err => {
+                    console.error('Error stopping scanner on page unload:', err);
+                });
+            }
+        });
     </script>
 </body>
 </html>

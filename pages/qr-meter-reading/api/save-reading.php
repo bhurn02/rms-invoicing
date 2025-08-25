@@ -40,7 +40,7 @@ try {
     // Sanitize and validate input
     $propertyId = sanitizeInput($input['propertyId']);
     $unitNumber = sanitizeInput($input['unitNumber']);
-    $meterId = sanitizeInput($input['meterId'] ?? '');
+    $meterId = sanitizeInput(isset($input['meterId']) ? $input['meterId'] : '');
     $readingDate = sanitizeInput($input['readingDate']);
     $meterReading = floatval($input['meterReading']);
     $timestamp = date('Y-m-d H:i:s');
@@ -79,9 +79,9 @@ try {
                  WHERE tenant_code = ? AND date_from = ?";
     $checkStmt = $pdo->prepare($checkSql);
     $checkStmt->execute([$tenantCode, $readingDate]);
-    $existingReading = $checkStmt->fetch();
+                $existingReading = $checkStmt->fetch();
     
-    if ($existingReading) {
+    if ($existingReading && $existingReading !== false) {
         // Update existing reading
         $sql = "UPDATE t_tenant_reading 
                 SET current_reading = ?, 

@@ -4,7 +4,10 @@
  * Configuration for connecting to the RMS MSSQL database
  */
 
-// Database configuration
+// Include the Database class
+require_once __DIR__ . '/Database.php';
+
+// Database configuration - these will be loaded by the Database class
 $db_server = 'localhost'; // Update with your MSSQL server
 $db_name = 'RMS'; // Update with your database name
 $db_user = 'web_app'; // Update with your database user
@@ -37,23 +40,12 @@ header('X-Content-Type-Options: nosniff');
 header('X-Frame-Options: DENY');
 header('X-XSS-Protection: 1; mode=block');
 
-// Database connection function
+// Database connection function using new Database class
 function getDatabaseConnection() {
-    global $db_server, $db_name, $db_user, $db_password;
-    
     try {
-        $pdo = new PDO(
-            "sqlsrv:Server=$db_server;Database=$db_name",
-            $db_user,
-            $db_password,
-            array(
-                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-                PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-                PDO::SQLSRV_ATTR_ENCODING => PDO::SQLSRV_ENCODING_UTF8
-            )
-        );
-        return $pdo;
-    } catch (PDOException $e) {
+        $db = Database::getInstance();
+        return $db->getConnection();
+    } catch (Exception $e) {
         error_log("Database connection failed: " . $e->getMessage());
         throw new Exception('Database connection failed');
     }
@@ -73,18 +65,13 @@ function formatCurrency($amount) {
     return number_format($amount, 2);
 }
 
-function logActivity($action, $details = '') {
-    $logEntry = date('Y-m-d H:i:s') . " - $action - $details\n";
-    error_log($logEntry, 3, '../logs/activity.log');
-}
+// logActivity function moved to auth/auth.php to avoid duplicates
 
 // Check if database connection is working
 function testDatabaseConnection() {
     try {
-        $pdo = getDatabaseConnection();
-        $stmt = $pdo->query('SELECT 1 as test');
-        $result = $stmt->fetch();
-        return $result && $result['test'] == 1;
+        $db = Database::getInstance();
+        return $db->testConnection();
     } catch (Exception $e) {
         return false;
     }
