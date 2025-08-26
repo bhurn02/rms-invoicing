@@ -16,12 +16,91 @@ $(document).on('select2:open', function () {
 
 // Initialize application
 document.addEventListener('DOMContentLoaded', function() {
-    // Initialize event listeners
-    initializeEventListeners();
-    
-    // Load active tenants for batch generation (this will populate the select first)
-    loadActiveTenants();
+    // Wait a bit for QRCode library to load
+    setTimeout(function() {
+        // Test QRCode library
+        testQRCodeLibrary();
+        
+        // Initialize event listeners
+        initializeEventListeners();
+        
+        // Load active tenants for batch generation (this will populate the select first)
+        loadActiveTenants();
+    }, 500);
 });
+
+// Test QRCode library functionality
+function testQRCodeLibrary() {
+    console.log('Testing QRCode library...');
+    console.log('QRCode type:', typeof QRCode);
+    console.log('QRCode available:', !!QRCode);
+    
+    if (typeof QRCode === 'undefined') {
+        console.error('QRCode library not loaded!');
+        showAlert('QRCode library failed to load. Please refresh the page.', 'danger');
+        
+        // Try to load QRCode library again
+        loadQRCodeLibrary();
+        return false;
+    }
+    
+    // Test basic QR generation
+    try {
+        const testContainer = document.createElement('div');
+        const testQR = new QRCode(testContainer, {
+            text: 'test',
+            width: 64,
+            height: 64
+        });
+        console.log('QRCode library test successful');
+        return true;
+    } catch (error) {
+        console.error('QRCode library test failed:', error);
+        showAlert('QRCode library test failed: ' + error.message, 'danger');
+        return false;
+    }
+}
+
+// Load QRCode library with multiple fallbacks
+function loadQRCodeLibrary() {
+    console.log('Attempting to load QRCode library...');
+    
+    const sources = [
+        'https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js',
+        'https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js',
+        'https://unpkg.com/qrcode@1.5.3/build/qrcode.min.js'
+    ];
+    
+    let currentSource = 0;
+    
+    function tryNextSource() {
+        if (currentSource >= sources.length) {
+            console.error('All QRCode library sources failed');
+            showAlert('Unable to load QRCode library. Please check your internet connection.', 'danger');
+            return;
+        }
+        
+        const script = document.createElement('script');
+        script.src = sources[currentSource];
+        script.onload = function() {
+            console.log('QRCode library loaded from:', sources[currentSource]);
+            // Retry initialization
+            setTimeout(function() {
+                testQRCodeLibrary();
+                initializeEventListeners();
+                loadActiveTenants();
+            }, 100);
+        };
+        script.onerror = function() {
+            console.log('Failed to load from:', sources[currentSource]);
+            currentSource++;
+            tryNextSource();
+        };
+        document.head.appendChild(script);
+    }
+    
+    tryNextSource();
+}
 
 // Initialize event listeners
 function initializeEventListeners() {
@@ -48,6 +127,9 @@ function initializeEventListeners() {
 
     // Batch QR generation button
     document.getElementById('generate-batch-qr').addEventListener('click', function() {
+        console.log('Batch QR generation button clicked');
+        console.log('Selected tenants:', selectedTenants);
+        console.log('QRCode library available:', typeof QRCode !== 'undefined');
         generateBatchQR();
     });
 
@@ -85,21 +167,33 @@ function generateQR() {
         return;
     }
 
+    // Check if QRCode library is available
+    if (typeof QRCode === 'undefined') {
+        showAlert('QR Code library not loaded. Attempting to load...', 'warning');
+        loadQRCodeLibrary();
+        return;
+    }
+
     try {
         // Create QR data in the format expected by the scanning system
         const qrData = {
             propertyId: propertyId,
             unitNumber: unitNumber,
-            meterId: meterId || null
+            meterId: meterId || null,
+            timestamp: Date.now(), // Add timestamp for uniqueness
+            type: 'individual'
         };
 
         const qrText = JSON.stringify(qrData);
+        
+        console.log('Individual QR data:', qrData);
+        console.log('Individual QR text:', qrText);
 
         // Clear previous QR code
         const qrcodeDiv = document.getElementById('qrcode');
         qrcodeDiv.innerHTML = '';
 
-        // Generate new QR code
+        // Generate new QR code with unique identifier
         qrCodeInstance = new QRCode(qrcodeDiv, {
             text: qrText,
             width: 320,
@@ -111,12 +205,22 @@ function generateQR() {
 
         // Ensure QR code canvas is properly sized and positioned
         setTimeout(() => {
+            // Remove any duplicate elements (images) and keep only canvas
+            const images = qrcodeDiv.querySelectorAll('img');
+            images.forEach(img => img.remove());
+            
             const canvas = qrcodeDiv.querySelector('canvas');
             if (canvas) {
+                canvas.style.display = 'block';
                 canvas.style.maxWidth = '100%';
                 canvas.style.maxHeight = '320px';
                 canvas.style.width = 'auto';
                 canvas.style.height = 'auto';
+                console.log('Individual QR code generated successfully');
+            } else {
+                console.error('No canvas found in individual QR generation');
+                showAlert('QR Code generation failed - no canvas created', 'danger');
+                return;
             }
         }, 100);
 
@@ -395,6 +499,13 @@ async function generateBatchQR() {
         return;
     }
 
+    // Check if QRCode library is available
+    if (typeof QRCode === 'undefined') {
+        showAlert('QR Code library not loaded. Attempting to load...', 'warning');
+        loadQRCodeLibrary();
+        return;
+    }
+
     try {
         // Show progress
         document.getElementById('batch-progress').style.display = 'block';
@@ -408,6 +519,12 @@ async function generateBatchQR() {
         progressTotalSpan.textContent = selectedTenants.length;
         batchQRCodes = [];
 
+        console.log('Starting batch QR generation for', selectedTenants.length, 'tenants');
+
+        // Prepare the display container first
+        const displayContainer = document.getElementById('batch-qr-display');
+        displayContainer.innerHTML = '';
+
         for (let i = 0; i < selectedTenants.length; i++) {
             const tenant = selectedTenants[i];
             currentTenantSpan.textContent = `${tenant.tenant_name} (${tenant.unit_no})`;
@@ -418,84 +535,126 @@ async function generateBatchQR() {
             progressBar.setAttribute('aria-valuenow', progress);
             progressBar.textContent = Math.round(progress) + '%';
 
-            // Generate QR code for this tenant
+            // Generate QR code for this tenant with unique data
             const qrData = {
                 propertyId: tenant.real_property_code,
                 unitNumber: tenant.unit_no,
-                meterId: null
+                meterId: null,
+                tenantCode: tenant.tenant_code, // Add tenant code for uniqueness
+                timestamp: Date.now() + i, // Add unique timestamp for each tenant
+                type: 'batch',
+                index: i
             };
 
             const qrText = JSON.stringify(qrData);
             
-            // Create QR code canvas
-            const canvas = document.createElement('canvas');
-            const qrCode = new QRCode(canvas, {
-                text: qrText,
-                width: 256,
-                height: 256,
-                colorDark: '#1e40af',
-                colorLight: '#ffffff',
-                correctLevel: QRCode.CorrectLevel.M
-            });
+            console.log('Batch QR data for tenant:', tenant.tenant_name, ':', qrData);
+            console.log('Batch QR text for tenant:', tenant.tenant_name, ':', qrText);
+            
+            // Create the display column first
+            const col = document.createElement('div');
+            col.className = 'col-md-4 col-lg-3 mb-4';
+            
+            col.innerHTML = `
+                <div class="professional-qr batch-qr">
+                    <div class="qr-code-container" id="batch-qr-${i}">
+                        <div class="qr-code-wrapper" style="width: 200px; height: 200px; margin: 0 auto; display: flex; justify-content: center; align-items: center;">
+                        </div>
+                    </div>
+                    <div class="qr-footer">
+                        <p class="scan-instruction">Scan for Meter Reading</p>
+                        <small class="qr-data">${tenant.real_property_code}|${tenant.unit_no}</small>
+                    </div>
+                </div>
+            `;
+            
+            displayContainer.appendChild(col);
+            
+            // Now generate QR code in the wrapper container
+            const qrContainer = document.getElementById(`batch-qr-${i}`);
+            const qrWrapper = qrContainer.querySelector('.qr-code-wrapper');
+            
+            try {
+                console.log('Creating QR code for tenant:', tenant.tenant_name, 'in container:', qrWrapper.id);
+                
+                // Clear any existing QR code in the wrapper
+                qrWrapper.innerHTML = '';
+                
+                // Generate QR code in the wrapper container with smaller size
+                const qrCode = new QRCode(qrWrapper, {
+                    text: qrText,
+                    width: 180,
+                    height: 180,
+                    colorDark: '#1e40af',
+                    colorLight: '#ffffff',
+                    correctLevel: QRCode.CorrectLevel.M
+                });
 
-            batchQRCodes.push({
-                tenant: tenant,
-                qrData: qrData,
-                qrText: qrText,
-                canvas: canvas
-            });
+                console.log('QRCode instance created for:', tenant.tenant_name);
+
+                // Small delay to ensure canvas is rendered
+                await new Promise(resolve => setTimeout(resolve, 150));
+
+                // Remove any duplicate elements (images) and keep only canvas
+                const images = qrWrapper.querySelectorAll('img');
+                images.forEach(img => img.remove());
+
+                // Verify QR code was generated
+                const canvas = qrWrapper.querySelector('canvas');
+                console.log('Canvas found for tenant:', tenant.tenant_name, 'Canvas:', canvas);
+                
+                if (!canvas) {
+                    console.error('No canvas found in QR container for tenant:', tenant.tenant_name);
+                    console.log('QR container contents:', qrWrapper.innerHTML);
+                    qrWrapper.innerHTML = '<div style="color: red; padding: 20px;">QR Code generation failed</div>';
+                    continue;
+                }
+
+                // Ensure canvas is properly contained and sized
+                canvas.style.display = 'block';
+                canvas.style.maxWidth = '100%';
+                canvas.style.maxHeight = '100%';
+                canvas.style.width = 'auto';
+                canvas.style.height = 'auto';
+                canvas.style.margin = '0 auto';
+
+                console.log('QR code generated successfully for:', tenant.tenant_name);
+                console.log('Canvas dimensions:', canvas.width, 'x', canvas.height);
+
+                batchQRCodes.push({
+                    tenant: tenant,
+                    qrData: qrData,
+                    qrText: qrText,
+                    qrContainer: qrContainer
+                });
+            } catch (qrError) {
+                console.error('Error generating QR for tenant:', tenant.tenant_name, qrError);
+                qrWrapper.innerHTML = '<div style="color: red; padding: 20px;">QR Code generation failed</div>';
+                continue;
+            }
 
             // Small delay to show progress
             await new Promise(resolve => setTimeout(resolve, 100));
         }
 
+        console.log('Batch generation complete. Generated', batchQRCodes.length, 'QR codes');
+
         // Hide progress and show results
         document.getElementById('batch-progress').style.display = 'none';
-        displayBatchResults();
+        document.getElementById('results-count').textContent = batchQRCodes.length;
+        document.getElementById('batch-results').style.display = 'block';
 
     } catch (error) {
         console.error('Error generating batch QR codes:', error);
-        showAlert('Error generating batch QR codes. Please try again.', 'danger');
+        showAlert('Error generating batch QR codes: ' + error.message, 'danger');
         document.getElementById('batch-progress').style.display = 'none';
     }
 }
 
-// Display batch QR results
+// Display batch QR results (simplified - QR codes are now generated directly in display containers)
 function displayBatchResults() {
+    console.log('Displaying batch results for', batchQRCodes.length, 'QR codes');
     document.getElementById('results-count').textContent = batchQRCodes.length;
-    
-    const displayContainer = document.getElementById('batch-qr-display');
-    displayContainer.innerHTML = '';
-
-    batchQRCodes.forEach((qrCode, index) => {
-        const col = document.createElement('div');
-        col.className = 'col-md-4 col-lg-3 mb-4';
-        
-        col.innerHTML = `
-            <div class="professional-qr batch-qr">
-                <div class="batch-qr-header">
-                    <h5>${qrCode.tenant.real_property_name}</h5>
-                    <p>Unit: ${qrCode.tenant.unit_no}</p>
-                </div>
-                <div class="qr-code-container" id="batch-qr-${index}">
-                </div>
-                <div class="qr-footer">
-                    <p class="scan-instruction">Scan for Meter Reading</p>
-                    <small class="qr-data">${qrCode.tenant.real_property_code}|${qrCode.tenant.unit_no}${qrCode.tenant.meter_id ? '|' + qrCode.tenant.meter_id : ''}</small>
-                </div>
-            </div>
-        `;
-        
-        displayContainer.appendChild(col);
-        
-        // Add QR code to the container
-        const qrContainer = document.getElementById(`batch-qr-${index}`);
-        const canvas = qrCode.canvas.querySelector('canvas');
-        if (canvas) {
-            qrContainer.appendChild(canvas);
-        }
-    });
-
     document.getElementById('batch-results').style.display = 'block';
 }
 
@@ -744,7 +903,56 @@ function printBatchQR() {
     }
 
     const printWindow = window.open('', '_blank');
-    const qrDisplay = document.getElementById('batch-qr-display').cloneNode(true);
+    
+    // Create print content with QR codes as images
+    let printContent = '';
+    let pageContent = '';
+    let qrCount = 0;
+    
+    batchQRCodes.forEach((qrCode, index) => {
+        const canvas = qrCode.qrContainer.querySelector('canvas');
+        if (canvas) {
+            const qrImageDataURL = canvas.toDataURL('image/png');
+            const tenant = qrCode.tenant;
+            
+            pageContent += `
+                <div class="professional-qr">
+                    <div class="qr-code-container">
+                        <img src="${qrImageDataURL}" alt="QR Code">
+                    </div>
+                    <div class="qr-footer">
+                        <p class="scan-instruction">Scan for Meter Reading</p>
+                        <small class="qr-data">${tenant.real_property_code}|${tenant.unit_no}</small>
+                    </div>
+                </div>
+            `;
+            
+            qrCount++;
+            
+            // Create new page after every 8 QR codes (but not on the last QR code)
+            if (qrCount % 8 === 0 && qrCount < batchQRCodes.length) {
+                printContent += `
+                    <div class="page">
+                        <div class="qr-grid">
+                            ${pageContent}
+                        </div>
+                    </div>
+                `;
+                pageContent = '';
+            }
+        }
+    });
+    
+    // Add remaining QR codes to the last page
+    if (pageContent) {
+        printContent += `
+            <div class="page">
+                <div class="qr-grid">
+                    ${pageContent}
+                </div>
+            </div>
+        `;
+    }
     
     printWindow.document.write(`
         <!DOCTYPE html>
@@ -752,27 +960,94 @@ function printBatchQR() {
         <head>
             <title>Print Batch QR Codes</title>
             <style>
-                body { margin: 0; padding: 20px; font-family: Arial, sans-serif; }
-                .row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10mm; }
-                .professional-qr { 
-                    width: 60mm; height: 80mm; border: 2px solid #1e40af; 
-                    border-radius: 8px; padding: 5mm; background: white; 
-                    text-align: center; page-break-inside: avoid; margin-bottom: 10mm;
+                @page {
+                    size: landscape;
+                    margin: 10mm;
                 }
-                .qr-header h4 { font-size: 10pt; color: #1e40af; margin-bottom: 2mm; }
-                .qr-header p { font-size: 8pt; color: #666; margin-bottom: 3mm; }
-                .qr-code-container canvas { width: 35mm !important; height: 35mm !important; }
-                .qr-footer { font-size: 8pt; color: #666; margin-top: 2mm; }
+                body { 
+                    margin: 0; 
+                    padding: 0; 
+                    font-family: Arial, sans-serif; 
+                    background: white;
+                }
+                .page {
+                    width: 100%;
+                    height: 100vh;
+                    page-break-after: auto;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                }
+                
+                .page:not(:last-child) {
+                    page-break-after: always;
+                }
+                .qr-grid {
+                    display: grid;
+                    grid-template-columns: repeat(4, 1fr);
+                    grid-template-rows: repeat(2, 1fr);
+                    gap: 5mm;
+                    width: 100%;
+                    height: 100%;
+                    padding: 5mm;
+                }
+                .professional-qr { 
+                    width: 50mm; 
+                    height: 70mm; 
+                    border: 2px solid #1e40af; 
+                    border-radius: 8px; 
+                    padding: 3mm; 
+                    background: white; 
+                    text-align: center; 
+                    page-break-inside: avoid; 
+                    display: flex; 
+                    flex-direction: column; 
+                    justify-content: space-between;
+                    margin: 0;
+                }
+                .qr-code-container { 
+                    flex: 1; 
+                    display: flex; 
+                    justify-content: center; 
+                    align-items: center; 
+                    margin: 1mm 0;
+                }
+                .qr-code-container img { 
+                    width: 40mm; 
+                    height: 40mm; 
+                    max-width: 40mm; 
+                    max-height: 40mm;
+                }
+                .qr-footer { 
+                    font-size: 8pt; 
+                    color: #666; 
+                    margin: 1mm 0 0 0; 
+                }
+                .scan-instruction { 
+                    font-size: 9pt; 
+                    color: #333; 
+                    margin-bottom: 1mm; 
+                    font-weight: bold;
+                }
+                .qr-data { 
+                    font-size: 8pt; 
+                    color: #666; 
+                    font-family: monospace; 
+                }
             </style>
         </head>
         <body>
-            ${qrDisplay.outerHTML}
+            ${printContent}
         </body>
         </html>
     `);
     
     printWindow.document.close();
-    printWindow.print();
+    
+    // Wait for images to load before printing
+    setTimeout(() => {
+        printWindow.print();
+    }, 500);
 }
 
 // Show alert messages
@@ -809,12 +1084,14 @@ function showAlert(message, type = 'info') {
 if (typeof QRCode === 'undefined') {
     console.warn('QRCode library not loaded, using fallback');
     window.QRCode = function(element, options) {
+        console.log('Using QRCode fallback for element:', element);
         element.innerHTML = `
             <div style="width: 256px; height: 256px; border: 2px dashed #ccc; 
                  display: flex; align-items: center; justify-content: center; 
                  flex-direction: column; margin: 0 auto;">
                 <i class="bi bi-qr-code" style="font-size: 4rem; color: #6b7280;"></i>
                 <p style="margin-top: 1rem; color: #6b7280;">QR Library Error</p>
+                <small style="color: #9ca3af; margin-top: 0.5rem;">Data: ${options.text || 'No data'}</small>
             </div>
         `;
     };
@@ -828,3 +1105,22 @@ window.addEventListener('beforeunload', () => {
         });
     }
 });
+
+// Test function for debugging batch QR generation
+window.testBatchQR = function() {
+    console.log('Testing batch QR generation...');
+    console.log('Active tenants:', activeTenants);
+    console.log('Selected tenants:', selectedTenants);
+    console.log('QRCode library:', typeof QRCode);
+    
+    if (activeTenants.length === 0) {
+        console.log('No active tenants available');
+        return;
+    }
+    
+    // Select first tenant for testing
+    selectedTenants = [activeTenants[0]];
+    console.log('Selected first tenant for testing:', selectedTenants[0]);
+    
+    generateBatchQR();
+};

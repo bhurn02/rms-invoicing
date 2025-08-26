@@ -90,23 +90,24 @@ body {
 /* Batch QR Specific Styling */
 .batch-qr {
     min-height: 300px;
+    overflow: hidden; /* Prevent overflow */
 }
 
 .batch-qr .qr-code-container {
     min-height: 200px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden; /* Prevent overflow */
 }
 
-.batch-qr-header h5 {
-    color: #1e40af;
-    font-weight: 600;
-    margin-bottom: 0.25rem;
-    font-size: 0.9rem;
-}
-
-.batch-qr-header p {
-    color: #6b7280;
-    font-size: 0.8rem;
-    margin-bottom: 0.5rem;
+.batch-qr .qr-code-wrapper {
+    width: 200px !important;
+    height: 200px !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    overflow: hidden !important;
 }
 
 .qr-code-container canvas {
@@ -114,6 +115,30 @@ body {
     max-height: 320px;
     width: auto !important;
     height: auto !important;
+}
+
+/* Batch QR canvas containment */
+.batch-qr .qr-code-wrapper canvas {
+    max-width: 100% !important;
+    max-height: 100% !important;
+    width: auto !important;
+    height: auto !important;
+    margin: 0 auto !important;
+    display: block !important;
+}
+
+/* Hide any duplicate image elements */
+.qr-code-container img,
+.qr-code-wrapper img,
+#qrcode img {
+    display: none !important;
+}
+
+/* Ensure only canvas is visible */
+.qr-code-container canvas,
+.qr-code-wrapper canvas,
+#qrcode canvas {
+    display: block !important;
 }
 
 .qr-footer {

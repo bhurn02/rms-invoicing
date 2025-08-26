@@ -23,6 +23,25 @@
         }
     </script>
     
+    <!-- Additional fallback -->
+    <script>
+        // Check if QRCode is available after a short delay
+        setTimeout(function() {
+            if (typeof QRCode === 'undefined') {
+                console.log('QRCode still not available, trying third fallback...');
+                var script = document.createElement('script');
+                script.src = 'https://unpkg.com/qrcode@1.5.3/build/qrcode.min.js';
+                script.onload = function() {
+                    console.log('Third fallback QRCode library loaded successfully');
+                };
+                script.onerror = function() {
+                    console.error('All QRCode library fallbacks failed');
+                };
+                document.head.appendChild(script);
+            }
+        }, 1000);
+    </script>
+    
     <!-- Enhanced QR Code Generator Styles -->
     <link rel="stylesheet" href="assets/css/qr-generator.css">
 </head>
