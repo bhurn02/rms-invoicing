@@ -4,7 +4,7 @@ let qrCodeInstance = null;
 let activeTenants = [];
 let selectedTenants = [];
 let batchQRCodes = [];
-let html5QrcodeScanner = null;
+
 
 // Force focus on search when dropdown is opened
 $(document).on('select2:open', function () {
@@ -139,17 +139,6 @@ function initializeEventListeners() {
             const targetTab = event.target.getAttribute('data-bs-target');
             if (targetTab === '#batch-generator') {
                 loadActiveTenants();
-            } else if (targetTab === '#scanner-test') {
-                // Don't automatically stop scanner when switching to scanner tab
-                // Only stop if scanner is already running
-                if (html5QrcodeScanner && html5QrcodeScanner.isScanning) {
-                    stopScanner();
-                }
-            } else {
-                // Stop scanner when switching to other tabs
-                if (html5QrcodeScanner && html5QrcodeScanner.isScanning) {
-                    stopScanner();
-                }
             }
         });
     });
@@ -387,6 +376,8 @@ function renderTenantTable() {
 // Create tenant table row
 function createTenantRow(tenant) {
     const tr = document.createElement('tr');
+    tr.className = 'tenant-row';
+    tr.style.cursor = 'pointer';
     tr.innerHTML = `
         <td>
             <div class="form-check">
@@ -405,8 +396,28 @@ function createTenantRow(tenant) {
 
     // Add event listener to checkbox
     const checkbox = tr.querySelector('.tenant-checkbox');
-    checkbox.addEventListener('change', function() {
+    checkbox.addEventListener('change', function(e) {
+        e.stopPropagation(); // Prevent row click when clicking checkbox
         updateSelectedTenants();
+    });
+
+    // Add event listener to entire row for clickability
+    tr.addEventListener('click', function(e) {
+        // Don't trigger if clicking on the checkbox itself
+        if (e.target.type === 'checkbox') {
+            return;
+        }
+        
+        // Toggle checkbox state
+        checkbox.checked = !checkbox.checked;
+        updateSelectedTenants();
+        
+        // Add visual feedback
+        if (checkbox.checked) {
+            tr.classList.add('table-active');
+        } else {
+            tr.classList.remove('table-active');
+        }
     });
 
     return tr;
@@ -444,10 +455,18 @@ function filterTenants() {
 
 // Toggle all visible tenants
 function toggleAllTenants(checked) {
-    const visibleCheckboxes = document.querySelectorAll('#tenant-list tr:not([style*="display: none"]) .tenant-checkbox');
+    const visibleRows = document.querySelectorAll('#tenant-list tr:not([style*="display: none"])');
     
-    visibleCheckboxes.forEach(checkbox => {
+    visibleRows.forEach(row => {
+        const checkbox = row.querySelector('.tenant-checkbox');
         checkbox.checked = checked;
+        
+        // Update visual feedback immediately
+        if (checked) {
+            row.classList.add('table-active');
+        } else {
+            row.classList.remove('table-active');
+        }
     });
 
     updateSelectedTenants();
@@ -461,6 +480,16 @@ function updateSelectedTenants() {
     );
 
     updateSelectedCount();
+    
+    // Update visual feedback for all rows
+    document.querySelectorAll('.tenant-row').forEach(row => {
+        const checkbox = row.querySelector('.tenant-checkbox');
+        if (checkbox.checked) {
+            row.classList.add('table-active');
+        } else {
+            row.classList.remove('table-active');
+        }
+    });
     
     // Update select all checkbox state
     const selectAllCheckbox = document.getElementById('select-all-tenants');
@@ -658,98 +687,7 @@ function displayBatchResults() {
     document.getElementById('batch-results').style.display = 'block';
 }
 
-// QR Scanner Test Functions
-function startScanner() {
-    const config = {
-        fps: 10,
-        qrbox: { width: 250, height: 250 },
-        aspectRatio: 1.0
-    };
-
-    html5QrcodeScanner = new Html5Qrcode("qr-reader");
-    
-    document.getElementById('qr-reader').style.display = 'block';
-    document.getElementById('scanner-controls').style.display = 'none';
-    document.getElementById('stop-btn').style.display = 'inline-block';
-    document.getElementById('scanner-result').style.display = 'none';
-    document.getElementById('scanner-error').style.display = 'none';
-
-    html5QrcodeScanner.start(
-        { facingMode: "environment" },
-        config,
-        onScanSuccess,
-        onScanFailure
-    ).then(() => {
-        // Scanner started successfully
-        console.log('Scanner started successfully');
-    }).catch(err => {
-        console.error('Unable to start scanning:', err);
-        showScannerError('Unable to start camera. Please check permissions and try again.');
-        // Reset UI on error
-        document.getElementById('qr-reader').style.display = 'none';
-        document.getElementById('scanner-controls').style.display = 'block';
-        document.getElementById('stop-btn').style.display = 'none';
-        html5QrcodeScanner = null;
-    });
-}
-
-function stopScanner() {
-    if (html5QrcodeScanner && html5QrcodeScanner.isScanning) {
-        html5QrcodeScanner.stop().then(() => {
-            document.getElementById('qr-reader').style.display = 'none';
-            document.getElementById('scanner-controls').style.display = 'block';
-            document.getElementById('stop-btn').style.display = 'none';
-            html5QrcodeScanner = null;
-        }).catch(err => {
-            console.error('Error stopping scanner:', err);
-            // Reset UI even if stop fails
-            document.getElementById('qr-reader').style.display = 'none';
-            document.getElementById('scanner-controls').style.display = 'block';
-            document.getElementById('stop-btn').style.display = 'none';
-            html5QrcodeScanner = null;
-        });
-    } else {
-        // Reset UI if scanner is not running
-        document.getElementById('qr-reader').style.display = 'none';
-        document.getElementById('scanner-controls').style.display = 'block';
-        document.getElementById('stop-btn').style.display = 'none';
-        html5QrcodeScanner = null;
-    }
-}
-
-function onScanSuccess(decodedText) {
-    try {
-        // Try to parse as JSON first
-        const qrData = JSON.parse(decodedText);
-        
-        document.getElementById('raw-data').textContent = decodedText;
-        document.getElementById('parsed-property').textContent = qrData.propertyId || 'Not found';
-        document.getElementById('parsed-unit').textContent = qrData.unitNumber || 'Not found';
-        document.getElementById('parsed-meter').textContent = qrData.meterId || 'Not specified';
-        
-    } catch (error) {
-        // If JSON parsing fails, try pipe-delimited format
-        const parts = decodedText.split('|');
-        
-        document.getElementById('raw-data').textContent = decodedText;
-        document.getElementById('parsed-property').textContent = parts[0] || 'Not found';
-        document.getElementById('parsed-unit').textContent = parts[1] || 'Not found';
-        document.getElementById('parsed-meter').textContent = parts[2] || 'Not specified';
-    }
-
-    document.getElementById('scanner-result').style.display = 'block';
-    document.getElementById('scanner-error').style.display = 'none';
-}
-
-function onScanFailure(error) {
-    // This is normal - scanner will keep trying
-}
-
-function showScannerError(message) {
-    document.getElementById('error-message').textContent = message;
-    document.getElementById('scanner-error').style.display = 'block';
-    document.getElementById('scanner-result').style.display = 'none';
-}
+// Camera test removed
 
 // Utility Functions
 function downloadQR() {
@@ -908,6 +846,7 @@ function printBatchQR() {
     let printContent = '';
     let pageContent = '';
     let qrCount = 0;
+    let totalQRs = batchQRCodes.length;
     
     batchQRCodes.forEach((qrCode, index) => {
         const canvas = qrCode.qrContainer.querySelector('canvas');
@@ -929,8 +868,8 @@ function printBatchQR() {
             
             qrCount++;
             
-            // Create new page after every 8 QR codes (but not on the last QR code)
-            if (qrCount % 8 === 0 && qrCount < batchQRCodes.length) {
+            // Create new page after every 8 QR codes, but only if there are more QR codes to come
+            if (qrCount % 8 === 0 && qrCount < totalQRs) {
                 printContent += `
                     <div class="page">
                         <div class="qr-grid">
@@ -943,8 +882,8 @@ function printBatchQR() {
         }
     });
     
-    // Add remaining QR codes to the last page
-    if (pageContent) {
+    // Add remaining QR codes to the last page (only if there's content)
+    if (pageContent.trim()) {
         printContent += `
             <div class="page">
                 <div class="qr-grid">
@@ -964,6 +903,22 @@ function printBatchQR() {
                     size: landscape;
                     margin: 10mm;
                 }
+                @media print {
+                    html, body { 
+                        margin: 0 !important; 
+                        padding: 0 !important; 
+                        height: auto !important;
+                        overflow: visible !important;
+                    }
+                    .page { 
+                        page-break-inside: avoid !important;
+                        break-inside: avoid-page !important;
+                    }
+                    .page:last-child {
+                        page-break-after: auto !important;
+                        break-after: auto !important;
+                    }
+                }
                 body { 
                     margin: 0; 
                     padding: 0; 
@@ -972,15 +927,18 @@ function printBatchQR() {
                 }
                 .page {
                     width: 100%;
-                    height: 100vh;
-                    page-break-after: auto;
-                    display: flex;
-                    justify-content: center;
-                    align-items: center;
+                    height: auto;
+                    min-height: 0;
+                    page-break-after: always;
+                    break-after: page;
+                    display: block;
+                    overflow: hidden;
                 }
                 
-                .page:not(:last-child) {
-                    page-break-after: always;
+                /* Ensure last page doesn't create extra blank page */
+                .page:last-child {
+                    page-break-after: auto !important;
+                    break-after: auto !important;
                 }
                 .qr-grid {
                     display: grid;
@@ -988,7 +946,6 @@ function printBatchQR() {
                     grid-template-rows: repeat(2, 1fr);
                     gap: 5mm;
                     width: 100%;
-                    height: 100%;
                     padding: 5mm;
                 }
                 .professional-qr { 
@@ -1000,6 +957,7 @@ function printBatchQR() {
                     background: white; 
                     text-align: center; 
                     page-break-inside: avoid; 
+                    break-inside: avoid-page; 
                     display: flex; 
                     flex-direction: column; 
                     justify-content: space-between;
@@ -1097,14 +1055,7 @@ if (typeof QRCode === 'undefined') {
     };
 }
 
-// Stop scanner when page is unloaded
-window.addEventListener('beforeunload', () => {
-    if (html5QrcodeScanner && html5QrcodeScanner.isScanning) {
-        html5QrcodeScanner.stop().catch(err => {
-            console.error('Error stopping scanner on page unload:', err);
-        });
-    }
-});
+// Camera test removed
 
 // Test function for debugging batch QR generation
 window.testBatchQR = function() {
