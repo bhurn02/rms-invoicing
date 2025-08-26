@@ -2,7 +2,7 @@
 
 ## 🚀 ENHANCED QR GENERATOR BUILD STATUS
 
-**CURRENT STATUS**: Enhanced QR Generator implementation is **IN PROGRESS** with major components completed according to user's explicit priority mandate.
+**CURRENT STATUS**: Enhanced QR Generator implementation progressed with UX and print fixes; scanner test removed from generator page. Remaining: database configuration for live tenants API.
 
 ## ✅ **ENHANCED QR GENERATOR - CODE ORGANIZATION COMPLETE**
 
@@ -40,24 +40,20 @@
 
 ## ⚠️ **ENHANCED QR GENERATOR - CRITICAL ISSUES PENDING**
 
-### **🚧 Pending Issues for Next Conversation - CRITICAL**
-**Status**: ⚠️ **PRODUCTION BLOCKERS IDENTIFIED**
-**Date**: August 2025 (END OF BUILD Sprint - Handoff)
-**Description**: Individual QR Generator complete, but Batch Generator and Camera Test have critical issues
+### **🚧 Pending Issues for Next Conversation - UPDATED**
+**Status**: ⚠️ **REMAINING ITEMS**
+**Date**: August 2025 (BUILD Sprint - Update)
+**Description**: Individual and Batch QR Generators functional; Camera Test tab removed. Remaining database configuration for live tenants API.
 
 #### **⚠️ Critical Issues Identified**:
-1. **Batch Generator Non-Functional**: ❌ **CRITICAL BLOCKER**
-   - **Issue**: HTTP 500 errors on tenant loading API calls
-   - **Impact**: Batch QR generation completely non-functional
-   - **Symptoms**: `get-active-tenants.php` failing with server errors
-   - **Likely Cause**: Database connection or authentication issues
-   - **Priority**: **HIGHEST - Core feature broken**
+1. **Batch Print Extra Page**: ✅ **RESOLVED**
+   - **Fix**: Removed fixed 100vh/flex layouts; explicit page breaks; avoid inside breaks
+   - **Result**: No extra blank pages regardless of QR count
 
-2. **Camera Test Missing Stop Control**: ❌ **UX ISSUE**
-   - **Issue**: No stop camera button, camera remains active on tab switch
-   - **Impact**: Poor user experience, resource waste, battery drain
-   - **Required**: Stop camera button and tab change cleanup
-   - **Priority**: **HIGH - User experience and resource management**
+2. **Scanner Test Tab on Generator Page**: ✅ **REMOVED**
+   - **Change**: Removed Test Scanner tab and scanner-related JS from generator page
+   - **Reason**: Redundant with dedicated `camera-test.html` utility
+   - **Impact**: Cleaner scope; no camera lifecycle concerns on generator page
 
 3. **Database Configuration Incomplete**: ⚠️ **DEPLOYMENT BLOCKER**
    - **Issue**: Live database credentials not configured
@@ -89,9 +85,14 @@
 ⚠️ **Database Config**: Live credentials needed for production testing  
 
 ### **🎯 Next Conversation Priorities**:
-1. **Debug Batch Generator** (2-3 hours) - CRITICAL
-2. **Add Camera Stop Controls** (1-2 hours) - HIGH  
-3. **Configure Live Database** (1 hour) - MEDIUM
+1. **Fix post-login incorrect redirection** (1 hour) - HIGH
+2. **Resolve double logout dialog alerts** (1 hour) - HIGH
+3. **Implement SweetAlert across generator and related pages** (1-2 hours) - HIGH
+4. **Plan how to save tenant readings in existing schema** (1-2 hours) - HIGH
+5. **Implement meter reading persistence with minimal schema changes** (2-4 hours) - HIGH
+6. **Implement batch downloads (PDF and ZIP)** (Backlog) - LOW
+7. **Performance test with 100+ tenants; minor optimizations if needed** (1 hour) - LOW
+8. **Optional quick QA pass on print and selection UX** (0.5 hour) - LOW
 
 ### **Handoff Status for Next Session**:
 ✅ **Foundation Solid**: Individual QR Generator fully operational and optimized  
