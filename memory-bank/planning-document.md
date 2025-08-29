@@ -14,7 +14,7 @@
 
 #### Phase 1: Mobile QR Code Meter Reading System (PRIORITIZED FIRST)
 1. **QR Code Generation & Scanning**
-   - Generate QR codes for units and meters with property ID, unit number, meter ID
+   - Generate QR codes for units and meters with real_property_code, unit_no, optional meter_id
    - Mobile camera integration for QR code scanning
    - Self-contained system for flexible IIS deployment
 
@@ -114,12 +114,14 @@
    - **Enhanced QR Display**: Include real property name and unit code on printed QRs
    - **Database Integration**: Direct connection to RMS for active tenant data
    - **Professional Layout**: Print-optimized design for physical deployment
+   - **QR Data Structure**: real_property_code|unit_no (required), real_property_code|unit_no|meter_id (optional)
 
 3. **Database Integration**
    - **Existing table**: `t_tenant_reading` (no schema changes required)
    - **Additional tables**: `m_tenant`, `m_real_property`, `m_units` for batch QR generation
    - **Dependencies**: Existing RMS database connection
    - **Impact**: Minimal (leverages existing structure)
+   - **Tenant Lookup**: Uses `real_property_code + unit_no` for active tenants only (ISNULL(terminated,'N') = 'N')
 
 #### Rate Management Components (PHASE 2 - SECOND PRIORITY)
 1. **Bootstrap 5 Enhanced Interface** 

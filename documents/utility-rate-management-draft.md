@@ -27,6 +27,9 @@ You may also use sqlcmd to connect and read the actual content of database table
 
 References:
 database/RMS database schema 2025-08-06 1531.sql
+database/RMS database table views 2025-08-28 1600.sql
+database/RMS database stored procedure 2025-08-28 1600.sql
+database/vw_TenantReading.sql
 pages/utilities/config.local.php (mssql login info)
 
 table that might help:
@@ -46,3 +49,83 @@ MSSQL 2019
 use Bootstrap 5 with modern design
 
 I will also need a qr code generator for all the active tenant. and improve qr code to include in the printed qr code the real property and unit code. add it in qr-generator.html there should be additional section to batch generate depending on the selected active tenants from a table.
+
+
+so the idea is, since we are just capturing the real_property_code and unit_no when scanning QR code, during saving, we need to identify the active tenant that is using that real_property_code + unit_no then save it to t_tenant_reading using the tenant_code, 
+
+first, we need to check s_tenant_reading_default if there is a set default values for trd_charge_code CUCF or CUCNF and use those values, if no records then we use the following formula: for columns date_from and date_to, reading period usually is between 25th-29th of the month and date_from and date_to value is the 1st and last day of the reading date, and for the billing_date_from and billing_date_to values are the 1st and last day of the next month of reading date: 
+e.g.
+Actual reading date: 08/29/2025 1428
+
+current reading: 10510
+last reading: 10374
+
+data saved are:
+date_from: 08/01/2025
+date_to: 08/31/2025
+billing_date_from: 09/01/2025
+billing_date_to: 09/30/2025
+curr_reading: 10510
+prev_reading: 10374
+
+
+
+we also need to add new columns to t_tenant_reading:
+reading_date datetime
+reading_by nvarchar(32)
+
+and a new table t_tenant_reading_ext (ext neabs extebded properties)
+id primary
+reading_id int foreign key
+ip_address
+user_agent
+other useful meta data for audit log
+
+
+there should also be a meter reading report with filter so that we can review and validate and audit if readings are correct.
+
+
+I would also like to add the scenario for tenant move in/out and how date period value for reading are made where default values are not used:
+
+e.g.
+real_property_code: GC A
+unit_no: 101
+
+tenant_code: 001
+tenant_name: AARON
+move out date: 08/15/2025
+
+tenant_code: 002
+tenant_name: ALDRICH
+move out date: 08/16/2025
+
+technician will have to make a reading 08/16/2025 after tenant 001 moved out and before tenant 002 move in:
+
+reading date: 08/16/2025
+curr_reading: 10510
+prev_reading: 10374
+
+t_tenant_reading values saved will be:
+tenant_code: 001
+date_from: 08/01/2025
+date_to: 08/15/2025
+billing_date_from: 08/01/2025
+billing_date_to: 08/16/2025 (+1day to move out date)
+reading_date: 08/16/2025
+curr_reading: 10510
+prev_reading: 10374
+
+technician proceeds with scheduled monthly 25th-29th reading:
+tenant_code: 002
+date_from: 08/16/2025 (do we get last reading date_to then add 1 day?)
+date_to: 08/31/2025 (still follows default from s_tenant_reading_default)
+billing_date_from: 09/01/2025 (still follows default from s_tenant_reading_default)
+billing_date_to: 09/30/2025 (still follows default from s_tenant_reading_default)
+reading_date: 08/26/2025
+curr_reading: 10585
+prev_reading: 10510 (get last know reading via property_code + unit_no, refer to vw_TenantReading.sql)
+
+vw_TenantReading.sql
+
+
+also include in the implementation task that since t_tenant_reading has remarks column, we should also be able to input it during qr meter reading. Reading Date in meter reading form should be read only as we don't want technicians to tamper with the actual reading date. also upon successful qr scan, it should auto focus on current meter reading input field.

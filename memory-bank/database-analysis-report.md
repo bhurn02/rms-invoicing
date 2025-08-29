@@ -135,7 +135,6 @@ SELECT TOP 10
     r.date_updated as updatedAt,
     t.tenant_name,
     t.real_property_code as propertyId,
-    t.building_code,
     t.unit_no as unitNumber,
     p.real_property_name as propertyName
 FROM t_tenant_reading r
@@ -155,24 +154,63 @@ VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 
 ## QR System Implementation Notes
 
-### 1. Tenant Lookup Process
-- QR codes contain `propertyId` and `unitNumber`
-- System looks up `tenant_code` using: `WHERE real_property_code = ? AND unit_no = ?`
+### 1. Tenant Lookup Process (Corrected)
+- QR codes contain `real_property_code` and `unit_no` (required)
+- QR codes may contain `meter_id` (optional)
+- System looks up `tenant_code` using: `WHERE real_property_code = ? AND unit_no = ? AND ISNULL(terminated,'N') = 'N'`
+- Only active tenants (not terminated) are considered for readings
 - If tenant not found, returns error
 
-### 2. Reading Storage
+### 2. QR Code Data Structure
+- **Default Format**: `real_property_code|unit_no`
+- **Enhanced Format**: `real_property_code|unit_no|meter_id`
+- **Security**: No tenant information stored in QR codes
+- **Flexibility**: Allows tenant changes without reprinting QR codes
+
+### 3. Reading Storage
 - Readings stored in `t_tenant_reading` table
 - `tenant_code` links to `m_tenant` table
 - `date_from` and `date_to` set to reading date
 - `remarks` field includes "QR System Reading" identifier
 
-### 3. Data Validation
+### 4. Data Validation
 - Validates tenant exists before saving
 - Checks for existing readings on same date
 - Updates existing readings if found
 - Logs all activities with user information
 
-### 4. Error Handling
+### 5. Tenant Move-In/Out Transition Rules
+
+#### A. Move-Out Reading (Between Tenants)
+- Attribute the reading to the outgoing tenant (last active)
+- Periods:
+  - `date_from` = 1st day of reading month
+  - `date_to` = `move_out_date`
+  - `billing_date_from` = 1st day of reading month
+  - `billing_date_to` = `move_out_date + 1 day`
+
+#### B. Next Tenant Regular Reading (Same Month)
+- `date_from` = previous reading `date_to + 1 day`
+- `date_to` = last day of month
+- `billing_date_from` = 1st day of next month
+- `billing_date_to` = last day of next month
+
+#### C. Last Reading Source (Unit-Level)
+- `prev_reading` is based on the last recorded reading for the unit using `real_property_code + unit_no`
+- Do not limit to tenant when determining `prev_reading`
+- Suggest using view `vw_TenantReading` for efficient lookup across tenant transitions
+
+```sql
+-- Suggested unit-level last reading lookup
+SELECT TOP 1 r.reading_id, r.current_reading, r.date_to
+FROM t_tenant_reading r
+JOIN m_tenant t ON r.tenant_code = t.tenant_code
+WHERE t.real_property_code = @propertyCode
+  AND t.unit_no = @unitNumber
+ORDER BY r.date_created DESC;
+```
+
+### 5. Error Handling
 - Tenant not found: Returns specific error message
 - Invalid data: Validates meter reading values
 - Database errors: Logs and returns user-friendly messages
@@ -182,10 +220,13 @@ VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 ### 1. Save Reading (`/api/save-reading.php`)
 **Method:** POST
 **Required Fields:**
-- `propertyId`: Real property code (char(5))
-- `unitNumber`: Unit number (char(10))
+- `propertyCode`: Real property code (char(5))
+- `unitNo`: Unit number (char(10))
 - `readingDate`: Reading date (YYYY-MM-DD)
-- `meterReading`: Current meter reading (decimal)
+- `currentReading`: Current meter reading (decimal)
+
+**Optional Fields:**
+- `meter_id`: Meter identifier if available (varchar(20))
 
 **Response:**
 ```json
@@ -194,9 +235,10 @@ VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     "message": "Reading saved successfully",
     "data": {
         "tenantCode": "TENANT001",
-        "propertyId": "PROP1",
-        "unitNumber": "UNIT001",
-        "meterReading": 1234.56,
+        "propertyCode": "PROP1",
+        "unitNo": "UNIT001",
+        "meter_id": "METER123",
+        "currentReading": 1234.56,
         "readingDate": "2025-01-15",
         "timestamp": "2025-01-15 10:30:00",
         "userId": "USER001"
@@ -215,14 +257,13 @@ VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             "readingId": 123,
             "tenantCode": "TENANT001",
             "tenantName": "John Doe",
-            "propertyId": "PROP1",
+            "propertyCode": "PROP1",
             "propertyName": "Sample Property",
-            "buildingCode": "BLDG1",
-            "unitNumber": "UNIT001",
+            "unitNo": "UNIT001",
             "readingDate": "2025-01-15",
             "readingDateTo": "2025-01-15",
             "prevReading": 1200.00,
-            "meterReading": 1234.56,
+            "currentReading": 1234.56,
             "usage": 34.56,
             "remarks": "QR System Reading: 1234.56",
             "createdBy": "USER001",
@@ -232,6 +273,23 @@ VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     "count": 1
 }
 ```
+
+### API Guidance: Using vw_TenantReading for Last Reading
+
+- All API logic that requires the most recent prior reading (prev_reading) for a unit MUST query `vw_TenantReading` keyed by `propertyCode + unitNo` (unit-level), not strictly by tenant.
+
+```sql
+-- Example: Get last reading for unit via vw_TenantReading
+SELECT TOP 1 reading_id, tenant_code, date_from, date_to, prev_reading, current_reading
+FROM vw_TenantReading
+WHERE real_property_code = @propertyCode
+  AND unit_no = @unitNo
+ORDER BY date_created DESC;
+```
+
+- Endpoints affected:
+  - `POST /api/save-reading.php`: Resolve `prev_reading` from view
+  - `GET /api/get-last-reading.php`: Return payload from view
 
 ## Security Considerations
 
