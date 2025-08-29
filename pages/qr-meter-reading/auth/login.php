@@ -5,7 +5,8 @@
  */
 
 session_start();
-require_once '../config/config.php';
+require_once __DIR__ . '/../config/config.php';
+require_once __DIR__ . '/auth.php';
 
 // Redirect if already logged in
 if (isset($_SESSION['qr_user_id']) && !empty($_SESSION['qr_user_id'])) {
@@ -155,22 +156,6 @@ try {
                     </div>
                     
                     <div class="card-body p-4">
-                        <?php if (!empty($error_message)): ?>
-                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                                <i class="bi bi-exclamation-triangle me-2"></i>
-                                <?php echo htmlspecialchars($error_message); ?>
-                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                            </div>
-                        <?php endif; ?>
-                        
-                        <?php if (!empty($success_message)): ?>
-                            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                                <i class="bi bi-check-circle me-2"></i>
-                                <?php echo htmlspecialchars($success_message); ?>
-                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                            </div>
-                        <?php endif; ?>
-                        
                         <form method="POST" action="">
                             <div class="mb-3">
                                 <label for="username" class="form-label">
@@ -239,5 +224,29 @@ try {
     
     <!-- Bootstrap 5.3+ JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- SweetAlert2 for modern alerts -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    <script>
+        // Replace Bootstrap alerts with SweetAlert
+        <?php if (!empty($error_message)): ?>
+        Swal.fire({
+            icon: 'error',
+            title: 'Login Error',
+            text: '<?php echo addslashes($error_message); ?>',
+            confirmButtonText: 'OK'
+        });
+        <?php endif; ?>
+        
+        <?php if (!empty($success_message)): ?>
+        Swal.fire({
+            icon: 'success',
+            title: 'Success',
+            text: '<?php echo addslashes($success_message); ?>',
+            confirmButtonText: 'OK'
+        });
+        <?php endif; ?>
+    </script>
 </body>
 </html>

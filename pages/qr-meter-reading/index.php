@@ -4,6 +4,11 @@
  * Requires authentication before access
  */
 
+// Prevent caching of this page
+header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
+header("Cache-Control: post-check=0, pre-check=0", false);
+header("Pragma: no-cache");
+
 // Require authentication
 require_once 'auth/auth.php';
 requireAuth();
@@ -27,6 +32,11 @@ $currentCompany = getCurrentCompanyCode();
     
     <!-- Disable automatic phone number detection -->
     <meta name="format-detection" content="telephone=no">
+    
+    <!-- Cache Control Headers -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
     
     <title>QR Meter Reading System - RMS</title>
     
@@ -292,8 +302,7 @@ $currentCompany = getCurrentCompanyCode();
                         </li>
                         <li><hr class="dropdown-divider"></li>
                         <li>
-                            <a class="dropdown-item" href="auth/logout.php" 
-                               onclick="return confirm('Are you sure you want to logout?');">
+                            <a class="dropdown-item" href="auth/logout.php">
                                 <i class="bi bi-box-arrow-right"></i>
                                 Logout
                             </a>
@@ -364,18 +373,28 @@ $currentCompany = getCurrentCompanyCode();
                         </h5>
                     </div>
                     <div class="card-body p-4">
+                        <!-- Tenant Information Display -->
+                        <div id="tenant-info" class="mb-4">
+                            <!-- Tenant info will be populated dynamically -->
+                        </div>
+                        
+                        <!-- Last Reading Information Display -->
+                        <div id="last-reading-info" class="mb-4">
+                            <!-- Last reading info will be populated dynamically -->
+                        </div>
+                        
                         <form id="reading-form">
                             <!-- Property Information - Bootstrap responsive grid -->
                             <div class="row g-3 mb-4">
                                 <div class="col-12 col-md-6">
                                     <label for="property-id" class="form-label field-label">Property ID</label>
                                     <input type="text" class="form-control form-field" 
-                                           id="property-id" readonly>
+                                           id="property-id" name="propertyCode" readonly>
                                 </div>
                                 <div class="col-12 col-md-6">
                                     <label for="unit-number" class="form-label field-label">Unit Number</label>
                                     <input type="text" class="form-control form-field" 
-                                           id="unit-number" readonly>
+                                           id="unit-number" name="unitNo" readonly>
                                 </div>
                             </div>
                             
@@ -384,30 +403,46 @@ $currentCompany = getCurrentCompanyCode();
                                 <div class="col-12 col-md-6">
                                     <label for="meter-id" class="form-label field-label">Meter ID</label>
                                     <input type="text" class="form-control form-field" 
-                                           id="meter-id" readonly>
+                                           id="meter-id" name="meterId" readonly>
                                 </div>
                                 <div class="col-12 col-md-6">
                                     <label for="reading-date" class="form-label field-label">Reading Date</label>
-                                    <input type="date" class="form-control form-field" 
-                                           id="reading-date" required>
+                                    <input type="text" class="form-control form-field" 
+                                           id="reading-date" value="<?php echo date('Y-m-d H:i:s'); ?>" readonly>
+                                    <small class="text-muted">Set automatically by system</small>
                                 </div>
                             </div>
                             
-                            <!-- Meter Reading -->
-                            <div class="mb-3">
-                                <label for="meter-reading" class="form-label field-label">Current Meter Reading</label>
-                                <input type="number" class="form-control form-field" id="meter-reading" 
-                                       placeholder="Enter current reading" required step="0.01" inputmode="decimal">
-                                <div class="form-text helper-text">
-                                    Enter the current reading displayed on the meter
+                            <!-- Reading Information - Bootstrap responsive grid -->
+                            <div class="row g-3 mb-4">
+                                <div class="col-12 col-md-6">
+                                    <label for="current-meter-reading" class="form-label field-label">
+                                        <i class="bi bi-speedometer2 me-2"></i>Current Meter Reading
+                                    </label>
+                                    <input type="number" class="form-control form-field" 
+                                           id="current-meter-reading" name="currentReading" 
+                                           step="0.01" min="0.01" required>
+                                    <small class="text-muted">Enter the current meter reading value</small>
+                                </div>
+                                <div class="col-12 col-md-6">
+                                    <label for="remarks" class="form-label field-label">
+                                        <i class="bi bi-chat-text me-2"></i>Remarks
+                                    </label>
+                                    <textarea class="form-control form-field" 
+                                              id="remarks" name="remarks" 
+                                              rows="3" placeholder="Optional notes about the reading..."></textarea>
+                                    <small class="text-muted">Add any relevant notes or observations</small>
                                 </div>
                             </div>
                             
-                            <!-- Submit Button -->
-                            <div class="d-grid">
+                            <!-- Form Actions -->
+                            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                                <button type="button" class="btn btn-secondary btn-lg" 
+                                        onclick="document.getElementById('reading-form-card').style.display='none'">
+                                    <i class="bi bi-x-circle me-2"></i>Cancel
+                                </button>
                                 <button type="submit" class="btn btn-success btn-lg">
-                                    <i class="bi bi-check-circle me-2"></i>
-                                    Submit Reading
+                                    <i class="bi bi-check-circle me-2"></i>Submit Reading
                                 </button>
                             </div>
                         </form>
@@ -461,11 +496,23 @@ $currentCompany = getCurrentCompanyCode();
     <!-- Bootstrap 5 JavaScript Bundle with Popper -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     
+    <!-- SweetAlert2 for modern alerts -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
     <!-- QR Code Library -->
     <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
     
     <!-- Custom JavaScript -->
-    <script src="assets/js/app.js"></script>
+    <script src="assets/js/app.js?v=<?php echo filemtime('assets/js/app.js'); ?>"></script>
+    
+    <!-- Force reload of app.js to prevent caching issues -->
+    <script>
+        // Clear any cached version of app.js
+        if (window.qrMeterApp) {
+            console.log('Clearing cached app instance');
+            delete window.qrMeterApp;
+        }
+    </script>
     
     <!-- Initialize Bootstrap Dropdowns -->
     <script>

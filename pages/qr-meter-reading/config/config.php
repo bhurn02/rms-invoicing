@@ -7,11 +7,18 @@
 // Include the Database class
 require_once __DIR__ . '/Database.php';
 
-// Database configuration - these will be loaded by the Database class
+// =====================================================
+// DATABASE CONFIGURATION - CENTRALIZED
+// =====================================================
 $db_server = 'localhost'; // Update with your MSSQL server
 $db_name = 'RMS'; // Update with your database name
 $db_user = 'web_app'; // Update with your database user
 $db_password = '@webapp123'; // Update with your database password
+$db_port = 1433; // SQL Server default port
+$db_connection_timeout = 30; // seconds
+$db_query_timeout = 60; // seconds
+$db_max_retries = 3;
+$db_pool_size = 10;
 
 // Application configuration
 define('APP_NAME', 'RMS QR Meter Reading System');
@@ -40,18 +47,22 @@ header('X-Content-Type-Options: nosniff');
 header('X-Frame-Options: DENY');
 header('X-XSS-Protection: 1; mode=block');
 
-// Database connection function using new Database class
+// =====================================================
+// DATABASE CONNECTION FUNCTION - USING DATABASE CLASS
+// =====================================================
 function getDatabaseConnection() {
     try {
         $db = Database::getInstance();
         return $db->getConnection();
     } catch (Exception $e) {
         error_log("Database connection failed: " . $e->getMessage());
-        throw new Exception('Database connection failed');
+        throw new Exception('Database connection failed: ' . $e->getMessage());
     }
 }
 
-// Utility functions
+// =====================================================
+// UTILITY FUNCTIONS
+// =====================================================
 function sanitizeInput($input) {
     return htmlspecialchars(strip_tags(trim($input)), ENT_QUOTES, 'UTF-8');
 }
@@ -66,16 +77,6 @@ function formatCurrency($amount) {
 }
 
 // logActivity function moved to auth/auth.php to avoid duplicates
-
-// Check if database connection is working
-function testDatabaseConnection() {
-    try {
-        $db = Database::getInstance();
-        return $db->testConnection();
-    } catch (Exception $e) {
-        return false;
-    }
-}
 
 // Initialize logging directory
 $logDir = __DIR__ . '/../logs';

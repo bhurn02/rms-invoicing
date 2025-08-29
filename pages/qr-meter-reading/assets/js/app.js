@@ -11,6 +11,7 @@ class QRMeterReadingApp {
         this.currentReading = null;
         this.offlineQueue = [];
         this.isAuthenticated = true; // Will be checked on initialization
+        this.isSubmitting = false; // Prevent double form submission
         
         this.init();
     }
@@ -63,7 +64,7 @@ class QRMeterReadingApp {
         // Form submission
         document.getElementById('reading-form').addEventListener('submit', (e) => {
             e.preventDefault();
-            this.submitReading();
+            this.submitReadingForm(e);
         });
 
         // Keyboard shortcuts
@@ -84,17 +85,29 @@ class QRMeterReadingApp {
     }
 
     async logout() {
-        if (confirm('Are you sure you want to logout?')) {
-            try {
+        try {
+            const result = await Swal.fire({
+                title: 'Confirm Logout',
+                text: 'Are you sure you want to logout?',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#dc3545',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Yes, Logout',
+                cancelButtonText: 'Cancel'
+            });
+            
+            if (result.isConfirmed) {
                 // Clear any stored data
                 localStorage.removeItem('qr_meter_readings_offline');
                 
                 // Redirect to logout
                 window.location.href = 'auth/logout.php';
-            } catch (error) {
-                console.error('Logout error:', error);
-                window.location.href = 'auth/logout.php';
             }
+        } catch (error) {
+            console.error('Logout error:', error);
+            // If SweetAlert fails, fallback to direct logout
+            window.location.href = 'auth/logout.php';
         }
     }
 
@@ -325,7 +338,8 @@ class QRMeterReadingApp {
         
         this.populateForm(qrData);
         this.showStatus('Manual entry completed!', 'success');
-        this.showReadingForm();
+        // Call enhanced reading form with manual entry data
+        this.showReadingForm(propertyId, unitNumber, meterId);
     }
 
     // Try camera anyway (for some browsers that might allow it)
@@ -378,7 +392,8 @@ class QRMeterReadingApp {
             if (qrData) {
                 this.populateForm(qrData);
                 this.showStatus('QR code scanned successfully!', 'success');
-                this.showReadingForm();
+                // Call enhanced reading form with parsed data
+                this.showReadingForm(qrData.propertyId, qrData.unitNumber, qrData.meterId);
             } else {
                 this.showStatus('Invalid QR code format', 'error');
             }
@@ -437,75 +452,257 @@ class QRMeterReadingApp {
         this.currentReading = qrData;
     }
 
-    showReadingForm() {
+    // Enhanced reading form with period display and API integration
+    showReadingForm(propertyCode, unitNo, meterId = null) {
         const formCard = document.getElementById('reading-form-card');
+        const form = document.getElementById('reading-form');
+        
+        // Clear previous form data
+        form.reset();
+        
+        // Set property and unit information
+        document.getElementById('property-id').value = propertyCode;
+        document.getElementById('unit-number').value = unitNo;
+        document.getElementById('meter-id').value = meterId || '';
+        
+        // Fetch tenant information and last reading
+        this.fetchTenantAndReadingInfo(propertyCode, unitNo);
+        
+        // Show the form
         formCard.style.display = 'block';
+        
+        // Auto-focus on current meter reading input
+        setTimeout(() => {
+            document.getElementById('current-meter-reading').focus();
+        }, 100);
+        
+        // Scroll to form
         formCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
-
-    async submitReading() {
-        const form = document.getElementById('reading-form');
-        const formData = new FormData(form);
-        
-        // Validate form
-        if (!this.validateForm(formData)) {
-            return;
-        }
-
-        const readingData = {
-            propertyId: formData.get('property-id') || document.getElementById('property-id').value,
-            unitNumber: formData.get('unit-number') || document.getElementById('unit-number').value,
-            meterId: formData.get('meter-id') || document.getElementById('meter-id').value,
-            readingDate: formData.get('reading-date') || document.getElementById('reading-date').value,
-            meterReading: formData.get('meter-reading') || document.getElementById('meter-reading').value,
-            timestamp: new Date().toISOString()
-        };
-
+    
+    // Fetch tenant information and last reading data
+    async fetchTenantAndReadingInfo(propertyCode, unitNo) {
         try {
-            this.showStatus('Submitting reading...', 'info');
+            // Fetch tenant information
+            const tenantResponse = await fetch(`api/get-tenant-by-unit.php?propertyCode=${encodeURIComponent(propertyCode)}&unitNo=${encodeURIComponent(unitNo)}`);
+            const tenantData = await tenantResponse.json();
             
-            // Try to submit online first
-            const success = await this.submitReadingOnline(readingData);
+            if (tenantData.success && tenantData.data) {
+                // Update tenant information display
+                this.updateTenantInfo(tenantData.data);
+            }
             
-            if (success) {
-                this.showStatus('Reading submitted successfully!', 'success');
-                this.resetForm();
-                this.loadRecentReadings();
-                this.hideReadingForm();
-            } else {
-                // Store for offline sync
-                this.storeOfflineReading(readingData);
-                this.showStatus('Reading saved for offline sync', 'info');
-                this.resetForm();
-                this.hideReadingForm();
+            // Fetch last reading
+            const readingResponse = await fetch(`api/get-last-reading.php?propertyCode=${encodeURIComponent(propertyCode)}&unitNo=${encodeURIComponent(unitNo)}`);
+            const readingData = await readingResponse.json();
+            
+            if (readingData.success && readingData.data) {
+                // Update last reading display
+                this.updateLastReadingInfo(readingData.data);
             }
             
         } catch (error) {
-            console.error('Error submitting reading:', error);
-            this.showStatus('Error submitting reading. Saved for offline sync.', 'error');
-            this.storeOfflineReading(readingData);
+            console.error('Error fetching tenant/reading info:', error);
+            this.showStatus('Error fetching property information', 'danger');
         }
+    }
+    
+    // Update tenant information display
+    updateTenantInfo(tenantData) {
+        const tenantInfoDiv = document.getElementById('tenant-info');
+        if (tenantInfoDiv) {
+            tenantInfoDiv.innerHTML = `
+                <div class="alert alert-info border-0">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <strong>Tenant:</strong> ${tenantData.tenantName}<br>
+                            <strong>Property:</strong> ${tenantData.realPropertyName}<br>
+                            <strong>Unit:</strong> ${tenantData.unitNo}
+                        </div>
+                        <div class="col-md-6">
+                            <strong>Meter:</strong> ${tenantData.meterNumber || 'N/A'}<br>
+                            <strong>Type:</strong> ${tenantData.unitType || 'N/A'}<br>
+                            <strong>Status:</strong> <span class="badge bg-success">Active</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+    }
+    
+    // Update last reading information display
+    updateLastReadingInfo(readingData) {
+        const lastReadingDiv = document.getElementById('last-reading-info');
+        if (lastReadingDiv) {
+            const prevReading = readingData.prevReading || 'N/A';
+            const currentReading = readingData.currentReading || 'N/A';
+            const usage = readingData.usage || 'N/A';
+            
+            lastReadingDiv.innerHTML = `
+                <div class="alert alert-warning border-0">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <strong>Last Reading:</strong> ${prevReading}<br>
+                            <strong>Last Reading Date:</strong> ${readingData.readingDate ? new Date(readingData.readingDate).toLocaleDateString() : 'N/A'}<br>
+                            <strong>Usage:</strong> ${usage}
+                        </div>
+                        <div class="col-md-6">
+                            <strong>Reading Period:</strong> ${readingData.dateFrom ? new Date(readingData.dateFrom).toLocaleDateString() : 'N/A'} - ${readingData.dateTo ? new Date(readingData.dateTo).toLocaleDateString() : 'N/A'}<br>
+                            <strong>Billing Period:</strong> ${readingData.billingDateFrom ? new Date(readingData.billingDateFrom).toLocaleDateString() : 'N/A'} - ${readingData.billingDateTo ? new Date(readingData.billingDateTo).toLocaleDateString() : 'N/A'}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+    }
+    
+    // Enhanced form submission with API integration
+    async submitReadingForm(event) {
+        event.preventDefault();
+        
+        // Prevent double submission
+        if (this.isSubmitting) {
+            return;
+        }
+        
+        const formData = new FormData(event.target);
+        const readingData = {
+            propertyCode: formData.get('propertyCode'),
+            unitNo: formData.get('unitNo'),
+            currentReading: parseFloat(formData.get('currentReading')),
+            remarks: formData.get('remarks') || ''
+        };
+        
+        // Enhanced validation
+        if (!readingData.propertyCode || !readingData.unitNo) {
+            this.showStatus('Property code and unit number are required', 'danger');
+            return;
+        }
+        
+        if (!readingData.currentReading || readingData.currentReading <= 0) {
+            this.showStatus('Please enter a valid current reading greater than 0', 'danger');
+            return;
+        }
+        
+        // Set submitting state
+        this.isSubmitting = true;
+        
+        // Show loading state
+        const submitBtn = event.target.querySelector('button[type="submit"]');
+        const originalText = submitBtn.innerHTML;
+        
+        try {
+            submitBtn.innerHTML = '<i class="bi bi-hourglass-split me-2"></i>Saving...';
+            submitBtn.disabled = true;
+            
+            // Submit reading to API
+            const response = await fetch('api/save-reading.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(readingData)
+            });
+            
+            const result = await response.json();
+            
+            if (result.success) {
+                // Show success message with SweetAlert
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Reading Saved Successfully!',
+                    html: `
+                        <div class="text-start">
+                            <p><strong>Tenant:</strong> ${result.data.tenantName}</p>
+                            <p><strong>Previous Reading:</strong> ${result.data.prevReading || 'N/A'}</p>
+                            <p><strong>Current Reading:</strong> ${result.data.currentReading}</p>
+                            <p><strong>Usage:</strong> ${result.data.usage || 'N/A'}</p>
+                            <p><strong>Reading Period:</strong> ${result.data.readingPeriod.from} - ${result.data.readingPeriod.to}</p>
+                            <p><strong>Billing Period:</strong> ${result.data.billingPeriod.from} - ${result.data.billingPeriod.to}</p>
+                        </div>
+                    `,
+                    confirmButtonText: 'Continue',
+                    confirmButtonColor: '#198754'
+                });
+                
+                // Reset form and hide
+                event.target.reset();
+                document.getElementById('reading-form-card').style.display = 'none';
+                
+                // Update recent readings table
+                this.updateRecentReadings();
+                
+            } else {
+                throw new Error(result.message || 'Unknown error occurred');
+            }
+            
+        } catch (error) {
+            console.error('Error saving reading:', error);
+            
+            // Show error message with SweetAlert
+            Swal.fire({
+                icon: 'error',
+                title: 'Error Saving Reading',
+                text: error.message || 'An error occurred while saving the reading',
+                confirmButtonText: 'OK',
+                confirmButtonColor: '#dc3545'
+            });
+            
+        } finally {
+            // Reset submitting state
+            this.isSubmitting = false;
+            
+            // Restore button state
+            const submitBtn = event.target.querySelector('button[type="submit"]');
+            submitBtn.innerHTML = originalText;
+            submitBtn.disabled = false;
+        }
+    }
+    
+    // Update recent readings table
+    async updateRecentReadings() {
+        try {
+            const response = await fetch('api/meter-reading-report.php?startDate=' + 
+                encodeURIComponent(new Date().toISOString().split('T')[0]) + 
+                '&endDate=' + encodeURIComponent(new Date().toISOString().split('T')[0]) + 
+                '&limit=10');
+            
+            const data = await response.json();
+            
+            if (data.success && data.data.readings) {
+                this.populateRecentReadingsTable(data.data.readings);
+            }
+        } catch (error) {
+            console.error('Error updating recent readings:', error);
+        }
+    }
+    
+    // Populate recent readings table
+    populateRecentReadingsTable(readings) {
+        const tbody = document.getElementById('readings-table-body');
+        
+        if (readings.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted">No recent readings</td></tr>';
+            return;
+        }
+        
+        tbody.innerHTML = readings.map(reading => `
+            <tr>
+                <td>${reading.real_property_name}</td>
+                <td>${reading.unit_no}</td>
+                <td>${reading.tenant_name}</td>
+                <td>${reading.current_reading}</td>
+                <td>${new Date(reading.reading_date).toLocaleDateString()}</td>
+                <td>
+                    <span class="badge bg-success">Saved</span>
+                </td>
+            </tr>
+        `).join('');
     }
 
-    validateForm(formData) {
-        const requiredFields = ['reading-date', 'meter-reading'];
-        
-        for (const field of requiredFields) {
-            const value = formData.get(field) || document.getElementById(field).value;
-            if (!value || value.trim() === '') {
-                this.showStatus(`Please fill in the ${field.replace('-', ' ')} field`, 'error');
-                return false;
-            }
-        }
-        
-        const reading = parseFloat(formData.get('meter-reading') || document.getElementById('meter-reading').value);
-        if (isNaN(reading) || reading < 0) {
-            this.showStatus('Please enter a valid meter reading', 'error');
-            return false;
-        }
-        
-        return true;
-    }
+
+
+
 
     async submitReadingOnline(readingData) {
         try {

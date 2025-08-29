@@ -31,6 +31,7 @@ select
 	,isnull(current_reading,0) as current_reading
 	,isnull(prev_reading,0) as prev_reading
 	,isnull(current_reading,0) - isnull(prev_reading,0) as usage
+	,ISNULL(r.reading_date, r.date_created) as reading_date
     ,'(' + convert(varchar(10),date_from,101) + '-' + convert(varchar(10),date_to,101) + ') '
 		+ case 
             when isnull(prev_reading,0) <> 0 or isnull(current_reading,0) <> 0 
@@ -40,6 +41,7 @@ select
 		else '' 
 		end as remarks    
     ,upper(ltrim(rtrim( t.real_property_code))) + '/' +upper(ltrim(rtrim( t.building_code))) + '/' + upper(ltrim(rtrim(t.unit_no))) as unit_desc
+	,r.date_created
 from t_tenant_reading r
 left join m_tenant t on r.tenant_code = t.tenant_code
 left join m_real_property p on p.real_property_code=t.real_property_code

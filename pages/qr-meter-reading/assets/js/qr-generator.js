@@ -1008,34 +1008,40 @@ function printBatchQR() {
     }, 500);
 }
 
-// Show alert messages
+// Show alert messages using SweetAlert2
 function showAlert(message, type = 'info') {
-    // Create alert element
-    const alertDiv = document.createElement('div');
-    alertDiv.className = `alert alert-${type} alert-dismissible fade show position-fixed`;
-    alertDiv.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+    // Map Bootstrap alert types to SweetAlert types
+    const sweetAlertType = {
+        'success': 'success',
+        'danger': 'error',
+        'warning': 'warning',
+        'info': 'info'
+    }[type] || 'info';
     
+    // Map Bootstrap alert types to SweetAlert icons
     const icon = {
-        'success': 'bi-check-circle',
-        'danger': 'bi-exclamation-triangle',
-        'warning': 'bi-exclamation-triangle',
-        'info': 'bi-info-circle'
-    }[type] || 'bi-info-circle';
+        'success': 'success',
+        'danger': 'error',
+        'warning': 'warning',
+        'info': 'info'
+    }[type] || 'info';
     
-    alertDiv.innerHTML = `
-        <i class="bi ${icon} me-2"></i>
-        ${message}
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-    `;
-    
-    document.body.appendChild(alertDiv);
-    
-    // Auto remove after 5 seconds
-    setTimeout(() => {
-        if (alertDiv.parentNode) {
-            alertDiv.remove();
+    // Show SweetAlert
+    Swal.fire({
+        title: type.charAt(0).toUpperCase() + type.slice(1),
+        text: message,
+        icon: icon,
+        toast: true,
+        position: 'top-end',
+        showConfirmButton: false,
+        timer: 5000,
+        timerProgressBar: true,
+        customClass: {
+            popup: 'swal2-toast',
+            title: 'swal2-toast-title',
+            content: 'swal2-toast-content'
         }
-    }, 5000);
+    });
 }
 
 // Initialize QR code fallback if library fails

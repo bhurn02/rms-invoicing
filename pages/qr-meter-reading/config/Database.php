@@ -1,8 +1,7 @@
 <?php
 /**
- * RMS QR Meter Reading System - Database Class
- * Provides PDO-based database connectivity for the QR meter reading system
- * Integrates with existing RMS configuration
+ * RMS QR Meter Reading System - Enhanced Database Class
+ * Implements essential best practices while maintaining compatibility
  */
 
 class Database {
@@ -29,28 +28,37 @@ class Database {
     }
     
     /**
-     * Load configuration from RMS config files
+     * Load configuration from config.php variables
      */
     private function loadConfiguration() {
-        // Load configuration directly (avoid circular dependency)
+        global $db_server, $db_name, $db_user, $db_password, $db_port, 
+               $db_connection_timeout, $db_query_timeout, $db_max_retries, $db_pool_size;
+        
         $this->config = array(
-            'host' => 'localhost',
-            'database' => 'RMS',
-            'username' => 'web_app',
-            'password' => '@webapp123',
-            'charset' => 'utf8'
+            'host' => $db_server,
+            'database' => $db_name,
+            'username' => $db_user,
+            'password' => $db_password,
+            'charset' => 'utf8',
+            'port' => $db_port,
+            'connection_timeout' => $db_connection_timeout,
+            'query_timeout' => $db_query_timeout,
+            'max_retries' => $db_max_retries,
+            'pool_size' => $db_pool_size
         );
         
-        // Log configuration for debugging
-        error_log("QR System Database Config: " . json_encode($this->config));
+        // Log configuration (mask password in production)
+        $logConfig = $this->config;
+        $logConfig['password'] = '***';
+        error_log("QR System Database Config: " . json_encode($logConfig));
     }
     
     /**
-     * Establish database connection using PDO
+     * Establish database connection with enhanced error handling
      */
     private function connect() {
         try {
-            $dsn = "sqlsrv:Server={$this->config['host']};Database={$this->config['database']}";
+            $dsn = "sqlsrv:Server={$this->config['host']},{$this->config['port']};Database={$this->config['database']}";
             
             $options = array(
                 PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
@@ -58,6 +66,12 @@ class Database {
             );
             
             $this->pdo = new PDO($dsn, $this->config['username'], $this->config['password'], $options);
+            
+            // Set additional SQL Server specific options
+            $this->pdo->exec("SET QUOTED_IDENTIFIER ON");
+            $this->pdo->exec("SET ANSI_NULLS ON");
+            $this->pdo->exec("SET ANSI_WARNINGS ON");
+            $this->pdo->exec("SET ARITHABORT ON");
             
             // Log successful connection
             error_log("QR System Database: Connected successfully to {$this->config['database']} on {$this->config['host']}");
@@ -129,28 +143,84 @@ class Database {
      * Get the last inserted ID
      */
     public function lastInsertId() {
-        return $this->pdo->lastInsertId();
+        try {
+            return $this->pdo->lastInsertId();
+        } catch (Exception $e) {
+            error_log("QR System Database: Failed to get last insert ID: " . $e->getMessage());
+            return null;
+        }
     }
     
     /**
-     * Begin a transaction
+     * Begin a transaction with enhanced error handling
      */
     public function beginTransaction() {
-        return $this->pdo->beginTransaction();
+        try {
+            if ($this->pdo->inTransaction()) {
+                error_log("QR System Database: Transaction already in progress, rolling back...");
+                $this->pdo->rollBack();
+            }
+            
+            $result = $this->pdo->beginTransaction();
+            
+            if ($result) {
+                error_log("QR System Database: Transaction started successfully");
+            }
+            
+            return $result;
+            
+        } catch (Exception $e) {
+            error_log("QR System Database: Failed to begin transaction: " . $e->getMessage());
+            throw $e;
+        }
     }
     
     /**
-     * Commit a transaction
+     * Commit a transaction with enhanced error handling
      */
     public function commit() {
-        return $this->pdo->commit();
+        try {
+            if (!$this->pdo->inTransaction()) {
+                error_log("QR System Database: No active transaction to commit");
+                return false;
+            }
+            
+            $result = $this->pdo->commit();
+            
+            if ($result) {
+                error_log("QR System Database: Transaction committed successfully");
+            }
+            
+            return $result;
+            
+        } catch (Exception $e) {
+            error_log("QR System Database: Failed to commit transaction: " . $e->getMessage());
+            throw $e;
+        }
     }
     
     /**
-     * Rollback a transaction
+     * Rollback a transaction with enhanced error handling
      */
     public function rollback() {
-        return $this->pdo->rollback();
+        try {
+            if (!$this->pdo->inTransaction()) {
+                error_log("QR System Database: No active transaction to rollback");
+                return false;
+            }
+            
+            $result = $this->pdo->rollback();
+            
+            if ($result) {
+                error_log("QR System Database: Transaction rolled back successfully");
+            }
+            
+            return $result;
+            
+        } catch (Exception $e) {
+            error_log("QR System Database: Failed to rollback transaction: " . $e->getMessage());
+            throw $e;
+        }
     }
     
     /**
@@ -161,6 +231,7 @@ class Database {
             $result = $this->querySingle('SELECT 1 as test');
             return $result && $result['test'] == 1;
         } catch (Exception $e) {
+            error_log("QR System Database Connection Test Failed: " . $e->getMessage());
             return false;
         }
     }
@@ -173,15 +244,36 @@ class Database {
             'host' => $this->config['host'],
             'database' => $this->config['database'],
             'username' => $this->config['username'],
+            'port' => $this->config['port'],
             'connected' => $this->pdo !== null
         );
     }
     
     /**
-     * Close database connection
+     * Close database connection and cleanup
      */
     public function close() {
-        $this->pdo = null;
+        try {
+            // Rollback any pending transactions
+            if ($this->pdo && $this->pdo->inTransaction()) {
+                $this->pdo->rollBack();
+            }
+            
+            // Close connection
+            $this->pdo = null;
+            
+            error_log("QR System Database: Connection closed successfully");
+            
+        } catch (Exception $e) {
+            error_log("QR System Database: Error closing connection: " . $e->getMessage());
+        }
+    }
+    
+    /**
+     * Destructor to ensure proper cleanup
+     */
+    public function __destruct() {
+        $this->close();
     }
 }
 
