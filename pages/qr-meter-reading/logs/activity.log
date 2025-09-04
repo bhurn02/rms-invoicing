@@ -160,3 +160,4 @@
 [2025-08-29 15:14:25] [DEV1/Aldrich] [::1] QR System Login - User dev1 logged in successfully from ::1
 [2025-08-29 15:20:30] [DEV1/Aldrich] [::1] QR System Logout - User DEV1 logged out from ::1
 [2025-08-29 15:20:44] [DEV1/Aldrich] [::1] QR System Login - User dev1 logged in successfully from ::1
+[2025-08-29 17:23:24] [DEV1/Aldrich] [::1] QR Reading Saved - Reading saved for tenant T000001935: 11918.00 -> 14527.00
