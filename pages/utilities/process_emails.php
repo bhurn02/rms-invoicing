@@ -80,6 +80,11 @@ foreach ($batchData as $entry) {
 
     $cc = ['rms_sysadmin@tanholdings.com'];
     $bcc = ['aldrich_delossantos@tanholdings.com', 'nat_angeles@tanholdings.com'];
+    
+    // Add system BCC addresses from config
+    if (defined('APP_MAIL_BCC') && is_array(APP_MAIL_BCC)) {
+        $bcc = array_merge($bcc, APP_MAIL_BCC);
+    }
 
     if ($read_only == 0) {
         log_to_file("[SENDING] Invoice $invoice_no to " . implode(", ", $emails), $logPath);
