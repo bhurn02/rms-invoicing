@@ -108,7 +108,7 @@ function BatchGenerateInvoicePdf(){
                 $invalidAttachments++;
             }
 
-
+			if ($attachment_status === "Invalid") {
             $cn = cn();
 			$server = $cn[1];
 			$db = $cn[2];
@@ -187,6 +187,10 @@ function BatchGenerateInvoicePdf(){
 			//end print
 			$strMode = "RETRIEVE";
 			// break;
+			} else {
+				$retStatus = 200;
+        		$strResult = 'Skipped. File already exist.';
+			}
         }
         
     }
