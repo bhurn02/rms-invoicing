@@ -1,0 +1,8 @@
+2025-09-04 00:07:08
+To: aldrich_delossantos@tanholdings.com
+CC: 
+BCC: 
+SUBJECT: SMTP Test Email - 2025-09-04 10:06:30
+The following From address failed: hr2admin@tanholdings.com : MAIL FROM command failed,Bad sequence of commands
+,503,5.5.1SMTP server error: MAIL FROM command failed Detail: Bad sequence of commands
+ SMTP code: 503 Additional SMTP info: 5.5.1
