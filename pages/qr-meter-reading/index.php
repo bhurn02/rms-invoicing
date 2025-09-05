@@ -274,10 +274,7 @@ $currentCompany = getCurrentCompanyCode();
                         <div class="d-flex flex-column align-items-start">
                             <span class="fw-semibold" style="font-size: 0.875rem;">
                                 <?php echo htmlspecialchars($currentUser ?? 'Field Technician'); ?>
-                            </span>
-                            <small class="opacity-75 d-none d-lg-block" style="font-size: 0.75rem;">
-                                <?php echo htmlspecialchars($currentCompany ?? 'Administrator'); ?>
-                            </small>
+                            </span>                            
                         </div>
                     </button>
                     <ul class="dropdown-menu dropdown-menu-end">
@@ -287,17 +284,12 @@ $currentCompany = getCurrentCompanyCode();
                                 <i class="bi bi-person"></i>
                                 Edit Account
                             </a>
-                        </li>
-                        <li>
-                            <a class="dropdown-item" href="#">
-                                <i class="bi bi-credit-card"></i>
-                                Billing
-                            </a>
-                        </li>
+                        </li>                        
+                        <li><hr class="dropdown-divider"></li>
                         <li>
                             <a class="dropdown-item" href="#">
                                 <i class="bi bi-receipt"></i>
-                                Payments
+                                Reports
                             </a>
                         </li>
                         <li><hr class="dropdown-divider"></li>
