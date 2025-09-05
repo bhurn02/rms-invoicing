@@ -1,0 +1,438 @@
+/* QR Scanner Specific Styles */
+
+/* ===== QR VIEWPORT ===== */
+.qr-viewport {
+    width: 100%;
+    min-height: 300px;
+    background: linear-gradient(135deg, var(--bg-light) 0%, #e5e7eb 100%);
+    border-radius: 0.75rem;
+    border: 2px dashed var(--border-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+    transition: all var(--transition-normal) ease-in-out;
+}
+
+.qr-viewport.active {
+    border-color: var(--primary-blue);
+    background: var(--white);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.qr-viewport.scanning {
+    border-color: var(--success-green);
+    background: var(--success-green-bg);
+}
+
+/* QR Scanner Container */
+#qr-reader {
+    width: 100%;
+    min-height: 300px;
+    position: relative;
+}
+
+#qr-reader__scan_region {
+    border-radius: 0.75rem;
+    overflow: hidden;
+}
+
+#qr-reader__scan_region > img {
+    border-radius: 0.75rem;
+}
+
+/* QR Scanner Overlay */
+#qr-reader__scan_region > div {
+    border-radius: 0.75rem;
+}
+
+/* Scanner Status Overlay */
+.scanner-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0.75rem;
+    z-index: 10;
+}
+
+.scanner-overlay-content {
+    text-align: center;
+    color: var(--white);
+    padding: var(--space-8);
+}
+
+.scanner-overlay-content i {
+    font-size: 3rem;
+    margin-bottom: var(--space-4);
+    color: var(--primary-blue-light);
+}
+
+/* Scanner Controls */
+.scanner-controls {
+    display: flex;
+    gap: var(--space-4);
+    margin-top: var(--space-6);
+}
+
+.scanner-controls .btn {
+    flex: 1;
+    min-height: 3rem;
+}
+
+/* Scanner Status Messages */
+.scanner-status {
+    margin-top: var(--space-4);
+    padding: var(--space-4) var(--space-6);
+    border-radius: 0.75rem;
+    font-weight: 500;
+}
+
+.scanner-status.success {
+    background: linear-gradient(135deg, var(--success-green-bg) 0%, #a7f3d0 100%);
+    color: var(--success-green);
+    border-left: 4px solid var(--success-green);
+}
+
+.scanner-status.error {
+    background: linear-gradient(135deg, #fef2f2 0%, #fecaca 100%);
+    color: #dc2626;
+    border-left: 4px solid #dc2626;
+}
+
+.scanner-status.info {
+    background: linear-gradient(135deg, var(--primary-blue-bg) 0%, #bfdbfe 100%);
+    color: var(--primary-blue);
+    border-left: 4px solid var(--primary-blue);
+}
+
+/* ===== CAMERA PERMISSION HANDLING ===== */
+.camera-permission {
+    text-align: center;
+    padding: var(--space-8);
+    background: var(--white);
+    border-radius: 0.75rem;
+    border: 2px dashed var(--border-color);
+}
+
+.camera-permission i {
+    font-size: 4rem;
+    color: var(--text-tertiary);
+    margin-bottom: var(--space-4);
+}
+
+.camera-permission h3 {
+    color: var(--text-primary);
+    margin-bottom: var(--space-2);
+}
+
+.camera-permission p {
+    color: var(--text-secondary);
+    margin-bottom: var(--space-6);
+}
+
+.camera-permission ul {
+    text-align: left;
+    margin-bottom: var(--space-6);
+}
+
+.camera-permission ul li {
+    margin-bottom: var(--space-2);
+    color: var(--text-secondary);
+}
+
+.camera-permission .form-label {
+    text-align: left;
+    font-weight: 600;
+    color: var(--text-secondary);
+    margin-bottom: var(--space-2);
+}
+
+.camera-permission .form-control {
+    border-radius: 0.75rem;
+    border: 2px solid var(--border-color);
+    padding: var(--space-4);
+    font-size: var(--text-base);
+    transition: all var(--transition-normal) ease-in-out;
+}
+
+.camera-permission .form-control:focus {
+    border-color: var(--primary-blue-light);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.camera-permission .row {
+    margin-bottom: var(--space-4);
+}
+
+.camera-permission .btn {
+    min-height: 3rem;
+    font-weight: 600;
+}
+
+/* ===== SCANNING ANIMATION ===== */
+@keyframes scanning-line {
+    0% {
+        transform: translateY(0);
+        opacity: 1;
+    }
+    50% {
+        transform: translateY(200px);
+        opacity: 0.8;
+    }
+    100% {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.scanning-line {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--primary-blue), transparent);
+    animation: scanning-line 2s ease-in-out infinite;
+    z-index: 5;
+}
+
+/* ===== RESPONSIVE SCANNER ===== */
+@media (max-width: 768px) {
+    .qr-viewport {
+        min-height: 250px;
+        max-height: 60vh;
+        border-radius: 0.75rem;
+    }
+    
+    #qr-reader {
+        min-height: 250px;
+        max-height: 60vh;
+        border-radius: 0.75rem;
+    }
+    
+    .scanner-controls {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    
+    .scanner-controls .btn {
+        width: 100%;
+        min-height: 3rem;
+        font-size: 1rem;
+    }
+    
+    /* Mobile camera permission styling */
+    .camera-permission {
+        padding: 1.5rem;
+        text-align: center;
+    }
+    
+    .camera-permission i {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+    }
+    
+    .camera-permission h3 {
+        font-size: 1.25rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .camera-permission p {
+        font-size: 0.9rem;
+        margin-bottom: 1.5rem;
+        line-height: 1.4;
+    }
+    
+    /* Mobile scanner status */
+    .scanner-status {
+        margin-top: 0.75rem;
+        padding: 0.75rem;
+        font-size: 0.9rem;
+    }
+    
+    /* Mobile scanner overlay */
+    .scanner-overlay {
+        border-radius: 0.75rem;
+    }
+    
+    .scanner-overlay-content {
+        padding: 1.5rem;
+    }
+    
+    .scanner-overlay-content i {
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+    }
+}
+
+/* Extra small devices */
+@media (max-width: 576px) {
+    .qr-viewport {
+        min-height: 200px;
+        max-height: 50vh;
+    }
+    
+    #qr-reader {
+        min-height: 200px;
+        max-height: 50vh;
+    }
+    
+    .camera-permission {
+        padding: 1rem;
+    }
+    
+    .camera-permission i {
+        font-size: 2.5rem;
+    }
+    
+    .camera-permission h3 {
+        font-size: 1.1rem;
+    }
+    
+    .camera-permission p {
+        font-size: 0.85rem;
+    }
+}
+
+/* Landscape orientation on mobile */
+@media (max-width: 768px) and (orientation: landscape) {
+    .qr-viewport {
+        min-height: 200px;
+        max-height: 40vh;
+    }
+    
+    #qr-reader {
+        min-height: 200px;
+        max-height: 40vh;
+    }
+    
+    .camera-permission {
+        padding: 1rem;
+    }
+    
+    .camera-permission i {
+        font-size: 2rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .camera-permission h3 {
+        font-size: 1rem;
+        margin-bottom: 0.25rem;
+    }
+    
+    .camera-permission p {
+        font-size: 0.8rem;
+        margin-bottom: 1rem;
+    }
+}
+
+/* ===== DARK MODE SUPPORT ===== */
+@media (prefers-color-scheme: dark) {
+    .qr-viewport {
+        background: linear-gradient(135deg, #1f2937 0%, #374151 100%);
+        border-color: #4b5563;
+    }
+    
+    .qr-viewport.active {
+        border-color: var(--primary-blue-light);
+        background: #1f2937;
+    }
+    
+    .camera-permission {
+        background: #1f2937;
+        border-color: #4b5563;
+        color: var(--white);
+    }
+}
+
+/* ===== ACCESSIBILITY ENHANCEMENTS ===== */
+.qr-viewport:focus-within {
+    outline: 2px solid var(--primary-blue);
+    outline-offset: 2px;
+}
+
+/* Screen reader only text */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* ===== LOADING STATES ===== */
+.scanner-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 300px;
+    background: var(--bg-light);
+    border-radius: 0.75rem;
+}
+
+.scanner-loading .spinner-border {
+    width: 3rem;
+    height: 3rem;
+    color: var(--primary-blue);
+}
+
+/* ===== ERROR STATES ===== */
+.scanner-error {
+    text-align: center;
+    padding: var(--space-8);
+    background: linear-gradient(135deg, #fef2f2 0%, #fecaca 100%);
+    border-radius: 0.75rem;
+    border: 1px solid #fca5a5;
+}
+
+.scanner-error i {
+    font-size: 3rem;
+    color: #dc2626;
+    margin-bottom: var(--space-4);
+}
+
+.scanner-error h3 {
+    color: #991b1b;
+    margin-bottom: var(--space-2);
+}
+
+.scanner-error p {
+    color: #7f1d1d;
+    margin-bottom: var(--space-4);
+}
+
+/* ===== SUCCESS STATES ===== */
+.scanner-success {
+    text-align: center;
+    padding: var(--space-8);
+    background: linear-gradient(135deg, var(--success-green-bg) 0%, #a7f3d0 100%);
+    border-radius: 0.75rem;
+    border: 1px solid #86efac;
+}
+
+.scanner-success i {
+    font-size: 3rem;
+    color: var(--success-green);
+    margin-bottom: var(--space-4);
+}
+
+.scanner-success h3 {
+    color: var(--success-green);
+    margin-bottom: var(--space-2);
+}
+
+.scanner-success p {
+    color: #065f46;
+    margin-bottom: var(--space-4);
+}

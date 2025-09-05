@@ -1,0 +1,13 @@
+input.btn {   
+	color:#050;   
+	font: bold 84% 'trebuchet ms',helvetica,sans-serif;   
+	background-color:#fed;   
+	border: 1px solid;   
+	border-color: #696969;   
+	filter:progid:DXImageTransform.Microsoft.Gradient   
+	(GradientType=0,StartColorStr='#ffffffff',EndColorStr='#ffeeddaa');   
+}   
+
+input.btnhov {   
+	border-color: #c63 #930 #930 #c63;   
+}
