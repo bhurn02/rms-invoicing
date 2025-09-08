@@ -4,12 +4,13 @@
  * Retrieves recent meter readings from the database using correct RMS schema
  */
 
-// Require authentication
-require_once '../auth/auth.php';
-requireAuth();
-
-// Include configuration
+// Include required files
 require_once '../config/config.php';
+require_once '../auth/auth.php';
+require_once '../auth/permission-check.php';
+
+// Validate API permissions (includes authentication check)
+validateAPIPermissions();
 
 // Set content type to JSON
 header('Content-Type: application/json');

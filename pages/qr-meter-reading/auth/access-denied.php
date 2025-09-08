@@ -1,26 +1,25 @@
 <?php
 /**
- * QR Meter Reading System - Access Denied Page
- * Displays when user does not have permission to access QR Meter Reading modules
+ * RMS QR Meter Reading System - Access Denied Page
+ * Simple access denied page for users without QR Meter Reading permissions
  */
 
-// Include authentication and database configuration
-require_once __DIR__ . '/../config/config.php';
-require_once __DIR__ . '/auth.php';
+// Clear the QR session to prevent loops
+session_start();
+$currentUser = isset($_SESSION['qr_username']) ? $_SESSION['qr_username'] : null;
+$currentUserId = isset($_SESSION['qr_user_id']) ? $_SESSION['qr_user_id'] : null;
 
-// Check if user is logged in
-if (!isAuthenticated()) {
-    header('Location: login.php');
-    exit;
-}
+// Clear QR session data to prevent loops
+unset($_SESSION['qr_user_id']);
+unset($_SESSION['qr_username']);
+unset($_SESSION['qr_company_code']);
+unset($_SESSION['qr_login_time']);
+unset($_SESSION['qr_ip_address']);
 
-// Get current user information
-$currentUser = getCurrentUsername();
-$currentUserId = getCurrentUserId();
-
-// Log access attempt
-logActivity($currentUserId, 'ACCESS_DENIED', 'QR Meter Reading - Insufficient permissions', $_SERVER['REMOTE_ADDR']);
-
+// Clear QR session cookies
+setcookie("userid", "", time() - 3600, "/");
+setcookie("username", "", time() - 3600, "/");
+setcookie("company_code", "", time() - 3600, "/");
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -29,263 +28,215 @@ logActivity($currentUserId, 'ACCESS_DENIED', 'QR Meter Reading - Insufficient pe
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Access Denied - QR Meter Reading System</title>
     
-    <!-- Bootstrap 5 CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap 5.3+ CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Custom Executive Professional Theme -->
+    <link href="../assets/css/custom-theme.css" rel="stylesheet">
+    
     <!-- Bootstrap Icons -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
-    <!-- SweetAlert2 -->
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
     
     <style>
         body {
-            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
-            min-height: 100vh;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-        }
-        
-        .access-denied-container {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 2rem;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
         
         .access-denied-card {
-            background: white;
-            border-radius: 1rem;
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-            padding: 3rem;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
             max-width: 600px;
             width: 100%;
+        }
+        
+        .access-denied-header {
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+            color: white;
+            border-radius: 20px 20px 0 0;
+            padding: 2rem;
             text-align: center;
-            border: 1px solid rgba(243, 244, 246, 0.8);
         }
         
         .access-denied-icon {
             font-size: 4rem;
-            color: #dc2626;
-            margin-bottom: 1.5rem;
-        }
-        
-        .access-denied-title {
-            font-size: 2rem;
-            font-weight: 700;
-            color: #111827;
             margin-bottom: 1rem;
+            opacity: 0.9;
         }
         
-        .access-denied-message {
-            font-size: 1.125rem;
-            color: #374151;
-            line-height: 1.6;
-            margin-bottom: 2rem;
-        }
-        
-        .user-info {
-            background: #f3f4f6;
-            border-radius: 0.75rem;
+        .info-card {
+            background: #f8f9fa;
+            border-radius: 15px;
             padding: 1.5rem;
-            margin-bottom: 2rem;
-            border-left: 4px solid #1e40af;
-        }
-        
-        .user-info h6 {
-            color: #1e40af;
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-        }
-        
-        .user-info p {
-            color: #374151;
-            margin: 0;
-        }
-        
-        .action-buttons {
-            display: flex;
-            gap: 1rem;
-            justify-content: center;
-            flex-wrap: wrap;
-        }
-        
-        .btn-primary {
-            background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
-            border: none;
-            border-radius: 0.75rem;
-            padding: 0.75rem 2rem;
-            font-weight: 600;
-            box-shadow: 0 4px 14px 0 rgba(30, 64, 175, 0.2);
-            transition: all 0.2s ease-in-out;
-        }
-        
-        .btn-primary:hover {
-            background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 100%);
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px 0 rgba(30, 64, 175, 0.3);
-        }
-        
-        .btn-secondary {
-            background: white;
-            color: #374151;
-            border: 2px solid #d1d5db;
-            border-radius: 0.75rem;
-            padding: 0.75rem 2rem;
-            font-weight: 500;
-            transition: all 0.2s ease-in-out;
-        }
-        
-        .btn-secondary:hover {
-            border-color: #1e40af;
-            color: #1e40af;
-            box-shadow: 0 4px 14px 0 rgba(30, 64, 175, 0.1);
+            margin: 1rem 0;
+            border-left: 4px solid #dc3545;
         }
         
         .contact-info {
-            background: #dbeafe;
-            border-radius: 0.75rem;
+            background: #e3f2fd;
+            border-radius: 15px;
             padding: 1.5rem;
-            margin-top: 2rem;
-            border-left: 4px solid #1e40af;
+            margin: 1rem 0;
+            border-left: 4px solid #2196f3;
         }
         
-        .contact-info h6 {
-            color: #1e40af;
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 10px;
+            padding: 12px 30px;
             font-weight: 600;
-            margin-bottom: 1rem;
+            transition: all 0.3s ease;
         }
         
-        .contact-info p {
-            color: #374151;
-            margin-bottom: 0.5rem;
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
         }
         
-        @media (max-width: 768px) {
-            .access-denied-card {
-                padding: 2rem;
-                margin: 1rem;
-            }
-            
-            .access-denied-title {
-                font-size: 1.5rem;
-            }
-            
-            .action-buttons {
-                flex-direction: column;
-            }
-            
-            .btn-primary,
-            .btn-secondary {
-                width: 100%;
-            }
+        .btn-outline-secondary {
+            border-radius: 10px;
+            padding: 12px 30px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-outline-secondary:hover {
+            transform: translateY(-2px);
+        }
+        
+        .user-info {
+            background: #fff3cd;
+            border-radius: 10px;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-left: 4px solid #ffc107;
         }
     </style>
 </head>
 <body>
-    <div class="access-denied-container">
-        <div class="access-denied-card">
-            <!-- Access Denied Icon -->
-            <div class="access-denied-icon">
-                <i class="bi bi-shield-exclamation"></i>
-            </div>
-            
-            <!-- Title -->
-            <h1 class="access-denied-title">Access Denied</h1>
-            
-            <!-- Message -->
-            <div class="access-denied-message">
-                <p>You do not have permission to access the QR Meter Reading System.</p>
-                <p>This system is restricted to authorized field technicians and administrators.</p>
-            </div>
-            
-            <!-- User Information -->
-            <div class="user-info">
-                <h6><i class="bi bi-person-circle me-2"></i>Current User</h6>
-                <p><strong>User ID:</strong> <?= htmlspecialchars($currentUserId) ?></p>
-                <p><strong>Username:</strong> <?= htmlspecialchars($currentUser) ?></p>
-            </div>
-            
-            <!-- Action Buttons -->
-            <div class="action-buttons">
-                <button class="btn btn-primary" onclick="requestAccess()">
-                    <i class="bi bi-envelope me-2"></i>Request Access
-                </button>
-                <button class="btn btn-secondary" onclick="returnToMain()">
-                    <i class="bi bi-house me-2"></i>Return to Main System
-                </button>
-            </div>
-            
-            <!-- Contact Information -->
-            <div class="contact-info">
-                <h6><i class="bi bi-info-circle me-2"></i>Need Help?</h6>
-                <p><strong>To request access to QR Meter Reading:</strong></p>
-                <p>1. Contact your system administrator</p>
-                <p>2. Request to be added to the "Field Technician" user group</p>
-                <p>3. Ensure you have the "QR Meter Reading" module permission</p>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-12">
+                <div class="access-denied-card">
+                    <div class="access-denied-header">
+                        <div class="access-denied-icon">
+                            <i class="bi bi-shield-exclamation"></i>
+                        </div>
+                        <h2 class="mb-2">Access Denied</h2>
+                        <p class="mb-0 opacity-75">QR Meter Reading System</p>
+                    </div>
+                    
+                    <div class="card-body p-4">
+                        <!-- User Information -->
+                        <?php if ($currentUser): ?>
+                        <div class="user-info">
+                            <h6 class="mb-2">
+                                <i class="bi bi-person-circle me-2"></i>
+                                Current User: <?php echo htmlspecialchars($currentUser); ?>
+                            </h6>
+                            <small class="text-muted">
+                                User ID: <?php echo htmlspecialchars($currentUserId); ?>
+                            </small>
+                        </div>
+                        <?php endif; ?>
+                        
+                        <!-- Main Message -->
+                        <div class="info-card">
+                            <h5 class="mb-3">
+                                <i class="bi bi-info-circle me-2"></i>
+                                <?php if ($currentUser): ?>
+                                    Insufficient Permissions
+                                <?php else: ?>
+                                    Access Required
+                                <?php endif; ?>
+                            </h5>
+                            <p class="mb-3">
+                                <?php if ($currentUser): ?>
+                                    You do not have the required permissions to access the QR Meter Reading System. 
+                                    This system is restricted to authorized field technicians and administrators.
+                                <?php else: ?>
+                                    You need to log in to access the QR Meter Reading System. 
+                                    This system is restricted to authorized field technicians and administrators.
+                                <?php endif; ?>
+                            </p>
+                            <p class="mb-0">
+                                <strong>Required Access:</strong> Field Technician user group membership with QR Meter Reading module permissions.
+                            </p>
+                        </div>
+                        
+                        <!-- Request Access Instructions -->
+                        <div class="contact-info">
+                            <h6 class="mb-3">
+                                <i class="bi bi-telephone me-2"></i>
+                                <?php if ($currentUser): ?>
+                                    Request Access
+                                <?php else: ?>
+                                    Get Started
+                                <?php endif; ?>
+                            </h6>
+                            <p class="mb-2">
+                                <?php if ($currentUser): ?>
+                                    To request access to the QR Meter Reading System, please contact your system administrator:
+                                <?php else: ?>
+                                    To access the QR Meter Reading System, please log in with your credentials:
+                                <?php endif; ?>
+                            </p>
+                            <ul class="mb-3">
+                                <?php if ($currentUser): ?>
+                                    <li>Contact your IT Administrator or System Manager</li>
+                                    <li>Provide your user ID: <strong><?php echo htmlspecialchars($currentUserId); ?></strong></li>
+                                    <li>Request assignment to the "Field Technician" user group</li>
+                                    <li>Specify that you need access to the "QR Meter Reading" module</li>
+                                <?php else: ?>
+                                    <li>Use your existing RMS system credentials</li>
+                                    <li>Contact your IT Administrator if you don't have an account</li>
+                                    <li>Request assignment to the "Field Technician" user group</li>
+                                    <li>Specify that you need access to the "QR Meter Reading" module</li>
+                                <?php endif; ?>
+                            </ul>
+                            <p class="mb-0">
+                                <small class="text-muted">
+                                    <i class="bi bi-clock me-1"></i>
+                                    Access requests are typically processed within 1-2 business days.
+                                </small>
+                            </p>
+                        </div>
+                        
+                        <!-- Action Buttons -->
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-center mt-4">
+                            <a href="login.php" class="btn btn-primary">
+                                <i class="bi bi-box-arrow-in-right me-2"></i>
+                                Login to System
+                            </a>
+                            <a href="../index.php" class="btn btn-outline-secondary">
+                                <i class="bi bi-house me-2"></i>
+                                Return to Main System
+                            </a>
+                        </div>
+                        
+                        <!-- Additional Information -->
+                        <div class="text-center mt-4">
+                            <small class="text-muted">
+                                <i class="bi bi-shield-check me-1"></i>
+                                This access control ensures system security and data integrity.
+                            </small>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
-
-    <!-- Bootstrap 5 JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     
-    <script>
-        function requestAccess() {
-            Swal.fire({
-                title: 'Request Access',
-                html: `
-                    <div class="text-start">
-                        <p><strong>To request access to QR Meter Reading System:</strong></p>
-                        <ol>
-                            <li>Contact your system administrator</li>
-                            <li>Request to be added to the "Field Technician" user group</li>
-                            <li>Ensure you have the "QR Meter Reading" module permission</li>
-                        </ol>
-                        <p><strong>Required Permissions:</strong></p>
-                        <ul>
-                            <li>User Group: Field Technician (Group Code: 12)</li>
-                            <li>Module: QR Meter Reading (Module ID: 25)</li>
-                        </ul>
-                    </div>
-                `,
-                icon: 'info',
-                confirmButtonText: 'I Understand',
-                confirmButtonColor: '#1e40af',
-                customClass: {
-                    popup: 'swal-access-request'
-                }
-            });
-        }
-        
-        function returnToMain() {
-            Swal.fire({
-                title: 'Return to Main System',
-                text: 'Are you sure you want to return to the main RMS system?',
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonText: 'Yes, Return',
-                cancelButtonText: 'Stay Here',
-                confirmButtonColor: '#1e40af',
-                cancelButtonColor: '#6b7280'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    // Redirect to main RMS system
-                    window.location.href = '../../../index.php';
-                }
-            });
-        }
-        
-        // Show access denied notification on page load
-        document.addEventListener('DOMContentLoaded', function() {
-            Swal.fire({
-                title: 'Access Denied',
-                text: 'You do not have permission to access QR Meter Reading System.',
-                icon: 'error',
-                confirmButtonText: 'I Understand',
-                confirmButtonColor: '#dc2626',
-                allowOutsideClick: false,
-                allowEscapeKey: false
-            });
-        });
-    </script>
+    <!-- Bootstrap 5.3+ JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    
 </body>
 </html>

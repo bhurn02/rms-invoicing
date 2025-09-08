@@ -22,29 +22,30 @@ class Database {
      */
     public static function getInstance() {
         if (self::$instance === null) {
+            // Check if constants are defined
+            if (!defined('DB_SERVER') || !defined('DB_NAME') || !defined('DB_USER') || !defined('DB_PASSWORD')) {
+                throw new Exception('Database configuration constants not available. Make sure config.php is included first.');
+            }
             self::$instance = new self();
         }
         return self::$instance;
     }
     
     /**
-     * Load configuration from config.php variables
+     * Load configuration from config.php constants
      */
     private function loadConfiguration() {
-        global $db_server, $db_name, $db_user, $db_password, $db_port, 
-               $db_connection_timeout, $db_query_timeout, $db_max_retries, $db_pool_size;
-        
         $this->config = array(
-            'host' => $db_server,
-            'database' => $db_name,
-            'username' => $db_user,
-            'password' => $db_password,
+            'host' => DB_SERVER,
+            'database' => DB_NAME,
+            'username' => DB_USER,
+            'password' => DB_PASSWORD,
             'charset' => 'utf8',
-            'port' => $db_port,
-            'connection_timeout' => $db_connection_timeout,
-            'query_timeout' => $db_query_timeout,
-            'max_retries' => $db_max_retries,
-            'pool_size' => $db_pool_size
+            'port' => DB_PORT,
+            'connection_timeout' => DB_CONNECTION_TIMEOUT,
+            'query_timeout' => DB_QUERY_TIMEOUT,
+            'max_retries' => DB_MAX_RETRIES,
+            'pool_size' => DB_POOL_SIZE
         );
         
         // Log configuration (mask password in production)

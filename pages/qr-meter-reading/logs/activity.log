@@ -182,3 +182,13 @@
 [2025-09-08 14:29:57] [DEV1/Aldrich] [::1] QR Reading Saved - Reading saved for tenant T000001986: 27275.00 -> 27459.00
 [2025-09-08 14:30:19] [DEV1/Aldrich] [::1] QR System Logout - User DEV1 logged out from ::1
 [2025-09-08 14:30:24] [DEV1/Aldrich] [::1] QR System Login - User dev1 logged in successfully from ::1
+[2025-09-08 18:17:39] [DEV1/Aldrich] [::1] QR System Logout - User DEV1 logged out from ::1
+[2025-09-08 18:17:49] [unknown/unknown] [::1] QR System Login Failed - Failed login attempt for user deasa from ::1
+[2025-09-08 18:17:53] [unknown/unknown] [::1] QR System Login Failed - Failed login attempt for user deasa from ::1
+[2025-09-08 18:18:05] [unknown/unknown] [::1] QR System Login Failed - Failed login attempt for user deasa from ::1
+[2025-09-08 18:18:11] [DEV1/Aldrich] [::1] QR System Login - User dev1 logged in successfully from ::1
+[2025-09-08 18:18:15] [DEV1/Aldrich] [::1] QR System Logout - User DEV1 logged out from ::1
+[2025-09-08 18:18:33] [CHRISTIAN_BRAVO/Christian] [::1] QR System Login - User christian_bravo logged in successfully from ::1
+[2025-09-08 18:21:37] [CHRISTIAN_BRAVO/Christian] [::1] QR System Login - User christian_bravo logged in successfully from ::1
+[2025-09-08 18:21:51] [CHRISTIAN_BRAVO/Christian] [::1] QR System Login - User christian_bravo logged in successfully from ::1
+[2025-09-08 18:22:22] [DEV1/Aldrich] [::1] QR System Login - User dev1 logged in successfully from ::1

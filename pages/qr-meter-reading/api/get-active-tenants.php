@@ -18,8 +18,13 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-// Include authentication check (needed for logActivity function)
+// Include required files
+require_once '../config/config.php';
 require_once '../auth/auth.php';
+require_once '../auth/permission-check.php';
+
+// Validate API permissions (includes authentication check)
+validateAPIPermissions();
 
 // Set JSON content type
 header('Content-Type: application/json');

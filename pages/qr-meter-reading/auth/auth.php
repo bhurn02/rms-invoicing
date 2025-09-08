@@ -134,6 +134,36 @@ function hasPermission($action) {
 }
 
 /**
+ * Require authentication and QR Meter Reading access
+ * This is the main function to use for QR Meter Reading pages
+ */
+function requireQRMeterReadingAccess() {
+    // First check if user is authenticated
+    if (!isAuthenticated() || isSessionExpired()) {
+        // Clear expired session
+        if (isSessionExpired()) {
+            session_destroy();
+        }
+        
+        // Redirect to login page
+        header('Location: auth/login.php');
+        exit();
+    }
+    
+    // Update session time on each request
+    $_SESSION['qr_login_time'] = time();
+    
+    // Then check QR Meter Reading permissions
+    require_once __DIR__ . '/../config/config.php';
+    require_once __DIR__ . '/permission-check.php';
+    if (!hasQRMeterReadingAccess()) {
+        // User is authenticated but doesn't have QR Meter Reading access
+        header('Location: auth/access-denied.php');
+        exit();
+    }
+}
+
+/**
  * Get session information for debugging
  * @return array
  */

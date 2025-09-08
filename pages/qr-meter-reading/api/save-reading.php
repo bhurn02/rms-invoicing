@@ -16,16 +16,10 @@ if (session_status() === PHP_SESSION_NONE) {
 // Include required files
 require_once '../config/config.php';
 require_once '../auth/auth.php';
+require_once '../auth/permission-check.php';
 
-// Check authentication
-if (!isAuthenticated()) {
-    http_response_code(401);
-    echo json_encode([
-        'success' => false,
-        'message' => 'Authentication required'
-    ]);
-    exit();
-}
+// Validate API permissions (includes authentication check)
+validateAPIPermissions();
 
 // Only allow POST requests
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {

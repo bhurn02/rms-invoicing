@@ -4,21 +4,21 @@
  * Configuration for connecting to the RMS MSSQL database
  */
 
-// Include the Database class
-require_once __DIR__ . '/Database.php';
-
 // =====================================================
 // DATABASE CONFIGURATION - CENTRALIZED
 // =====================================================
-$db_server = 'localhost'; // Update with your MSSQL server
-$db_name = 'RMS'; // Update with your database name
-$db_user = 'web_app'; // Update with your database user
-$db_password = '@webapp123'; // Update with your database password
-$db_port = 1433; // SQL Server default port
-$db_connection_timeout = 30; // seconds
-$db_query_timeout = 60; // seconds
-$db_max_retries = 3;
-$db_pool_size = 10;
+define('DB_SERVER', 'localhost'); // Update with your MSSQL server
+define('DB_NAME', 'RMS'); // Update with your database name
+define('DB_USER', 'web_app'); // Update with your database user
+define('DB_PASSWORD', '@webapp123'); // Update with your database password
+define('DB_PORT', 1433); // SQL Server default port
+define('DB_CONNECTION_TIMEOUT', 30); // seconds
+define('DB_QUERY_TIMEOUT', 60); // seconds
+define('DB_MAX_RETRIES', 3);
+define('DB_POOL_SIZE', 10);
+
+// Include the Database class AFTER variables are defined
+require_once __DIR__ . '/Database.php';
 
 // Application configuration
 define('APP_NAME', 'RMS QR Meter Reading System');

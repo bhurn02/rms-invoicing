@@ -9,8 +9,13 @@
  * Returns JSON response with detailed tenant information
  */
 
-// Include authentication check
+// Include required files
+require_once '../config/config.php';
 require_once '../auth/auth.php';
+require_once '../auth/permission-check.php';
+
+// Validate API permissions (includes authentication check)
+validateAPIPermissions();
 
 // Set JSON content type
 header('Content-Type: application/json');
@@ -21,8 +26,6 @@ header('Access-Control-Allow-Methods: GET, POST');
 header('Access-Control-Allow-Headers: Content-Type');
 
 try {
-    // Include database configuration and Database class
-    require_once '../config/config.php';
     
     // Get database connection
     $db = Database::getInstance();

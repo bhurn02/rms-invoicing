@@ -51,8 +51,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 // Log successful login
                 logActivity("QR System Login", "User $username logged in successfully from {$_SERVER['REMOTE_ADDR']}");
                 
-                header('Location: ../index.php');
-                exit();
+                // Check if user has QR Meter Reading access
+                require_once __DIR__ . '/permission-check.php';
+                if (hasQRMeterReadingAccess($username)) {
+                    // User has access - redirect to main interface
+                    header('Location: ../index.php');
+                    exit();
+                } else {
+                    // User doesn't have access - redirect to access denied
+                    header('Location: access-denied.php');
+                    exit();
+                }
             } else {
                 $error_message = 'Invalid username, password, or company code.';
                 logActivity("QR System Login Failed", "Failed login attempt for user $username from {$_SERVER['REMOTE_ADDR']}");
