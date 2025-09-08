@@ -5,12 +5,12 @@
  */
 
 // Include authentication and database configuration
-require_once __DIR__ . '/config/config.php';
-require_once __DIR__ . '/auth/auth.php';
+require_once __DIR__ . '/../config/config.php';
+require_once __DIR__ . '/auth.php';
 
 // Check if user is logged in
 if (!isAuthenticated()) {
-    header('Location: auth/login.php');
+    header('Location: login.php');
     exit;
 }
 
@@ -269,7 +269,7 @@ logActivity($currentUserId, 'ACCESS_DENIED', 'QR Meter Reading - Insufficient pe
             }).then((result) => {
                 if (result.isConfirmed) {
                     // Redirect to main RMS system
-                    window.location.href = '../../index.php';
+                    window.location.href = '../../../index.php';
                 }
             });
         }
