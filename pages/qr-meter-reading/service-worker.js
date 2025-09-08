@@ -92,6 +92,11 @@ self.addEventListener('fetch', (event) => {
 
 // Handle API requests with offline support
 async function handleApiRequest(request) {
+    // Skip caching for unsupported schemes
+    if (!request.url.startsWith('http://') && !request.url.startsWith('https://')) {
+        return fetch(request);
+    }
+    
     try {
         // Try network first
         const response = await fetch(request);
@@ -133,6 +138,11 @@ async function handleApiRequest(request) {
 
 // Handle static file requests
 async function handleStaticRequest(request) {
+    // Skip caching for unsupported schemes
+    if (!request.url.startsWith('http://') && !request.url.startsWith('https://')) {
+        return fetch(request);
+    }
+    
     const cachedResponse = await caches.match(request);
     
     if (cachedResponse) {
@@ -157,6 +167,11 @@ async function handleStaticRequest(request) {
 
 // Handle dynamic requests
 async function handleDynamicRequest(request) {
+    // Skip caching for unsupported schemes
+    if (!request.url.startsWith('http://') && !request.url.startsWith('https://')) {
+        return fetch(request);
+    }
+    
     try {
         const response = await fetch(request);
         

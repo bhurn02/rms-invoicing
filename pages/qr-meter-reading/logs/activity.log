@@ -1,0 +1,184 @@
+2025-08-08 17:09:25 - QR System Login - User dev1 logged in successfully from ::1
+2025-08-08 17:09:59 - QR System Login - User dev1 logged in successfully from 172.16.31.101
+2025-08-08 17:13:41 - QR System Login - User Dev1 logged in successfully from 172.16.35.192
+2025-08-08 18:04:46 - QR System Logout - User DEV1 logged out from 172.16.31.101
+2025-08-08 18:05:16 - QR System Login - User dev1 logged in successfully from 172.16.31.101
+2025-08-08 18:05:32 - QR System Logout - User DEV1 logged out from 172.16.31.101
+2025-08-08 18:05:42 - QR System Login - User dev1 logged in successfully from 172.16.31.101
+2025-08-08 18:05:50 - QR System Logout - User DEV1 logged out from 172.16.31.101
+2025-08-12 11:19:51 - QR System Login - User dev1 logged in successfully from 172.16.31.101
+2025-08-21 17:45:39 - QR System Login - User dev1 logged in successfully from 172.16.35.129
+2025-08-21 17:57:42 - QR System Login - User dev1 logged in successfully from ::1
+2025-08-21 18:14:30 - QR System Logout - User DEV1 logged out from 172.16.35.72
+2025-08-22 17:02:14 - QR System Logout - User DEV1 logged out from ::1
+2025-08-22 17:02:18 - QR System Login - User dev1 logged in successfully from ::1
+2025-08-22 17:02:39 - QR System Logout - User DEV1 logged out from ::1
+2025-08-22 17:02:42 - QR System Login - User dev1 logged in successfully from ::1
+2025-08-22 17:04:08 - QR System Logout - User DEV1 logged out from ::1
+2025-08-25 09:16:54 - QR System Login - User dev1 logged in successfully from ::1
+2025-08-25 14:16:36 - Retrieved 300 active tenants for QR generation - 
+2025-08-25 14:16:37 - Retrieved 300 active tenants for QR generation - 
+[2025-08-25 15:09:13] [unknown/unknown] [unknown] Debug test completed successfully
+[2025-08-25 15:10:48] [unknown/unknown] [unknown] Test log entry
+[2025-08-25 15:14:11] [DEV1/Aldrich] [::1] Retrieved 300 active tenants for QR generation
+[2025-08-25 15:14:14] [DEV1/Aldrich] [::1] Retrieved 300 active tenants for QR generation
+[2025-08-25 15:20:11] [unknown/unknown] [::1] Retrieved 300 active tenants for QR generation
+[2025-08-25 15:20:17] [unknown/unknown] [::1] Retrieved 300 active tenants for QR generation
+[2025-08-25 15:22:04] [unknown/unknown] [::1] Retrieved 300 active tenants for QR generation
+[2025-08-25 15:22:16] [unknown/unknown] [::1] Retrieved tenant details for T000001668
+[2025-08-25 15:26:01] [DEV1/Aldrich] [::1] Retrieved 300 active tenants for QR generation
+[2025-08-25 15:26:02] [DEV1/Aldrich] [::1] Retrieved 300 active tenants for QR generation
+[2025-08-25 15:26:39] [unknown/unknown] [::1] Retrieved 300 active tenants for QR generation
+[2025-08-25 15:28:03] [unknown/unknown] [::1] Retrieved 300 active tenants for QR generation
+[2025-08-25 15:31:13] [DEV1/Aldrich] [::1] Retrieved 300 active tenants for QR generation
+[2025-08-25 15:40:51] [DEV1/Aldrich] [::1] Retrieved 300 active tenants for QR generation
+[2025-08-25 15:40:52] [DEV1/Aldrich] [::1] Retrieved 300 active tenants for QR generation
+[2025-08-25 15:41:38] [DEV1/Aldrich] [::1] Retrieved 300 active tenants for QR generation
+[2025-08-25 15:41:41] [DEV1/Aldrich] [::1] Retrieved 300 active tenants for QR generation
+[2025-08-25 15:43:14] [DEV1/Aldrich] [::1] Retrieved 300 active tenants for QR generation
+[2025-08-25 15:43:16] [DEV1/Aldrich] [::1] Retrieved 300 active tenants for QR generation
+[2025-08-25 15:45:07] [DEV1/Aldrich] [::1] Retrieved 300 active tenants for QR generation
+[2025-08-25 15:47:43] [DEV1/Aldrich] [::1] Retrieved 300 active tenants for QR generation
+[2025-08-25 15:47:43] [DEV1/Aldrich] [::1] Retrieved 300 active tenants for QR generation
+[2025-08-25 16:02:40] [DEV1/Aldrich] [::1] Retrieved 300 active tenants for QR generation
+[2025-08-25 16:02:41] [DEV1/Aldrich] [::1] Retrieved 300 active tenants for QR generation
+[2025-08-25 16:09:40] [DEV1/Aldrich] [::1] Retrieved 285 active tenants for QR generation
+[2025-08-25 16:09:41] [DEV1/Aldrich] [::1] Retrieved 285 active tenants for QR generation
+[2025-08-25 16:10:00] [DEV1/Aldrich] [::1] Retrieved 285 active tenants for QR generation
+[2025-08-25 16:12:52] [DEV1/Aldrich] [::1] Retrieved 285 active tenants for QR generation
+[2025-08-25 16:12:53] [DEV1/Aldrich] [::1] Retrieved 285 active tenants for QR generation
+[2025-08-25 16:14:42] [DEV1/Aldrich] [::1] Retrieved 285 active tenants for QR generation
+[2025-08-25 16:14:43] [DEV1/Aldrich] [::1] Retrieved 285 active tenants for QR generation
+[2025-08-25 16:17:01] [DEV1/Aldrich] [::1] Retrieved 285 active tenants for QR generation
+[2025-08-25 16:17:02] [DEV1/Aldrich] [::1] Retrieved 285 active tenants for QR generation
+[2025-08-25 16:17:16] [DEV1/Aldrich] [::1] Retrieved 285 active tenants for QR generation
+[2025-08-25 16:17:17] [DEV1/Aldrich] [::1] Retrieved 285 active tenants for QR generation
+[2025-08-25 16:17:23] [DEV1/Aldrich] [::1] Retrieved 285 active tenants for QR generation
+[2025-08-25 16:21:06] [DEV1/Aldrich] [::1] Retrieved 285 active tenants for QR generation
+[2025-08-25 16:21:07] [DEV1/Aldrich] [::1] Retrieved 285 active tenants for QR generation
+[2025-08-25 16:25:07] [DEV1/Aldrich] [::1] Retrieved 285 active tenants for QR generation
+[2025-08-25 16:25:08] [DEV1/Aldrich] [::1] Retrieved 285 active tenants for QR generation
+[2025-08-25 16:25:19] [DEV1/Aldrich] [::1] Retrieved 285 active tenants for QR generation
+[2025-08-25 16:25:20] [DEV1/Aldrich] [::1] Retrieved 285 active tenants for QR generation
+[2025-08-25 16:33:39] [DEV1/Aldrich] [::1] Retrieved 285 active tenants for QR generation
+[2025-08-25 16:33:42] [DEV1/Aldrich] [::1] Retrieved 285 active tenants for QR generation
+[2025-08-25 16:35:49] [DEV1/Aldrich] [::1] Retrieved 285 active tenants for QR generation
+[2025-08-25 16:35:50] [DEV1/Aldrich] [::1] Retrieved 285 active tenants for QR generation
+[2025-08-25 16:36:37] [DEV1/Aldrich] [::1] Retrieved 285 active tenants for QR generation
+[2025-08-25 16:36:46] [DEV1/Aldrich] [::1] Retrieved 285 active tenants for QR generation
+[2025-08-25 16:37:06] [DEV1/Aldrich] [::1] Retrieved 285 active tenants for QR generation
+[2025-08-25 16:37:09] [DEV1/Aldrich] [::1] Retrieved 285 active tenants for QR generation
+[2025-08-25 16:37:45] [DEV1/Aldrich] [::1] Retrieved 285 active tenants for QR generation
+[2025-08-25 16:47:59] [DEV1/Aldrich] [::1] Retrieved 285 active tenants for QR generation
+[2025-08-25 16:47:59] [DEV1/Aldrich] [::1] Retrieved 285 active tenants for QR generation
+[2025-08-25 16:51:42] [DEV1/Aldrich] [::1] Retrieved 285 active tenants for QR generation
+[2025-08-25 16:51:45] [DEV1/Aldrich] [::1] Retrieved 285 active tenants for QR generation
+[2025-08-25 16:51:54] [DEV1/Aldrich] [::1] Retrieved 285 active tenants for QR generation
+[2025-08-25 16:51:56] [DEV1/Aldrich] [::1] Retrieved 285 active tenants for QR generation
+[2025-08-25 16:54:17] [DEV1/Aldrich] [::1] Retrieved 285 active tenants for QR generation
+[2025-08-25 16:55:04] [DEV1/Aldrich] [::1] Retrieved 285 active tenants for QR generation
+[2025-08-25 16:56:11] [DEV1/Aldrich] [::1] Retrieved 285 active tenants for QR generation
+[2025-08-25 16:56:14] [DEV1/Aldrich] [::1] Retrieved 285 active tenants for QR generation
+[2025-08-25 16:56:35] [DEV1/Aldrich] [::1] Retrieved 285 active tenants for QR generation
+[2025-08-25 16:56:36] [DEV1/Aldrich] [::1] Retrieved 285 active tenants for QR generation
+[2025-08-25 16:56:37] [DEV1/Aldrich] [::1] Retrieved 285 active tenants for QR generation
+[2025-08-25 16:58:21] [DEV1/Aldrich] [::1] Retrieved 285 active tenants for QR generation
+[2025-08-25 16:58:22] [DEV1/Aldrich] [::1] Retrieved 285 active tenants for QR generation
+[2025-08-25 16:59:31] [DEV1/Aldrich] [::1] Retrieved 285 active tenants for QR generation
+[2025-08-25 16:59:38] [DEV1/Aldrich] [::1] Retrieved 285 active tenants for QR generation
+[2025-08-25 17:03:41] [DEV1/Aldrich] [::1] Retrieved 285 active tenants for QR generation
+[2025-08-25 17:03:42] [DEV1/Aldrich] [::1] Retrieved 285 active tenants for QR generation
+[2025-08-25 17:04:56] [DEV1/Aldrich] [::1] Retrieved 285 active tenants for QR generation
+[2025-08-25 17:04:57] [DEV1/Aldrich] [::1] Retrieved 285 active tenants for QR generation
+[2025-08-25 17:06:58] [DEV1/Aldrich] [::1] Retrieved 285 active tenants for QR generation
+[2025-08-25 17:06:59] [DEV1/Aldrich] [::1] Retrieved 285 active tenants for QR generation
+[2025-08-25 17:12:40] [DEV1/Aldrich] [::1] Retrieved 285 active tenants for QR generation
+[2025-08-25 17:12:41] [DEV1/Aldrich] [::1] Retrieved 285 active tenants for QR generation
+[2025-08-25 17:13:02] [DEV1/Aldrich] [::1] Retrieved 285 active tenants for QR generation
+[2025-08-25 17:13:03] [DEV1/Aldrich] [::1] Retrieved 285 active tenants for QR generation
+[2025-08-25 17:13:09] [DEV1/Aldrich] [::1] Retrieved 285 active tenants for QR generation
+[2025-08-25 17:24:01] [DEV1/Aldrich] [::1] Retrieved 285 active tenants for QR generation
+[2025-08-25 17:24:08] [DEV1/Aldrich] [::1] Retrieved 285 active tenants for QR generation
+[2025-08-25 17:28:25] [DEV1/Aldrich] [::1] Retrieved 285 active tenants for QR generation
+[2025-08-25 17:28:26] [DEV1/Aldrich] [::1] Retrieved 285 active tenants for QR generation
+[2025-08-26 10:54:51] [DEV1/Aldrich] [::1] Retrieved 285 active tenants for QR generation
+[2025-08-26 11:32:16] [DEV1/Aldrich] [::1] Retrieved 285 active tenants for QR generation
+[2025-08-26 11:32:18] [DEV1/Aldrich] [::1] Retrieved 285 active tenants for QR generation
+[2025-08-26 13:26:34] [DEV1/Aldrich] [::1] Retrieved 285 active tenants for QR generation
+[2025-08-26 13:26:40] [DEV1/Aldrich] [::1] Retrieved 285 active tenants for QR generation
+[2025-08-26 13:26:56] [DEV1/Aldrich] [::1] Retrieved 285 active tenants for QR generation
+[2025-08-26 13:27:23] [DEV1/Aldrich] [::1] Retrieved 285 active tenants for QR generation
+[2025-08-26 13:29:29] [DEV1/Aldrich] [::1] Retrieved 285 active tenants for QR generation
+[2025-08-26 13:29:30] [DEV1/Aldrich] [::1] Retrieved 285 active tenants for QR generation
+[2025-08-26 13:29:41] [DEV1/Aldrich] [::1] Retrieved 285 active tenants for QR generation
+[2025-08-26 13:34:19] [DEV1/Aldrich] [::1] Retrieved 285 active tenants for QR generation
+[2025-08-26 13:34:25] [DEV1/Aldrich] [::1] Retrieved 285 active tenants for QR generation
+[2025-08-26 13:36:31] [DEV1/Aldrich] [::1] Retrieved 285 active tenants for QR generation
+[2025-08-26 13:36:44] [DEV1/Aldrich] [::1] Retrieved 285 active tenants for QR generation
+[2025-08-26 13:38:02] [DEV1/Aldrich] [::1] Retrieved 285 active tenants for QR generation
+[2025-08-26 14:00:34] [DEV1/Aldrich] [::1] Retrieved 285 active tenants for QR generation
+[2025-08-26 14:00:37] [DEV1/Aldrich] [::1] Retrieved 285 active tenants for QR generation
+[2025-08-26 14:00:43] [DEV1/Aldrich] [::1] Retrieved 285 active tenants for QR generation
+[2025-08-26 14:04:27] [DEV1/Aldrich] [::1] Retrieved 285 active tenants for QR generation
+[2025-08-26 14:04:41] [DEV1/Aldrich] [::1] Retrieved 285 active tenants for QR generation
+[2025-08-26 14:25:32] [DEV1/Aldrich] [::1] Retrieved 285 active tenants for QR generation
+[2025-08-26 14:25:33] [DEV1/Aldrich] [::1] Retrieved 285 active tenants for QR generation
+[2025-08-26 14:27:55] [DEV1/Aldrich] [::1] Retrieved 285 active tenants for QR generation
+[2025-08-26 14:28:07] [DEV1/Aldrich] [::1] Retrieved 285 active tenants for QR generation
+[2025-08-26 14:54:30] [DEV1/Aldrich] [::1] Retrieved 285 active tenants for QR generation
+[2025-08-26 14:54:35] [DEV1/Aldrich] [::1] Retrieved 285 active tenants for QR generation
+[2025-08-26 14:54:53] [DEV1/Aldrich] [::1] Retrieved 285 active tenants for QR generation
+[2025-08-26 16:11:42] [DEV1/Aldrich] [::1] Retrieved 285 active tenants for QR generation
+[2025-08-26 16:11:43] [DEV1/Aldrich] [::1] Retrieved 285 active tenants for QR generation
+[2025-08-26 16:55:27] [DEV1/Aldrich] [::1] Retrieved 285 active tenants for QR generation
+[2025-08-26 16:55:48] [DEV1/Aldrich] [::1] Retrieved 285 active tenants for QR generation
+[2025-08-26 16:55:56] [DEV1/Aldrich] [::1] Retrieved 285 active tenants for QR generation
+[2025-08-26 16:59:18] [DEV1/Aldrich] [::1] Retrieved 285 active tenants for QR generation
+[2025-08-26 16:59:19] [DEV1/Aldrich] [::1] Retrieved 285 active tenants for QR generation
+[2025-08-26 17:01:03] [DEV1/Aldrich] [::1] Retrieved 285 active tenants for QR generation
+[2025-08-26 17:01:26] [DEV1/Aldrich] [::1] QR System Logout - User DEV1 logged out from ::1
+[2025-08-26 17:02:08] [DEV1/Aldrich] [::1] Retrieved 285 active tenants for QR generation
+[2025-08-26 17:28:41] [DEV1/Aldrich] [::1] Retrieved 285 active tenants for QR generation
+[2025-08-26 17:29:19] [DEV1/Aldrich] [::1] Retrieved 285 active tenants for QR generation
+[2025-08-26 17:29:20] [DEV1/Aldrich] [::1] Retrieved 285 active tenants for QR generation
+[2025-08-26 17:29:31] [DEV1/Aldrich] [::1] Retrieved 285 active tenants for QR generation
+[2025-08-26 17:34:03] [DEV1/Aldrich] [::1] Retrieved 285 active tenants for QR generation
+[2025-08-26 17:34:21] [DEV1/Aldrich] [::1] Retrieved 285 active tenants for QR generation
+[2025-08-29 13:37:40] [DEV1/Aldrich] [::1] QR System Login - User dev1 logged in successfully from ::1
+[2025-08-29 13:38:02] [DEV1/Aldrich] [::1] QR System Login - User dev1 logged in successfully from ::1
+[2025-08-29 14:10:57] [DEV1/Aldrich] [::1] QR System Logout - User DEV1 logged out from ::1
+[2025-08-29 14:12:12] [DEV1/Aldrich] [::1] QR System Login - User dev1 logged in successfully from ::1
+[2025-08-29 14:12:25] [DEV1/Aldrich] [::1] QR System Logout - User DEV1 logged out from ::1
+[2025-08-29 14:12:36] [DEV1/Aldrich] [::1] QR System Login - User dev1 logged in successfully from ::1
+[2025-08-29 14:12:54] [DEV1/Aldrich] [::1] QR System Logout - User DEV1 logged out from ::1
+[2025-08-29 14:12:59] [DEV1/Aldrich] [::1] QR System Login - User dev1 logged in successfully from ::1
+[2025-08-29 14:15:19] [DEV1/Aldrich] [::1] QR System Logout - User DEV1 logged out from ::1
+[2025-08-29 14:15:23] [DEV1/Aldrich] [::1] QR System Login - User dev1 logged in successfully from ::1
+[2025-08-29 14:50:27] [DEV1/Aldrich] [::1] QR System Logout - User DEV1 logged out from ::1
+[2025-08-29 14:50:32] [DEV1/Aldrich] [::1] QR System Login - User dev1 logged in successfully from ::1
+[2025-08-29 15:04:12] [DEV1/Aldrich] [::1] QR System Logout - User DEV1 logged out from ::1
+[2025-08-29 15:14:25] [DEV1/Aldrich] [::1] QR System Login - User dev1 logged in successfully from ::1
+[2025-08-29 15:20:30] [DEV1/Aldrich] [::1] QR System Logout - User DEV1 logged out from ::1
+[2025-08-29 15:20:44] [DEV1/Aldrich] [::1] QR System Login - User dev1 logged in successfully from ::1
+[2025-08-29 17:23:24] [DEV1/Aldrich] [::1] QR Reading Saved - Reading saved for tenant T000001935: 11918.00 -> 14527.00
+[2025-09-05 13:43:04] [DEV1/Aldrich] [::1] QR System Login - User dev1 logged in successfully from ::1
+[2025-09-05 13:43:35] [DEV1/Aldrich] [::1] Retrieved 285 active tenants for QR generation
+[2025-09-05 13:43:36] [DEV1/Aldrich] [::1] Retrieved 285 active tenants for QR generation
+[2025-09-05 13:43:57] [DEV1/Aldrich] [::1] Retrieved 285 active tenants for QR generation
+[2025-09-05 13:44:15] [DEV1/Aldrich] [::1] Retrieved 285 active tenants for QR generation
+[2025-09-05 13:44:17] [DEV1/Aldrich] [::1] Retrieved 285 active tenants for QR generation
+[2025-09-05 13:44:18] [DEV1/Aldrich] [::1] Retrieved 285 active tenants for QR generation
+[2025-09-05 17:54:28] [DEV1/Aldrich] [::1] QR System Logout - User DEV1 logged out from ::1
+[2025-09-05 17:54:31] [DEV1/Aldrich] [::1] QR System Login - User dev1 logged in successfully from ::1
+[2025-09-08 11:20:04] [DEV1/Aldrich] [::1] QR Reading Saved - Reading saved for tenant T000001935: 14401.00 -> 14561.00
+[2025-09-08 13:27:06] [DEV1/Aldrich] [::1] QR System Login - User dev1 logged in successfully from ::1
+[2025-09-08 13:27:35] [DEV1/Aldrich] [::1] QR System Logout - User DEV1 logged out from ::1
+[2025-09-08 13:27:40] [DEV1/Aldrich] [::1] QR System Login - User dev1 logged in successfully from ::1
+[2025-09-08 13:31:07] [DEV1/Aldrich] [::1] QR Reading Saved - Reading saved for tenant T000001935: 14401.00 -> 14561.00
+[2025-09-08 14:14:57] [DEV1/Aldrich] [::1] QR System Logout - User DEV1 logged out from ::1
+[2025-09-08 14:15:08] [DEV1/Aldrich] [::1] QR System Login - User dev1 logged in successfully from ::1
+[2025-09-08 14:15:55] [DEV1/Aldrich] [::1] QR Reading Saved - Reading saved for tenant T000001935: 14401.00 -> 14561.00
+[2025-09-08 14:23:43] [DEV1/Aldrich] [::1] QR Reading Saved - Reading saved for tenant T000001935: 14401.00 -> 14561.00
+[2025-09-08 14:29:57] [DEV1/Aldrich] [::1] QR Reading Saved - Reading saved for tenant T000001986: 27275.00 -> 27459.00
+[2025-09-08 14:30:19] [DEV1/Aldrich] [::1] QR System Logout - User DEV1 logged out from ::1
+[2025-09-08 14:30:24] [DEV1/Aldrich] [::1] QR System Login - User dev1 logged in successfully from ::1

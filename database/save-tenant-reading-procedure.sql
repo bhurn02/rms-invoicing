@@ -15,7 +15,8 @@ CREATE PROCEDURE [dbo].[sp_t_SaveTenantReading]
     @createdBy NVARCHAR(32),
     @ipAddress NVARCHAR(45) = NULL,
     @userAgent NVARCHAR(500) = NULL,
-    @deviceInfo NVARCHAR(200) = 'QR System Mobile'
+    @deviceInfo NVARCHAR(200) = 'QR System Mobile',
+    @locationData NVARCHAR(500) = NULL
 AS
 /*
 Author		:	Aldrich Delos Santos
@@ -205,9 +206,9 @@ BEGIN
         
         -- Insert into t_tenant_reading_ext for audit trail
         INSERT INTO t_tenant_reading_ext 
-            (reading_id, ip_address, user_agent, device_info, created_date)
+            (reading_id, ip_address, user_agent, device_info, location_data, created_date)
         VALUES 
-            (@readingId, @ipAddress, @userAgent, @deviceInfo, GETDATE());
+            (@readingId, @ipAddress, @userAgent, @deviceInfo, @locationData, GETDATE());
         
         COMMIT TRANSACTION;
         

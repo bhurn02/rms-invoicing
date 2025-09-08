@@ -1,4 +1,4 @@
-# Utility Rate & QR Meter Reading Implementation v1.0
+# Utility Rate & QR Meter Reading Implementation v1.1
 
 ## Executive Summary
 This document reflects current implementation status, recent changes, and the remaining scope for the RMS enhancements across two tracks: Utility Rate Management and Mobile QR Code Meter Reading. It focuses in particular on the Reading Persistence Plan and implementation approach that leverages the existing schema with minimal or no changes.
@@ -13,11 +13,11 @@ This document reflects current implementation status, recent changes, and the re
 - Documentation: memory-bank active context, tasks, and progress updated with new priorities
 
 ### In Progress / Next Priorities
-- Fix post-login incorrect redirection (auth flow)
-- Resolve double logout dialog alerts
-- Implement SweetAlert for alerts/confirmations (replace Bootstrap alert toasts)
-- Reading Persistence: finalize plan and implement API/UI to save readings using existing schema
-- Backlog: Batch downloads (PDF/ZIP), performance runs with 100+ tenants
+- **User Access Rights Implementation**: Implement proper user group validation for QR Meter Reading modules
+- End-to-End Testing: Test complete QR reading flow with real data
+- Tenant Readings Management Page: Implement comprehensive reading management interface
+- Documentation Updates: Update user and technical documentation
+- Production Deployment: Deploy to production environment
 
 ## Reading Persistence Plan (Using Existing Schema)
 
@@ -280,15 +280,111 @@ ORDER BY r.reading_date DESC, p.real_property_name, t.unit_no
 - No schema changes needed beyond potential service layer for transactional bulk updates
 - Will integrate with classification via existing tables (e.g., `m_space_type` or property/space type flags)
 
+## User Access Rights Implementation (NEW REQUIREMENT)
+
+### Goal
+Implement proper user group validation for QR Meter Reading modules to ensure only authorized users can access the system.
+
+### Database Setup
+Execute the provided SQL script to create the necessary user access structure:
+
+```sql
+-- From database/qr-meter-reading-user-access.sql
+-- 1. Add QR Meter Reading Module
+INSERT INTO s_modules (module_id, module_name)
+VALUES (25, 'QR METER READING');
+
+-- 2. Add Field Technician User Group
+INSERT INTO s_user_group (group_code, group_desc)
+VALUES (12, 'FIELD TECHNICIAN');
+
+-- 3. Grant Field Technician access to QR Meter Reading module
+INSERT INTO s_user_group_modules (group_code, module_id)
+VALUES (12, 25);
+```
+
+### Authentication Enhancement Requirements
+
+#### 1. User Permission Validation
+- **Login Validation**: After successful login, check if user has access to QR Meter Reading module
+- **Module Access Check**: Validate user group membership for module_id = 25
+- **API Protection**: All API endpoints must validate user permissions
+
+#### 2. Access Control Implementation
+```php
+// Enhanced authentication function
+function hasQRMeterReadingAccess($userId) {
+    $sql = "SELECT COUNT(*) as access_count
+            FROM s_user_group_users ugu
+            INNER JOIN s_user_group_modules ugm ON ugu.group_code = ugm.group_code
+            WHERE ugu.user_id = ? AND ugm.module_id = 25";
+    
+    $result = $database->query($sql, [$userId]);
+    return $result[0]['access_count'] > 0;
+}
+```
+
+#### 3. User Experience Requirements
+
+**Access Denied Page** (`pages/qr-meter-reading/access-denied.php`):
+- Professional design matching RMS style guide
+- Clear explanation of insufficient permissions
+- Instructions for requesting access from administrator
+- Contact information for access requests
+- Link back to main RMS system
+
+**Failed Login Message**:
+- SweetAlert dialog for users without QR Meter Reading permissions
+- Clear message: "You do not have permission to access QR Meter Reading. Please contact your administrator to request access."
+- Professional, non-technical language
+- Option to contact administrator or return to main system
+
+#### 4. Implementation Files to Update
+
+**Authentication Files**:
+- `pages/qr-meter-reading/auth/auth.php` - Add permission validation
+- `pages/qr-meter-reading/auth/login.php` - Add permission check after login
+- `pages/qr-meter-reading/index.php` - Add permission validation on page load
+
+**New Files to Create**:
+- `pages/qr-meter-reading/access-denied.php` - Access denied page
+- `pages/qr-meter-reading/includes/permission-check.php` - Permission validation functions
+
+**API Files to Update**:
+- All API endpoints in `pages/qr-meter-reading/api/` - Add permission validation
+
+### User Assignment Process
+To assign QR Meter Reading access to a user:
+
+1. **Find User**: Query s_users table for user_id
+2. **Assign Group**: Insert into s_user_group_users table
+   ```sql
+   INSERT INTO s_user_group_users (user_id, group_code) 
+   VALUES ('USER_ID_HERE', 12);
+   ```
+3. **Verify Assignment**: Confirm user has access to QR Meter Reading module
+
+### Security Considerations
+- **Session Validation**: Ensure user permissions are checked on every request
+- **API Protection**: All API endpoints must validate permissions
+- **Audit Trail**: Log access attempts and permission denials
+- **Graceful Degradation**: Provide helpful error messages for unauthorized access
+
 ## Implementation Strategy (Remaining Work)
 
-1) Authentication UX fixes
+1) **User Access Rights Implementation** (NEW PRIORITY)
+   - Execute database script to create module and user group
+   - Update authentication system to check user permissions
+   - Create access denied pages and failed login messages
+   - Test with different user permission levels
+
+2) Authentication UX fixes
    - Correct post-login redirect route
    - Remove duplicate logout dialogs; single confirmation with SweetAlert
 
-2) SweetAlert integration
+3) SweetAlert integration
    - Replace Bootstrap alerts/toasts in generator and related pages
    - Align visuals with project style guide
 
-3) Reading persistence build
+4) Reading persistence build
    - Implement proposed endpoints (`save-reading`, `

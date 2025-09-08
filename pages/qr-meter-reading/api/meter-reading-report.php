@@ -101,11 +101,43 @@ try {
         }
     }
     
-    // Count total records
-    $countSql = "SELECT COUNT(*) as total " . $baseSql;
+    // Count total records - use simpler approach to avoid JOIN issues in COUNT
+    $countSql = "SELECT COUNT(DISTINCT r.reading_id) as total 
+                 FROM t_tenant_reading r
+                 INNER JOIN m_tenant t ON r.tenant_code = t.tenant_code
+                 WHERE r.reading_date BETWEEN ? AND ?";
+    
+    $countParams = [$startDate, $endDate];
+    
+    // Add filters to count query
+    if (!empty($propertyFilter)) {
+        $countSql .= " AND t.real_property_code = ?";
+        $countParams[] = $propertyFilter;
+    }
+    
+    if (!empty($technicianFilter)) {
+        $countSql .= " AND r.reading_by = ?";
+        $countParams[] = $technicianFilter;
+    }
+    
+    if (!empty($statusFilter)) {
+        switch ($statusFilter) {
+            case 'valid':
+                $countSql .= " AND r.current_reading >= ISNULL(r.prev_reading, 0)";
+                break;
+            case 'invalid':
+                $countSql .= " AND r.current_reading < ISNULL(r.prev_reading, 0)";
+                break;
+            case 'no_prev':
+                $countSql .= " AND r.prev_reading IS NULL";
+                break;
+        }
+    }
+    
     $countStmt = $pdo->prepare($countSql);
-    $countStmt->execute($params);
-    $totalRecords = $countStmt->fetch(PDO::FETCH_ASSOC)['total'];
+    $countStmt->execute($countParams);
+    $countResult = $countStmt->fetch(PDO::FETCH_ASSOC);
+    $totalRecords = $countResult['total'];
     
     // Calculate pagination
     $totalPages = ceil($totalRecords / $limit);
@@ -132,10 +164,7 @@ try {
                      ext.device_info
                  " . $baseSql . "
                  ORDER BY r.reading_date DESC, p.real_property_name, t.unit_no
-                 OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
-    
-    $params[] = $offset;
-    $params[] = $limit;
+                 OFFSET " . intval($offset) . " ROWS FETCH NEXT " . intval($limit) . " ROWS ONLY";
     
     $mainStmt = $pdo->prepare($mainSql);
     $mainStmt->execute($params);
@@ -165,10 +194,39 @@ try {
                        COUNT(DISTINCT t.unit_no) as unique_units,
                        SUM(r.current_reading - ISNULL(r.prev_reading, 0)) as total_usage,
                        AVG(r.current_reading - ISNULL(r.prev_reading, 0)) as avg_usage
-                   " . $baseSql;
+                   FROM t_tenant_reading r
+                   INNER JOIN m_tenant t ON r.tenant_code = t.tenant_code
+                   WHERE r.reading_date BETWEEN ? AND ?";
+    
+    $summaryParams = [$startDate, $endDate];
+    
+    // Add filters to summary query
+    if (!empty($propertyFilter)) {
+        $summarySql .= " AND t.real_property_code = ?";
+        $summaryParams[] = $propertyFilter;
+    }
+    
+    if (!empty($technicianFilter)) {
+        $summarySql .= " AND r.reading_by = ?";
+        $summaryParams[] = $technicianFilter;
+    }
+    
+    if (!empty($statusFilter)) {
+        switch ($statusFilter) {
+            case 'valid':
+                $summarySql .= " AND r.current_reading >= ISNULL(r.prev_reading, 0)";
+                break;
+            case 'invalid':
+                $summarySql .= " AND r.current_reading < ISNULL(r.prev_reading, 0)";
+                break;
+            case 'no_prev':
+                $summarySql .= " AND r.prev_reading IS NULL";
+                break;
+        }
+    }
     
     $summaryStmt = $pdo->prepare($summarySql);
-    $summaryStmt->execute(array_slice($params, 0, -2)); // Remove pagination params
+    $summaryStmt->execute($summaryParams);
     $summary = $summaryStmt->fetch(PDO::FETCH_ASSOC);
     
     // Prepare response data

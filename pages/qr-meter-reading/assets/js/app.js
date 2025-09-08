@@ -582,7 +582,8 @@ class QRMeterReadingApp {
             propertyCode: formData.get('propertyCode'),
             unitNo: formData.get('unitNo'),
             currentReading: parseFloat(formData.get('currentReading')),
-            remarks: formData.get('remarks') || ''
+            remarks: formData.get('remarks') || '',
+            locationData: await this.getLocationData()
         };
         
         // Enhanced validation
@@ -619,30 +620,27 @@ class QRMeterReadingApp {
             const result = await response.json();
             
             if (result.success) {
-                // Show success message with SweetAlert
+                // Show simple success message
                 Swal.fire({
                     icon: 'success',
                     title: 'Reading Saved Successfully!',
-                    html: `
-                        <div class="text-start">
-                            <p><strong>Tenant:</strong> ${result.data.tenantName}</p>
-                            <p><strong>Previous Reading:</strong> ${result.data.prevReading || 'N/A'}</p>
-                            <p><strong>Current Reading:</strong> ${result.data.currentReading}</p>
-                            <p><strong>Usage:</strong> ${result.data.usage || 'N/A'}</p>
-                            <p><strong>Reading Period:</strong> ${result.data.readingPeriod.from} - ${result.data.readingPeriod.to}</p>
-                            <p><strong>Billing Period:</strong> ${result.data.billingPeriod.from} - ${result.data.billingPeriod.to}</p>
-                        </div>
-                    `,
+                    text: 'Your meter reading has been recorded and will appear in the Recent Readings table below.',
                     confirmButtonText: 'Continue',
-                    confirmButtonColor: '#198754'
+                    confirmButtonColor: '#198754',
+                    width: '500px',
+                    customClass: {
+                        popup: 'swal2-popup-custom'
+                    }
                 });
                 
                 // Reset form and hide
                 event.target.reset();
                 document.getElementById('reading-form-card').style.display = 'none';
                 
-                // Update recent readings table
-                this.updateRecentReadings();
+                // Refresh recent readings table after a short delay
+                setTimeout(async () => {
+                    await this.loadRecentReadings();
+                }, 500);
                 
             } else {
                 throw new Error(result.message || 'Unknown error occurred');
@@ -793,6 +791,7 @@ class QRMeterReadingApp {
 
     async loadRecentReadings() {
         try {
+            console.log('Loading recent readings...');
             const response = await fetch('api/get-recent-readings.php');
             
             if (response.status === 401 || response.status === 403) {
@@ -803,9 +802,12 @@ class QRMeterReadingApp {
             
             if (response.ok) {
                 const result = await response.json();
+                console.log('Recent readings response:', result);
                 if (result.success) {
                     this.displayRecentReadings(result.data);
                 }
+            } else {
+                console.error('Failed to load recent readings:', response.status, response.statusText);
             }
         } catch (error) {
             console.error('Error loading recent readings:', error);
@@ -813,9 +815,11 @@ class QRMeterReadingApp {
     }
 
     displayRecentReadings(readings) {
+        console.log('Displaying recent readings:', readings);
         const tbody = document.getElementById('readings-table-body');
         
         if (!readings || readings.length === 0) {
+            console.log('No readings to display');
             tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted">No recent readings</td></tr>';
             return;
         }
@@ -837,7 +841,7 @@ class QRMeterReadingApp {
     formatDate(dateString) {
         if (!dateString) return 'N/A';
         const date = new Date(dateString);
-        return date.toLocaleDateString();
+        return date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
     }
 
     setCurrentDate() {
@@ -868,6 +872,32 @@ class QRMeterReadingApp {
             startBtn.style.display = 'block';
             stopBtn.style.display = 'none';
             viewport.classList.remove('active', 'scanning');
+        }
+    }
+
+    async getLocationData() {
+        try {
+            if (!navigator.geolocation) {
+                return null;
+            }
+            
+            const position = await new Promise((resolve, reject) => {
+                navigator.geolocation.getCurrentPosition(resolve, reject, {
+                    enableHighAccuracy: true,
+                    timeout: 5000,
+                    maximumAge: 300000 // 5 minutes
+                });
+            });
+            
+            return JSON.stringify({
+                latitude: position.coords.latitude,
+                longitude: position.coords.longitude,
+                accuracy: position.coords.accuracy,
+                timestamp: new Date(position.timestamp).toISOString()
+            });
+        } catch (error) {
+            console.log('Location access denied or unavailable:', error.message);
+            return null;
         }
     }
 

@@ -60,6 +60,7 @@ try {
     $unitNo = trim($input['unitNo']);
     $currentReading = floatval($input['currentReading']);
     $remarks = isset($input['remarks']) ? trim($input['remarks']) : '';
+    $locationData = isset($input['locationData']) ? trim($input['locationData']) : null;
     
     // Validate current reading
     if ($currentReading <= 0) {
@@ -87,7 +88,8 @@ try {
                      @createdBy = ?, 
                      @ipAddress = ?, 
                      @userAgent = ?, 
-                     @deviceInfo = ?";
+                     @deviceInfo = ?,
+                     @locationData = ?";
     
     $procedureStmt = $pdo->prepare($procedureSql);
     
@@ -100,7 +102,8 @@ try {
         $currentUserId,
         $_SERVER['REMOTE_ADDR'] ?? 'unknown',
         $_SERVER['HTTP_USER_AGENT'] ?? 'unknown',
-        'QR System Mobile'
+        'QR System Mobile',
+        $locationData
     ]);
     
     // Get the result set from stored procedure

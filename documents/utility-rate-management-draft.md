@@ -129,3 +129,9 @@ vw_TenantReading.sql
 
 
 also include in the implementation task that since t_tenant_reading has remarks column, we should also be able to input it during qr meter reading. Reading Date in meter reading form should be read only as we don't want technicians to tamper with the actual reading date. also upon successful qr scan, it should auto focus on current meter reading input field.
+
+
+we also need to add entries for the following tables for the module (user page access rights), we need to add the QR Meter Reading, also a new user group  Field Technician
+s_modules
+s_user_group
+s_user_group_modules
