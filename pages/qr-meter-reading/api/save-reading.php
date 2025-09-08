@@ -62,8 +62,8 @@ try {
     $remarks = isset($input['remarks']) ? trim($input['remarks']) : '';
     
     // Validate current reading
-    if ($currentReading < 0) {
-        throw new Exception('Current reading must be non-negative');
+    if ($currentReading <= 0) {
+        throw new Exception('Current reading must be greater than 0');
     }
     
     // Get current user info
@@ -90,6 +90,7 @@ try {
                      @deviceInfo = ?";
     
     $procedureStmt = $pdo->prepare($procedureSql);
+    
     $procedureStmt->execute([
         $propertyCode,
         $unitNo,
@@ -105,18 +106,42 @@ try {
     // Get the result set from stored procedure
     $result = $procedureStmt->fetch(PDO::FETCH_ASSOC);
     
+    // Debug: Log the actual result for troubleshooting
+    error_log("Stored procedure result: " . json_encode($result));
+    
+    // Check if there are multiple result sets and get the last one (our success result)
+    while ($procedureStmt->nextRowset()) {
+        $nextResult = $procedureStmt->fetch(PDO::FETCH_ASSOC);
+        if ($nextResult) {
+            error_log("Additional result set: " . json_encode($nextResult));
+            // Use the last result set that has our expected fields
+            if (isset($nextResult['status']) || isset($nextResult['errorMessage'])) {
+                $result = $nextResult;
+            }
+        }
+    }
+    
     if (!$result) {
         throw new Exception('Stored procedure did not return expected results');
     }
     
-    // Check if procedure returned an error
+    // Check if procedure returned an error (CATCH block result set)
     if (isset($result['errorMessage'])) {
-        throw new Exception($result['errorMessage']);
+        $errorDetails = $result['errorMessage'];
+        if (isset($result['errorSeverity'])) {
+            $errorDetails .= ' (Severity: ' . $result['errorSeverity'] . ')';
+        }
+        if (isset($result['errorState'])) {
+            $errorDetails .= ' (State: ' . $result['errorState'] . ')';
+        }
+        throw new Exception($errorDetails);
     }
     
-    // Check if procedure was successful
-    if ($result['status'] !== 'success') {
-        throw new Exception($result['message'] ?? 'Unknown error from stored procedure');
+    // Check if procedure was successful (TRY block result set)
+    if (!isset($result['status']) || $result['status'] !== 'success') {
+        // Debug: Log what we actually got
+        error_log("Expected 'status' field not found or not 'success'. Got: " . json_encode($result));
+        throw new Exception($result['message'] ?? 'Unknown error from stored procedure - result: ' . json_encode($result));
     }
     
     // Log successful reading

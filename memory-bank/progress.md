@@ -1,6 +1,28 @@
 # QR Meter Reading System - Implementation Progress
 
-## 🚀 **IMPLEMENTATION COMPLETED - READY FOR TESTING**
+## ⚠️ **CRITICAL ISSUES IDENTIFIED - IMMEDIATE ACTION REQUIRED**
+
+### **❌ CRITICAL ISSUE 1: Incorrect Previous Reading Calculation**
+**Status**: **NEEDS IMMEDIATE FIX**  
+**Problem**: The stored procedure `sp_t_SaveTenantReading` is not correctly retrieving the previous reading from the most recent reading for the unit  
+**Impact**: Previous readings are being saved incorrectly, affecting usage calculations  
+**Root Cause**: The query for previous reading is not using the correct logic to get the last reading for the property+unit combination  
+
+### **❌ CRITICAL ISSUE 2: Missing Charge Code Integration**
+**Status**: **NEEDS IMMEDIATE FIX**  
+**Problem**: The system is not automatically creating entries in `t_tenant_reading_charges` for CUCF and CUCNF charge codes  
+**Impact**: Charge codes are not being linked to readings, breaking the billing workflow  
+**Root Cause**: The stored procedure does not call `sp_t_TenantReading_Charges_Save` to create charge code entries  
+
+### **❌ CRITICAL ISSUE 3: Invoice Columns Not Set to NULL**
+**Status**: **NEEDS IMMEDIATE FIX**  
+**Problem**: Invoice-related columns in `t_tenant_reading_charges` should be left as NULL initially  
+**Impact**: May cause issues with billing workflow  
+**Root Cause**: Not explicitly setting invoice columns to NULL in the charge creation process  
+
+---
+
+## 🚀 **PREVIOUSLY COMPLETED IMPLEMENTATIONS**
 
 ### **✅ Task 1: Authentication UX Fixes - COMPLETE**
 **Status**: 100% Complete  

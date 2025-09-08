@@ -465,19 +465,14 @@ class QRMeterReadingApp {
         document.getElementById('unit-number').value = unitNo;
         document.getElementById('meter-id').value = meterId || '';
         
-        // Fetch tenant information and last reading
-        this.fetchTenantAndReadingInfo(propertyCode, unitNo);
-        
         // Show the form
         formCard.style.display = 'block';
         
-        // Auto-focus on current meter reading input
-        setTimeout(() => {
-            document.getElementById('current-meter-reading').focus();
-        }, 100);
-        
         // Scroll to form
         formCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        
+        // Fetch tenant information and last reading, then auto-focus
+        this.fetchTenantAndReadingInfo(propertyCode, unitNo);
     }
     
     // Fetch tenant information and last reading data
@@ -501,9 +496,25 @@ class QRMeterReadingApp {
                 this.updateLastReadingInfo(readingData.data);
             }
             
+            // Auto-focus on current meter reading input after data is loaded
+            setTimeout(() => {
+                const currentReadingInput = document.getElementById('current-meter-reading');
+                if (currentReadingInput) {
+                    currentReadingInput.focus();
+                }
+            }, 200);
+            
         } catch (error) {
             console.error('Error fetching tenant/reading info:', error);
             this.showStatus('Error fetching property information', 'danger');
+            
+            // Still try to focus even if there's an error
+            setTimeout(() => {
+                const currentReadingInput = document.getElementById('current-meter-reading');
+                if (currentReadingInput) {
+                    currentReadingInput.focus();
+                }
+            }, 200);
         }
     }
     
@@ -542,7 +553,8 @@ class QRMeterReadingApp {
                 <div class="alert alert-warning border-0">
                     <div class="row">
                         <div class="col-md-6">
-                            <strong>Last Reading:</strong> ${prevReading}<br>
+                            <strong>Last Reading:</strong> ${currentReading}<br>
+                            <strong>Previous Reading:</strong> ${prevReading}<br>
                             <strong>Last Reading Date:</strong> ${readingData.readingDate ? new Date(readingData.readingDate).toLocaleDateString() : 'N/A'}<br>
                             <strong>Usage:</strong> ${usage}
                         </div>

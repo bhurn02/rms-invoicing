@@ -74,9 +74,9 @@ BEGIN
             RETURN;
         END
         
-        IF @currentReading < 0
+        IF @currentReading <= 0
         BEGIN
-            RAISERROR('Current reading must be non-negative', 16, 1);
+            RAISERROR('Current reading must be greater than 0', 16, 1);
             RETURN;
         END
         
@@ -103,7 +103,7 @@ BEGIN
             FROM vw_TenantReading 
             WHERE property_code = @propertyCode 
               AND unit_no = @unitNo
-            ORDER BY ISNULL(reading_date, date_created) DESC;
+            ORDER BY ISNULL(reading_date, convert(date, reading_date_to)) DESC;
             
             IF @tenantCode IS NULL
             BEGIN
@@ -116,14 +116,18 @@ BEGIN
         -- GET PREVIOUS READING
         -- =====================================================
         
-        -- Get last reading for the unit (property + unit combination)
+        -- Get last reading for the unit (property + unit combination) using vw_TenantReading
+        -- This handles first-time readings (new units) where @prevReading will be NULL
+        -- Uses reading_date_to for proper chronological ordering (handles late encoding scenarios)
         SELECT TOP 1 
             @prevReading = current_reading
-        FROM t_tenant_reading r
-        INNER JOIN m_tenant t ON r.tenant_code = t.tenant_code
-        WHERE t.real_property_code = @propertyCode 
-          AND t.unit_no = @unitNo
-        ORDER BY r.reading_date DESC;
+        FROM vw_TenantReading 
+        WHERE property_code = @propertyCode 
+          AND unit_no = @unitNo
+        ORDER BY ISNULL(reading_date, convert(date, reading_date_to)) DESC;
+        
+        -- For first-time readings (new units), @prevReading will be NULL
+        -- This is expected and valid - the system will save the reading with prev_reading = NULL
         
         -- =====================================================
         -- DATE CALCULATION LOGIC
@@ -147,12 +151,11 @@ BEGIN
         BEGIN
             DECLARE @lastReadingDateTo DATETIME;
             
-            SELECT TOP 1 @lastReadingDateTo = date_to
-            FROM t_tenant_reading r
-            INNER JOIN m_tenant t ON r.tenant_code = t.tenant_code
-            WHERE t.real_property_code = @propertyCode 
-              AND t.unit_no = @unitNo
-            ORDER BY r.reading_date DESC;
+            SELECT TOP 1 @lastReadingDateTo = CONVERT(DATETIME, reading_date_to)
+            FROM vw_TenantReading 
+            WHERE property_code = @propertyCode 
+              AND unit_no = @unitNo
+            ORDER BY ISNULL(reading_date, convert(date, reading_date_to)) DESC;
             
             IF @lastReadingDateTo IS NOT NULL
             BEGIN
@@ -207,6 +210,55 @@ BEGIN
             (@readingId, @ipAddress, @userAgent, @deviceInfo, GETDATE());
         
         COMMIT TRANSACTION;
+        
+        -- =====================================================
+        -- CREATE CHARGE CODE ENTRIES (CUCF AND CUCNF)
+        -- Note: Charge code creation is secondary - reading is already saved
+        -- =====================================================
+        
+        -- Get company code for the tenant
+        DECLARE @companyCode NVARCHAR(5);
+        SELECT TOP 1 @companyCode = company_code 
+        FROM m_tenant 
+        WHERE tenant_code = @tenantCode;
+        
+        -- Create CUCF charge entry (LEAC) - with error handling
+        BEGIN TRY
+            DECLARE @cucfResult INT;
+            EXEC @cucfResult = sp_t_TenantReading_Charges_Save 
+                @strMode = 'SAVE',
+                @reading_id = @readingId,
+                @reading_charge_id = 0,
+                @charge_code = 'CUCF',
+                @uid = @createdBy,
+                @company_code = @companyCode,
+                @ip_addr = @ipAddress;
+        END TRY
+        BEGIN CATCH
+            -- Log error but don't fail the entire operation
+            DECLARE @cucfError NVARCHAR(500) = 'CUCF charge creation failed: ' + ERROR_MESSAGE();
+            -- Log to event log for tracking
+            EXEC sp_s_EventLog 'sp_t_SaveTenantReading', @createdBy, @ipAddress, @cucfError, 'WARNING', @companyCode;
+        END CATCH
+        
+        -- Create CUCNF charge entry (Electric Rate) - with error handling
+        BEGIN TRY
+            DECLARE @cucnfResult INT;
+            EXEC @cucnfResult = sp_t_TenantReading_Charges_Save 
+                @strMode = 'SAVE',
+                @reading_id = @readingId,
+                @reading_charge_id = 0,
+                @charge_code = 'CUCNF',
+                @uid = @createdBy,
+                @company_code = @companyCode,
+                @ip_addr = @ipAddress;
+        END TRY
+        BEGIN CATCH
+            -- Log error but don't fail the entire operation
+            DECLARE @cucnfError NVARCHAR(500) = 'CUCNF charge creation failed: ' + ERROR_MESSAGE();
+            -- Log to event log for tracking
+            EXEC sp_s_EventLog 'sp_t_SaveTenantReading', @createdBy, @ipAddress, @cucnfError, 'WARNING', @companyCode;
+        END CATCH
         
         -- Return success response
         SELECT 

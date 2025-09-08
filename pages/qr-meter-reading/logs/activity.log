@@ -168,3 +168,6 @@
 [2025-09-05 13:44:15] [DEV1/Aldrich] [::1] Retrieved 285 active tenants for QR generation
 [2025-09-05 13:44:17] [DEV1/Aldrich] [::1] Retrieved 285 active tenants for QR generation
 [2025-09-05 13:44:18] [DEV1/Aldrich] [::1] Retrieved 285 active tenants for QR generation
+[2025-09-05 17:54:28] [DEV1/Aldrich] [::1] QR System Logout - User DEV1 logged out from ::1
+[2025-09-05 17:54:31] [DEV1/Aldrich] [::1] QR System Login - User dev1 logged in successfully from ::1
+[2025-09-08 11:20:04] [DEV1/Aldrich] [::1] QR Reading Saved - Reading saved for tenant T000001935: 14401.00 -> 14561.00

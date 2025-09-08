@@ -327,24 +327,49 @@ Benefits:
 - [ ] **Audit trail** implemented for rate changes
 - [ ] **User training** completed for both systems
 
-## Next Steps ⚠️ **IMMEDIATE QR CODE FOCUS**
+## ⚠️ **CRITICAL ISSUES IDENTIFIED - IMMEDIATE ACTION REQUIRED**
 
-1. **IMMEDIATE PRIORITY**
-   - Begin QR Code System development (Phase 1)
-   - Set up Bootstrap 5 development environment
-   - Create standalone project structure
+### **CRITICAL ISSUE 1: Incorrect Previous Reading Calculation**
+- **Problem**: Stored procedure not correctly retrieving previous reading from most recent reading for unit
+- **Impact**: Previous readings saved incorrectly, affecting usage calculations
+- **Status**: **NEEDS IMMEDIATE FIX**
 
-2. **CREATIVE MODE REQUIREMENTS** ✅ **ENHANCED FOR NON-TECHNICAL USERS**
+### **CRITICAL ISSUE 2: Missing Charge Code Integration**
+- **Problem**: System not creating entries in t_tenant_reading_charges for CUCF and CUCNF charge codes
+- **Impact**: Charge codes not linked to readings, breaking billing workflow
+- **Status**: **NEEDS IMMEDIATE FIX**
+
+### **CRITICAL ISSUE 3: Invoice Columns Not Set to NULL**
+- **Problem**: Invoice-related columns in t_tenant_reading_charges should be NULL initially
+- **Impact**: May cause issues with billing workflow
+- **Status**: **NEEDS IMMEDIATE FIX**
+
+## Next Steps ⚠️ **CRITICAL ISSUES MUST BE FIXED FIRST**
+
+1. **IMMEDIATE PRIORITY - CRITICAL FIXES**
+   - Fix previous reading calculation in stored procedure
+   - Add charge code integration (CUCF, CUCNF) to stored procedure
+   - Ensure invoice columns are set to NULL in charge creation
+   - Test and validate all fixes before production deployment
+
+2. **SECONDARY PRIORITY - COMPLETED FEATURES**
+   - QR Code System development (Phase 1) - **COMPLETED**
+   - Bootstrap 5 development environment - **COMPLETED**
+   - Standalone project structure - **COMPLETED**
+
+3. **FUTURE ENHANCEMENTS** ✅ **ENHANCED FOR NON-TECHNICAL USERS**
    - **Executive Professional Design System** (`memory-bank/style-guide.md`)
    - **Sophisticated QR scanner interface** designed for non-technical field staff
    - **Executive-level utility rate management** for administrative users
    - **Modern professional aesthetics** that inspire confidence and trust
    - **Zero-training interfaces** with intuitive progressive disclosure
 
-3. **IMPLEMENTATION SEQUENCE**
-   - Week 1-4: Complete QR Code system
-   - Week 5-8: Utility Rate Management (Bootstrap 5 enhanced)
-   - Ongoing: Support and optimization
+4. **IMPLEMENTATION SEQUENCE - UPDATED**
+   - **IMMEDIATE**: Fix critical issues in QR Code system
+   - **Week 1-2**: Complete testing and validation of fixes
+   - **Week 3-4**: Production deployment and monitoring
+   - **Week 5-8**: Utility Rate Management (Bootstrap 5 enhanced)
+   - **Ongoing**: Support and optimization
 
 ## Key Updates from Original Plan ⚠️ **MAJOR CHANGES**
 

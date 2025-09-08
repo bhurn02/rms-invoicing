@@ -215,18 +215,34 @@ ORDER BY r.date_created DESC;
 - Invalid data: Validates meter reading values
 - Database errors: Logs and returns user-friendly messages
 
+## ⚠️ CRITICAL ISSUES IDENTIFIED
+
+### Issue 1: Previous Reading Calculation
+**Problem**: The stored procedure `sp_t_SaveTenantReading` is not correctly retrieving the previous reading from the most recent reading for the unit.  
+**Impact**: Previous readings are being saved incorrectly, affecting usage calculations.  
+**Required Fix**: Update the previous reading query to correctly get the last reading for the property+unit combination.
+
+### Issue 2: Missing Charge Code Integration
+**Problem**: The system is not automatically creating entries in `t_tenant_reading_charges` for CUCF and CUCNF charge codes.  
+**Impact**: Charge codes are not being linked to readings, breaking the billing workflow.  
+**Required Fix**: Add calls to `sp_t_TenantReading_Charges_Save` for CUCF and CUCNF charge codes.
+
+### Issue 3: Invoice Columns Not Set to NULL
+**Problem**: Invoice-related columns in `t_tenant_reading_charges` should be left as NULL initially.  
+**Impact**: May cause issues with billing workflow.  
+**Required Fix**: Ensure `trc_invoice_no`, `trc_invoice_detail_id`, `trc_invoice_detail_reading_id` are set to NULL.
+
 ## API Endpoints
 
-### 1. Save Reading (`/api/save-reading.php`)
+### 1. Save Reading (`/api/save-reading.php`) ⚠️ **HAS CRITICAL ISSUES**
 **Method:** POST
 **Required Fields:**
 - `propertyCode`: Real property code (char(5))
 - `unitNo`: Unit number (char(10))
-- `readingDate`: Reading date (YYYY-MM-DD)
 - `currentReading`: Current meter reading (decimal)
 
 **Optional Fields:**
-- `meter_id`: Meter identifier if available (varchar(20))
+- `remarks`: Optional remarks/notes (varchar(500))
 
 **Response:**
 ```json
@@ -234,14 +250,22 @@ ORDER BY r.date_created DESC;
     "success": true,
     "message": "Reading saved successfully",
     "data": {
+        "readingId": 123,
         "tenantCode": "TENANT001",
-        "propertyCode": "PROP1",
-        "unitNo": "UNIT001",
-        "meter_id": "METER123",
+        "tenantName": "John Doe",
+        "prevReading": 1200.00,
         "currentReading": 1234.56,
-        "readingDate": "2025-01-15",
-        "timestamp": "2025-01-15 10:30:00",
-        "userId": "USER001"
+        "readingDate": "2025-01-15 10:30:00",
+        "readingPeriod": {
+            "from": "2025-01-01 00:00:00",
+            "to": "2025-01-31 23:59:59"
+        },
+        "billingPeriod": {
+            "from": "2025-02-01 00:00:00",
+            "to": "2025-02-28 23:59:59"
+        },
+        "usage": 34.56,
+        "remarks": "QR System Reading"
     }
 }
 ```
@@ -306,10 +330,62 @@ ORDER BY date_created DESC;
 3. **Caching**: Consider caching for frequently accessed data
 4. **Batch Operations**: For bulk readings, consider batch inserts
 
+## Electric Meter Replacement Scenario
+
+### Problem Description
+When electric meters are replaced, the new meter starts at 0, creating a scenario where:
+- Previous reading = 0 (new meter starting point)
+- Current reading = actual reading on new meter
+- Usage calculation = current reading - 0 = current reading (incorrect)
+
+### Simplified Solution: Tenant Readings Management Page
+**No database schema changes required** - handled via management interface:
+
+1. **Edit Interface**: Allow editing of `prev_reading` field in saved readings
+2. **Meter Replacement Handling**: Edit previous reading to 0 and add "METER REPLACEMENT" to remarks
+3. **Usage Recalculation**: Automatically recalculate usage when readings are edited
+4. **Audit Trail**: Track changes via existing `updated_by` and `date_updated` fields
+
+### Business Logic Implementation
+1. **Management Page**: Create `tenant-readings-management.php` for reading review and editing
+2. **Edit Capability**: Allow modification of previous reading, current reading, and remarks
+3. **Billing Protection**: Prevent editing if readings are already billed (have invoice entries)
+4. **User Instructions**: Guide user to existing invoice void interface for billed readings
+5. **Export Options**: Excel, PDF, Print functionality for reporting
+6. **Search & Filter**: By date range, property, unit, tenant, technician
+
+### Billing Protection Implementation
+```sql
+-- Check if reading is already billed
+SELECT COUNT(*) as billed_count
+FROM t_tenant_reading_charges 
+WHERE trc_reading_id = @readingId 
+  AND trc_invoice_no IS NOT NULL;
+
+-- Note: Invoice voiding handled by existing invoice void interface
+-- No need to duplicate void functionality in this page
+```
+
+### User Workflow for Billed Readings
+1. **User attempts to edit billed reading**
+2. **System shows message**: "Reading is already billed. Please void the invoice first using the existing invoice void interface, then return here to edit the reading."
+3. **User navigates to existing invoice void interface**
+4. **User voids invoice using existing functionality**
+5. **User returns to tenant readings management page**
+6. **User can now edit the reading**
+7. **After edit, system prompts**: "Re-generate invoice for this tenant?"
+
+### Implementation Priority: HIGH
+- Essential for operational management
+- Resolves meter replacement scenario without schema changes
+- Provides comprehensive reporting capabilities
+- Should be implemented after current critical issues are resolved
+
 ## Future Enhancements
 
 1. **Reading History**: Implement reading history tracking
 2. **Usage Calculations**: Automatic usage calculation based on previous readings
 3. **Billing Integration**: Direct integration with billing system
 4. **Reporting**: Enhanced reporting capabilities
-5. **Mobile Optimization**: Further mobile-specific optimizations 
+5. **Mobile Optimization**: Further mobile-specific optimizations
+6. **Meter Replacement Handling**: Complete solution for meter replacement scenarios 

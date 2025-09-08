@@ -8,7 +8,9 @@
 - [x] Database schema update scripts created
 - [x] Enhanced API endpoints implemented
 - [x] Enhanced UI integration completed
-- [ ] Database schema deployment
+- [x] **Database schema deployment** ✅ **COMPLETED**
+- [x] **Stored procedure deployment** ✅ **COMPLETED**
+- [ ] Fix new issues (location data, report error, UI population, dialog design)
 - [ ] End-to-end testing
 - [ ] Documentation updates
 
@@ -89,8 +91,165 @@
   - Verified database connectivity and query execution
   - QR project database functionality now working correctly
   
-## Next Steps
-1. **Database Schema Deployment**: Execute the schema update script on the target database
-2. **End-to-End Testing**: Test the complete QR reading flow with real data
-3. **Documentation Updates**: Update user and technical documentation
-4. **Production Deployment**: Deploy to production environment 
+## Critical Issues Identified ⚠️
+
+### Issue 1: Incorrect Previous Reading Calculation ✅ **FIXED**
+- **Problem**: The stored procedure `sp_t_SaveTenantReading` was not correctly retrieving the previous reading from the most recent reading for the unit
+- **Impact**: Previous readings were being saved incorrectly, affecting usage calculations
+- **Root Cause**: The query for previous reading was not using the correct logic to get the last reading for the property+unit combination
+- **Solution**: Updated stored procedure to use `vw_TenantReading` with `ORDER BY ISNULL(reading_date, convert(date, reading_date_to)) DESC` consistently for proper chronological ordering including late encoding scenarios
+
+### Issue 2: Missing Charge Code Integration ✅ **FIXED**
+- **Problem**: The system was not automatically creating entries in `t_tenant_reading_charges` for CUCF and CUCNF charge codes
+- **Impact**: Charge codes were not being linked to readings, breaking the billing workflow
+- **Root Cause**: The stored procedure was not integrated with the charge code system
+- **Solution**: Added calls to `sp_t_TenantReading_Charges_Save` for both CUCF and CUCNF charge codes with proper error handling - charge code creation is secondary and won't fail the main reading save operation
+
+### Issue 3: Invoice Columns Not Set to NULL ✅ **FIXED**
+- **Problem**: Invoice-related columns in `t_tenant_reading_charges` should be left as NULL initially
+- **Impact**: May cause issues with billing workflow
+- **Root Cause**: Not explicitly setting invoice columns to NULL in the charge creation process
+- **Solution**: The existing `sp_t_TenantReading_Charges_Save` procedure already handles this correctly - it only inserts required columns, leaving invoice columns as NULL by default
+
+### Issue 4: First-Time Reading Scenario ✅ **FIXED**
+- **Problem**: New units with no previous readings were not handled properly
+- **Impact**: First-time readings could fail or produce incorrect results
+- **Root Cause**: The system was not designed to handle NULL previous readings
+- **Solution**: Added proper handling for first-time readings where `prev_reading` is NULL
+
+### Issue 5: Input Validation Enhancement ✅ **FIXED**
+- **Problem**: Current reading validation was not strict enough (allowed 0)
+- **Impact**: Invalid readings could be saved
+- **Root Cause**: Validation was set to `>= 0` instead of `> 0`
+- **Solution**: Updated validation to require current reading > 0 in both client-side and server-side validation
+
+### Issue 6: Auto-Focus and Error Handling ✅ **FIXED**
+- **Problem**: Auto-focus on current reading input was lost, and stored procedure errors showed "Unknown error"
+- **Impact**: Poor user experience and unclear error messages
+- **Root Cause**: Auto-focus timing issue and improper error handling in PHP API
+- **Solution**: Fixed auto-focus timing to occur after data loading, and enhanced error handling to properly display stored procedure error details
+
+## New Issues Identified ⚠️
+
+### Issue 7: Location Data Not Captured ✅ **IDENTIFIED**
+- **Problem**: `location_data` column in `t_tenant_reading_ext` is empty
+- **Impact**: Missing GPS/location information for audit trail
+- **Root Cause**: Location data not being captured or passed to the stored procedure
+- **Status**: **NEEDS FIX**
+
+### Issue 8: Meter Reading Report SQL Error ✅ **IDENTIFIED**
+- **Problem**: `meter-reading-report.php` returns SQL error: "The number of rows provided for a TOP or FETCH clauses row count parameter must be an integer"
+- **Impact**: Report generation fails completely
+- **Root Cause**: Invalid parameter type being passed to TOP/FETCH clause
+- **Status**: **NEEDS FIX**
+
+### Issue 9: Recent Readings UI Not Populated ✅ **IDENTIFIED**
+- **Problem**: Recent readings table in UI is not showing the last reading data
+- **Impact**: Users cannot see their recent readings in the interface
+- **Root Cause**: API endpoint or UI integration issue
+- **Status**: **NEEDS FIX**
+
+### Issue 10: Success Dialog Design Issues ✅ **IDENTIFIED**
+- **Problem**: Success dialog box is not following best design practices for user-friendly data display
+- **Impact**: Poor user experience and unclear information presentation
+- **Root Cause**: Dialog layout and data presentation not optimized
+- **Status**: **NEEDS FIX**
+
+### Issue 11: Electric Meter Replacement Scenario ✅ **IDENTIFIED**
+- **Problem**: When electric meters are replaced, the new meter starts at 0, making previous reading = 0
+- **Impact**: Usage calculation would be incorrect (current reading - 0 = current reading as usage)
+- **Root Cause**: System doesn't account for meter replacement scenarios
+- **Status**: **SOLUTION IDENTIFIED** - Will be handled via tenant readings management page
+
+### Issue 12: Missing Tenant Readings Management Page ✅ **IDENTIFIED**
+- **Problem**: No page exists for reviewing, editing, and managing tenant readings
+- **Impact**: Cannot review readings, edit mistakes, or handle meter replacements after saving
+- **Root Cause**: System only has QR scanning page, no management interface
+- **Status**: **NEEDS IMPLEMENTATION**
+
+## Database Deployment Status ✅ **COMPLETED**
+- [x] **Database schema updates executed** - `schema-updates-qr-reading.sql` deployed
+  - Added `reading_date` and `reading_by` columns to `t_tenant_reading`
+  - Created `t_tenant_reading_ext` table with audit trail columns
+  - Added performance indexes for audit queries
+- [x] **Stored procedure deployed** - `save-tenant-reading-procedure.sql` deployed
+  - `sp_t_SaveTenantReading` with all critical fixes implemented
+  - Proper previous reading calculation using `vw_TenantReading`
+  - Charge code integration (CUCF/CUCNF) with error handling
+  - Transaction safety and comprehensive audit trail
+
+## Tenant Readings Management Page Solution
+
+### Problem Analysis
+- No page exists for reviewing, editing, and managing tenant readings
+- Cannot handle meter replacements or edit mistakes after saving
+- Need comprehensive reporting and export capabilities
+
+### Proposed Solution: Tenant Readings Management Page
+1. **New Page: `tenant-readings-management.php`**
+   - Separate from QR scanning page
+   - Comprehensive reading management interface
+   - Edit capabilities for saved readings
+
+2. **Core Features**
+   - **Reading Review**: View all readings with filters (date, property, unit, tenant)
+   - **Edit Capability**: Modify previous reading, current reading, remarks (with billing protection)
+   - **Billing Protection**: Prevent editing if readings are already billed (have invoice entries)
+   - **Invoice Management**: Prompt to void invoice before editing, then re-generate after edit
+   - **Meter Replacement Handling**: Edit previous reading to 0 and add remarks
+   - **Export Options**: Excel, PDF, Print functionality
+   - **Search & Filter**: By date range, property, unit, tenant, technician
+
+3. **Billing Protection Logic**
+   - **Check Invoice Status**: Query `t_tenant_reading_charges` for invoice entries
+   - **Edit Prevention**: Disable edit if `trc_invoice_no` is not NULL
+   - **User Instruction**: Show message: "Reading is already billed. Please void the invoice first using the existing invoice void interface, then return here to edit the reading."
+   - **No Integration Needed**: Use existing invoice void interface (no duplication)
+   - **Re-generation**: After edit, prompt to re-generate invoice for tenant
+
+4. **Meter Replacement Solution (Simplified)**
+   - **No database schema changes needed**
+   - **Edit Interface**: Allow editing of `prev_reading` field
+   - **Remarks Field**: Add "METER REPLACEMENT" to remarks when editing
+   - **Usage Recalculation**: Automatically recalculate usage when readings are edited
+
+5. **Page Structure**
+   ```
+   pages/qr-meter-reading/tenant-readings-management.php
+   ├── Reading List Table (with filters and billing status)
+   ├── Edit Modal/Form (with billing protection instructions)
+   ├── Export Options (Excel, PDF, Print)
+   └── Search & Filter Controls
+   ```
+
+6. **Database Queries for Billing Protection**
+   ```sql
+   -- Check if reading is already billed
+   SELECT COUNT(*) as billed_count
+   FROM t_tenant_reading_charges 
+   WHERE trc_reading_id = @readingId 
+     AND trc_invoice_no IS NOT NULL;
+   
+   -- Note: Invoice voiding handled by existing invoice void interface
+   -- No need to duplicate void functionality in this page
+   ```
+
+### Implementation Priority: HIGH
+- Essential for operational management
+- Resolves meter replacement scenario without schema changes
+- Provides comprehensive reporting capabilities
+- Should be implemented after current critical issues are resolved
+
+## Next Steps - PRIORITY ORDER
+1. **Fix New Issues**: Address location data capture, report SQL error, UI population, and dialog design
+2. **End-to-End Testing**: Test the complete QR reading flow with real data including:
+   - First-time readings (new units)
+   - Regular monthly readings
+   - Tenant transition readings (move-in/move-out)
+   - Input validation (current reading > 0)
+3. **Tenant Readings Management Page**: Implement comprehensive reading management interface
+   - Reading review and edit capabilities
+   - Export options (Excel, PDF, Print)
+   - Meter replacement handling via edit interface
+4. **Documentation Updates**: Update user and technical documentation
+5. **Production Deployment**: Deploy to production environment 
