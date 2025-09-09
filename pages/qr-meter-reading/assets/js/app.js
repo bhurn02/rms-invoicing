@@ -99,27 +99,14 @@ class QRMeterReadingApp {
 
     async logout() {
         try {
-            const result = await Swal.fire({
-                title: 'Confirm Logout',
-                text: 'Are you sure you want to logout?',
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonColor: '#dc3545',
-                cancelButtonColor: '#6c757d',
-                confirmButtonText: 'Yes, Logout',
-                cancelButtonText: 'Cancel'
-            });
+            // Clear any stored data
+            localStorage.removeItem('qr_meter_readings_offline');
             
-            if (result.isConfirmed) {
-                // Clear any stored data
-                localStorage.removeItem('qr_meter_readings_offline');
-                
-                // Redirect to logout
-                window.location.href = 'auth/logout.php';
-            }
+            // Immediate logout - no confirmation dialog (modern UX standard)
+            window.location.href = 'auth/logout.php';
         } catch (error) {
             console.error('Logout error:', error);
-            // If SweetAlert fails, fallback to direct logout
+            // Fallback to direct logout
             window.location.href = 'auth/logout.php';
         }
     }

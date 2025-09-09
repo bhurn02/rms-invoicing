@@ -215,3 +215,7 @@
 [2025-09-09 17:57:27] [DEV1/Aldrich] [::1] QR System Login - User dev1 logged in successfully from ::1
 [2025-09-09 18:00:53] [DEV1/Aldrich] [::1] QR System Logout - User DEV1 logged out from ::1
 [2025-09-09 18:00:56] [DEV1/Aldrich] [::1] QR System Login - User dev1 logged in successfully from ::1
+[2025-09-09 18:11:50] [DEV1/Aldrich] [::1] QR System Logout - User DEV1 logged out from ::1
+[2025-09-09 18:11:54] [DEV1/Aldrich] [::1] QR System Login - User dev1 logged in successfully from ::1
+[2025-09-09 18:11:57] [DEV1/Aldrich] [::1] QR System Logout - User DEV1 logged out from ::1
+[2025-09-09 18:12:00] [unknown/unknown] [::1] QR System Login Failed - Failed login attempt for user asdassa from ::1
