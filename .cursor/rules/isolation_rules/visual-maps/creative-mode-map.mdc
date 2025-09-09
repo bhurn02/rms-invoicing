@@ -1,12 +1,12 @@
 ---
-description: Visual process map for CREATIVE mode (Design Decisions)
+description: Visual process map for CREATIVE mode (Design Decisions) - Updated with Implementation Mode Integration
 globs: "**/creative*/**", "**/design*/**", "**/decision*/**"
 alwaysApply: false
 ---
 
-# CREATIVE MODE: DESIGN PROCESS MAP
+# CREATIVE MODE: DESIGN PROCESS MAP - UPDATED
 
-> **TL;DR:** This visual map guides the CREATIVE mode process, focusing on structured design decision-making for components that require deeper exploration before implementation.
+> **TL;DR:** This visual map guides the CREATIVE mode process, focusing on structured design decision-making for components that require deeper exploration before implementation, with automatic integration to Implementation Mode.
 
 ## 🧭 CREATIVE MODE PROCESS FLOW
 
@@ -62,10 +62,57 @@ graph TD
     %% Documentation & Completion
     UI_Document & Arch_Diagram & Data_Document & Algo_Document --> CreateDoc["Create Creative<br>Phase Document"]
     CreateDoc --> UpdateTasks["Update tasks.md<br>with Decision"]
-    UpdateTasks --> MorePhases{"More Creative<br>Phases?"}
+    UpdateTasks --> UpdateImplFiles["Update Implementation<br>Mode Files"]
+    UpdateImplFiles --> MorePhases{"More Creative<br>Phases?"}
     MorePhases -->|"Yes"| SelectPhase
     MorePhases -->|"No"| VerifyComplete["Verify All<br>Phases Complete"]
     VerifyComplete --> NotifyComplete["Signal Creative<br>Phases Complete"]
+```
+
+## 🎨 CREATIVE MODE TO IMPLEMENTATION MODE INTEGRATION
+
+### **Required File Updates for Implementation Mode**
+When completing creative phases, Creative Mode MUST update these files:
+
+#### **Update Implementation Guidelines**
+- [ ] **Update `memory-bank/implementation-phase-guidelines.md`** with design decisions
+- [ ] **Add Creative Phase Integration Requirements** section
+- [ ] **Add Design Decision Implementation** checklist
+- [ ] **Add Creative Phase Verification** requirements
+
+#### **Update Testing Checklist**
+- [ ] **Update `memory-bank/testing-checklist.md`** with creative testing requirements
+- [ ] **Add Creative Design Testing** as a new testing level
+- [ ] **Add Creative Mode Testing Requirements** section
+- [ ] **Add Design Decision Validation** checklist
+
+#### **Update UX Design Standards**
+- [ ] **Update `memory-bank/ux-design-standards.md`** with creative implementation standards
+- [ ] **Add Creative Mode Integration** section
+- [ ] **Add Creative Mode Implementation Standards**
+- [ ] **Add Design Decision Implementation** requirements
+
+#### **Create Bridge Document**
+- [ ] **Create `memory-bank/creative-to-implementation-bridge.md`**
+- [ ] **Map all Creative Mode outputs to Implementation Mode requirements**
+- [ ] **Provide design decision implementation checklist**
+- [ ] **Ensure seamless mode transition**
+
+### **Creative Phase Completion Requirements**
+```
+✓ CREATIVE PHASE COMPLETION VERIFICATION
+- Problem clearly defined? [YES/NO]
+- Multiple options considered (3+)? [YES/NO]
+- Pros/cons documented for each option? [YES/NO]
+- Decision made with clear rationale? [YES/NO]
+- Implementation plan included? [YES/NO]
+- Visualization/diagrams created? [YES/NO]
+- tasks.md updated with decision? [YES/NO]
+- Implementation files updated? [YES/NO]
+- Bridge document created? [YES/NO]
+
+→ If all YES: Creative phase complete
+→ If any NO: Complete missing elements
 ```
 
 ## 📋 CREATIVE PHASE DOCUMENT FORMAT
@@ -192,22 +239,6 @@ Use these visual markers for creative phases:
 🎨🎨🎨 EXITING CREATIVE PHASE - DECISION MADE 🎨🎨🎨
 ```
 
-## 📊 CREATIVE PHASE VERIFICATION CHECKLIST
-
-```
-✓ CREATIVE PHASE VERIFICATION
-- Problem clearly defined? [YES/NO]
-- Multiple options considered (3+)? [YES/NO]
-- Pros/cons documented for each option? [YES/NO]
-- Decision made with clear rationale? [YES/NO]
-- Implementation plan included? [YES/NO]
-- Visualization/diagrams created? [YES/NO]
-- tasks.md updated with decision? [YES/NO]
-
-→ If all YES: Creative phase complete
-→ If any NO: Complete missing elements
-```
-
 ## 🔄 MODE TRANSITION NOTIFICATION
 
 When all creative phases are complete, notify user with:
@@ -218,7 +249,9 @@ When all creative phases are complete, notify user with:
 ✅ All required design decisions made
 ✅ Creative phase documents created
 ✅ tasks.md updated with decisions
-✅ Implementation plan updated
+✅ Implementation files updated for Implementation Mode
+✅ Bridge document created
+✅ Implementation Mode ready to load creative design decisions
 
 → NEXT RECOMMENDED MODE: IMPLEMENT MODE
 ``` 

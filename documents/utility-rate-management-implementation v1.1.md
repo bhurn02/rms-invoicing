@@ -13,6 +13,7 @@ This document reflects the enhanced implementation with modern UX/UI improvement
 - ✅ **Mobile-Optimized Interface**: Touch-friendly design for field technicians
 
 ### Enhanced UX Features (v1.1)
+- **Smart Alert Strategy**: Context-appropriate use of SweetAlert vs inline notifications
 - **Streamlined Authentication**: No logout confirmation dialogs (modern UX standard)
 - **Inline Error Handling**: Form validation without blocking dialogs
 - **Continuous Scanning Mode**: Seamless transition between meter readings
@@ -21,40 +22,59 @@ This document reflects the enhanced implementation with modern UX/UI improvement
 
 ## Modern UX Design Principles Applied
 
-### 1. Notification & Alert Strategy ⚠️ **ENHANCED**
+### 1. Smart Alert & Notification Strategy ⚠️ **ENHANCED**
 
-#### ❌ **Removed Unnecessary Dialogs**
-- **Logout Confirmation**: Eliminated (modern apps don't confirm logout)
-- **Login Error Dialogs**: Replaced with inline form validation
-- **Success Confirmation Dialogs**: Replaced with subtle toast notifications
+#### **Global UX Standards: When to Use SweetAlert vs Inline Notifications**
 
-#### ✅ **Smart Notification Patterns**
+**❌ NEVER Use SweetAlert For:**
+- **Logout Actions**: Modern apps don't confirm logout - automatic logout
+- **Form Validation Errors**: Use inline validation for immediate feedback
+- **Success Confirmations**: Use subtle notifications that don't interrupt workflow
+- **Navigation Actions**: Back, forward, refresh - no confirmation needed
+
+**✅ Use SweetAlert For:**
+- **Destructive Actions**: Delete readings, void invoices, permanent data changes
+- **Critical Warnings**: Data loss, system errors, security alerts
+- **Complex Confirmations**: Multi-step processes requiring user acknowledgment
+- **Important Information**: System maintenance, policy changes, legal notices
+
+#### **Smart Notification Patterns**
 ```javascript
-// Modern UX: Inline validation instead of blocking dialogs
-const modernValidation = {
-  // Real-time field validation
-  username: {
-    onBlur: showInlineError,
-    onInput: clearError,
-    pattern: /^[a-zA-Z0-9]+$/,
+// Modern UX: Context-appropriate notification types
+const notificationStrategy = {
+  // Inline validation for form errors
+  formValidation: {
+    type: "inline",
+    placement: "below-field",
+    trigger: "onBlur",
     message: "Username must contain only letters and numbers"
   },
   
-  // Non-blocking success feedback
-  readingSubmitted: {
+  // Subtle success feedback
+  successFeedback: {
     type: "toast",
     duration: 3000,
-    action: "auto-advance",
+    placement: "top-right",
     message: "Reading saved • Ready for next scan"
+  },
+  
+  // SweetAlert for destructive actions
+  destructiveAction: {
+    type: "sweetalert",
+    title: "Delete Reading",
+    text: "This action cannot be undone",
+    confirmButtonText: "Yes, Delete",
+    showCancelButton: true
   }
 };
 ```
 
 #### **Context-Aware Alert System**
-- **Critical Errors**: Toast notification with retry option
-- **Success States**: Subtle confirmation with auto-advance
+- **Form Validation**: Inline field highlighting with helpful hints
+- **Success States**: Subtle toast notifications with auto-advance
+- **Destructive Actions**: SweetAlert with clear confirmation
 - **Network Issues**: Persistent offline indicator with sync status
-- **Validation Errors**: Inline field highlighting with helpful hints
+- **Critical Errors**: SweetAlert for system-level issues
 
 ### 2. Seamless QR Scanning Workflow ⚠️ **ENHANCED**
 
@@ -500,10 +520,10 @@ document.addEventListener('DOMContentLoaded', () => {
 ## Implementation Strategy (Complete Work Plan)
 
 ### Phase 1: Modern UX Enhancement Implementation (NEW PRIORITY)
-1) **Streamlined Authentication & Notifications**
-   - Remove logout confirmation dialogs (modern UX standard)
+1) **Smart Alert Strategy Implementation**
+   - Remove logout confirmation dialogs (modern UX standard - automatic logout)
    - Replace blocking login error dialogs with inline validation
-   - Implement toast notification system for non-blocking feedback
+   - Implement context-appropriate notification system (SweetAlert for destructive actions, inline for validation)
    - Add real-time form validation without interrupting workflow
 
 2) **Seamless QR Scanning Workflow**

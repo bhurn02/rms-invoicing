@@ -13,7 +13,7 @@ The QR Meter Reading System currently provides:
 - ✅ **User Access Rights**: Proper authentication and permission validation
 - ✅ **SweetAlert Integration**: Modern alert system implementation
 - ❌ **Critical UX Issues**: Excessive header content across ALL pages forcing users to scroll
-- ❌ **Outdated UX Patterns**: Blocking dialogs for logout, login errors
+- ❌ **Poor Alert Strategy**: Inappropriate use of SweetAlert for non-critical actions (logout, form validation)
 - ❌ **Inefficient Workflow**: Manual progression between meter readings
 - ❌ **No Offline Support**: Requires constant internet connection
 - ❌ **Limited Responsive Optimization**: Basic responsive design only, not optimized for target devices
@@ -21,6 +21,7 @@ The QR Meter Reading System currently provides:
 ### Design Objective
 Transform the QR Meter Reading System into a modern, efficient, offline-capable mobile application that follows current UX best practices, while maintaining all existing functionality including Tenant Readings Management and Utility Rate Management:
 - ✅ **Immediate Functionality Access**: Fix ALL QR pages to show primary actions without scrolling
+- ✅ **Smart Alert Strategy**: Context-appropriate use of SweetAlert vs inline notifications following global UX standards
 - ✅ **Streamlined Interactions**: Eliminate unnecessary dialog boxes and confirmations
 - ✅ **Seamless Workflow**: Continuous scanning mode with auto-advance
 - ✅ **Offline-First Architecture**: Progressive Web App with background sync
@@ -39,7 +40,7 @@ Transform the QR Meter Reading System into a modern, efficient, offline-capable 
 | **Continuous Scanning Mode** | Auto-advance to next meter after successful reading | Critical |
 | **Offline Functionality** | Full system operation without internet connection | Critical |
 | **Background Sync** | Automatic synchronization when connection restored | High |
-| **Smart Notifications** | Context-aware toast notifications | High |
+| **Smart Alert Strategy** | Context-appropriate use of SweetAlert vs inline notifications | High |
 | **Mobile Gestures** | Swipe navigation and touch optimization | Medium |
 
 ### Technical Requirements
@@ -59,6 +60,86 @@ Transform the QR Meter Reading System into a modern, efficient, offline-capable 
 - **Offline-First**: Core functionality works without internet
 - **Progressive Enhancement**: Graceful degradation for older browsers
 - **Performance**: Optimized for mobile devices with limited resources
+
+## 🎯 Smart Alert Strategy: Global UX Standards
+
+### **When to Use SweetAlert vs Inline Notifications**
+
+As a veteran front-end developer following global UX standards, the system must use the appropriate notification type for each context:
+
+#### **❌ NEVER Use SweetAlert For:**
+- **Logout Actions**: Modern apps don't confirm logout - automatic logout
+- **Form Validation Errors**: Use inline validation for immediate feedback
+- **Success Confirmations**: Use subtle notifications that don't interrupt workflow
+- **Navigation Actions**: Back, forward, refresh - no confirmation needed
+- **Simple Information**: Basic status updates, progress indicators
+
+#### **✅ Use SweetAlert For:**
+- **Destructive Actions**: Delete readings, void invoices, permanent data changes
+- **Critical Warnings**: Data loss, system errors, security alerts
+- **Complex Confirmations**: Multi-step processes requiring user acknowledgment
+- **Important Information**: System maintenance, policy changes, legal notices
+- **Irreversible Actions**: Actions that cannot be undone
+
+#### **✅ Use Inline Notifications For:**
+- **Form Validation**: Real-time field validation with helpful hints
+- **Success Feedback**: Subtle confirmations that don't interrupt workflow
+- **Progress Indicators**: Loading states, sync status, completion percentages
+- **Contextual Help**: Field-specific guidance and tips
+
+### **Implementation Examples**
+
+```javascript
+// ❌ WRONG: SweetAlert for logout
+function logout() {
+    Swal.fire({
+        title: 'Logout?',
+        text: 'Are you sure you want to logout?',
+        showCancelButton: true
+    });
+}
+
+// ✅ CORRECT: Automatic logout
+function logout() {
+    // Clear session and redirect immediately
+    clearSession();
+    window.location.href = '/login';
+}
+
+// ❌ WRONG: SweetAlert for form validation
+function validateUsername() {
+    if (!isValidUsername(username)) {
+        Swal.fire('Error', 'Invalid username format');
+    }
+}
+
+// ✅ CORRECT: Inline validation
+function validateUsername() {
+    const errorElement = document.getElementById('username-error');
+    if (!isValidUsername(username)) {
+        errorElement.textContent = 'Username must contain only letters and numbers';
+        errorElement.classList.add('show');
+    } else {
+        errorElement.classList.remove('show');
+    }
+}
+
+// ✅ CORRECT: SweetAlert for destructive action
+function deleteReading(readingId) {
+    Swal.fire({
+        title: 'Delete Reading?',
+        text: 'This action cannot be undone',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Yes, Delete',
+        cancelButtonText: 'Cancel'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            performDelete(readingId);
+        }
+    });
+}
+```
 
 ## 🚨 Critical UX Issue: QR Scanner Page Optimization
 

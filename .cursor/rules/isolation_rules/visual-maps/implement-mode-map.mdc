@@ -1,12 +1,12 @@
 ---
-description: Visual process map for BUILD mode (Code Implementation)
+description: Visual process map for BUILD mode (Code Implementation) - Updated with Creative Mode Integration
 globs: implementation-mode-map.mdc
 alwaysApply: false
 ---
 
-# BUILD MODE: CODE EXECUTION PROCESS MAP
+# BUILD MODE: CODE EXECUTION PROCESS MAP - UPDATED
 
-> **TL;DR:** This visual map guides the BUILD mode process, focusing on efficient code implementation based on the planning and creative phases, with proper command execution and progress tracking.
+> **TL;DR:** This visual map guides the BUILD mode process, focusing on efficient code implementation based on the planning and creative phases, with automatic loading of Creative Mode design decisions.
 
 ## 🧭 BUILD MODE PROCESS FLOW
 
@@ -39,7 +39,12 @@ graph TD
     L34Review --> L34Phase{"Creative Phase<br>Documents<br>Complete?"}
     
     L34Phase -->|"No"| L34Error["ERROR:<br>Return to CREATIVE Mode"]
-    L34Phase -->|"Yes"| L34DirSetup["Create Directory<br>Structure"]
+    L34Phase -->|"Yes"| LoadCreativeFiles["Load Creative<br>Design Decisions"]
+    
+    LoadCreativeFiles --> VerifyCreativeFiles{"Creative files<br>updated for<br>implementation?"}
+    VerifyCreativeFiles -->|"No"| ErrorCreativeFiles["ERROR:<br>Return to CREATIVE Mode<br>to update files"]
+    VerifyCreativeFiles -->|"Yes"| L34DirSetup["Create Directory<br>Structure"]
+    
     L34DirSetup --> L34VerifyDirs["VERIFY Directories<br>Created Successfully"]
     L34VerifyDirs --> L34Implementation["Build<br>Phase"]
     
@@ -86,8 +91,39 @@ graph TD
     CheckCreative -->|"Yes"| VerifyCreative{"Creative phases<br>completed?"}
     
     VerifyCreative -->|"No"| ErrorCreative["ERROR:<br>Return to CREATIVE Mode"]
-    VerifyCreative -->|"Yes"| L34Ready
+    VerifyCreative -->|"Yes"| LoadCreativeFiles["Load Creative<br>Design Decisions"]
+    
+    LoadCreativeFiles --> VerifyCreativeFiles{"Creative files<br>updated for<br>implementation?"}
+    VerifyCreativeFiles -->|"No"| ErrorCreativeFiles["ERROR:<br>Return to CREATIVE Mode<br>to update files"]
+    VerifyCreativeFiles -->|"Yes"| L34Ready
 ```
+
+## 🎨 CREATIVE MODE INTEGRATION REQUIREMENTS
+
+### **Creative Phase Documents to Load**
+When switching to Implementation Mode, automatically load:
+1. **`memory-bank/implementation-phase-guidelines.md`** - Core implementation rules
+2. **`memory-bank/enhanced-ux-flows.md`** - UX flow patterns and requirements
+3. **`memory-bank/testing-checklist.md`** - Phase validation requirements
+4. **`memory-bank/ux-design-standards.md`** - Global UX standards and patterns
+5. **`memory-bank/creative-modern-ux-enhancements.md`** - Design decisions and implementation guidelines
+6. **`memory-bank/creative-to-implementation-bridge.md`** - Mode integration bridge
+
+### **Design Decision Implementation Checklist**
+- [ ] **Smart Alert Strategy**: Context-appropriate notification types implemented
+- [ ] **Streamlined Authentication**: No logout confirmation dialogs
+- [ ] **Continuous Scanning Workflow**: Auto-advance functionality working
+- [ ] **Offline-First Architecture**: PWA features implemented
+- [ ] **Mobile Optimization**: Touch-friendly interface for target devices
+- [ ] **Enhanced UX Flows**: All flow patterns implemented correctly
+
+### **Creative Phase Verification**
+Before implementation, verify:
+- [ ] **Design Decisions Made**: All creative phases completed with clear decisions
+- [ ] **Options Analyzed**: Multiple approaches considered and evaluated
+- [ ] **Implementation Guidelines**: Clear steps provided for each design decision
+- [ ] **Success Criteria**: Measurable outcomes defined for each design element
+- [ ] **Validation Requirements**: Testing approach defined for design implementation
 
 ## 🔄 FILE SYSTEM VERIFICATION PROCESS
 
@@ -246,6 +282,7 @@ During the build process, update tasks.md with progress:
 - [x] Planning complete
 [For Level 3-4:]
 - [x] Creative phases complete
+- [x] Creative design decisions loaded
 - [x] Directory structure created and verified
 - [x] [Built component 1]
 - [x] [Built component 2]
@@ -292,6 +329,7 @@ Update progress.md with:
 - All files created in correct locations? [YES/NO]
 - All file paths verified with absolute paths? [YES/NO]
 - All planned changes implemented? [YES/NO]
+- Creative design decisions implemented? [YES/NO]
 - Testing performed for all changes? [YES/NO]
 - Code follows project standards? [YES/NO]
 - Edge cases handled appropriately? [YES/NO]
@@ -313,6 +351,7 @@ When the build is complete, notify user with:
 ✅ Directory structure verified
 ✅ All files created in correct locations
 ✅ All planned changes implemented
+✅ Creative design decisions implemented
 ✅ Testing performed successfully
 ✅ tasks.md updated with status
 ✅ progress.md updated with details
