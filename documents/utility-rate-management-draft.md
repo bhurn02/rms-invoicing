@@ -135,3 +135,16 @@ we also need to add entries for the following tables for the module (user page a
 s_modules
 s_user_group
 s_user_group_modules
+
+
+PLAN, can you update @utility-rate-management-implementation v1.0.md to utility-rate-management-implementation v1.1.md and @memory-bank documentation. As a veteran front-end developer, follow the best practice for modern UI and UX design principles, focusing on user-centric convenience. UI/UX to improve:
+
+1. When to use notifications, dialog box and alerts. I've noticed you are using dialog box when logging out when the modern UX design practice does not have a dialog box for log out. Also for invalid user name and passwords, you are using dialog box sweet alerts, adding more clicks interactions for the user, making it inefficient. 
+
+2. Upon successful submit reading, you are showing sweet alert with only continue button. The purpose of QR meter reading scanning multiple meter reading, you should make the UX seamless. Provide options for users to proceed with the next scan and minimize user interactions or additional click events.
+
+3. Field Technicians who are doing the scans have limited mobile data or possibly does not have internet access, this project should work even when offline and has capability to sync the offline data processed. Similar to modern web apps, they can work offline and has sync option at top with progress, you can either manually sync or auto sync.
+
+Target device that will use QR Meter Reading are:
+Samsung A15
+iPhone 14 pro max

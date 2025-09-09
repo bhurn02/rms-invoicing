@@ -415,39 +415,307 @@ Elegant Teal (Freshness)
 
 ---
 
-## 🔔 Alert System - Sweet Alert Professional Theme
+## 🔔 Modern Notification System - Enhanced UX
 
-### Alert Types & Visual Standards
+### Modern UX Principles Applied
+- **No Blocking Dialogs**: Eliminate unnecessary confirmation dialogs (logout, login errors)
+- **Inline Validation**: Real-time form validation without blocking dialogs
+- **Toast Notifications**: Subtle, non-blocking success/error feedback
+- **Context-Aware Alerts**: Smart notifications that don't interrupt workflow
+
+### Toast Notification System
 ```css
-/* Success Alerts - Achievement & Confirmation */
+/* Modern Toast Notifications - Non-blocking */
+.toast-notification {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: white;
+  border-radius: 0.75rem;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  padding: 1rem 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  transform: translateX(100%);
+  transition: transform 0.3s ease-in-out;
+  z-index: 1000;
+  max-width: 400px;
+}
+
+.toast-notification.show {
+  transform: translateX(0);
+}
+
+/* Success Toast - Achievement & Confirmation */
+.toast-notification.success {
+  border-left: 4px solid #059669;
+  background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+}
+
+.toast-notification.success .toast-icon {
+  color: #059669;
+}
+
+/* Error Toast - Helpful Guidance */
+.toast-notification.error {
+  border-left: 4px solid #dc2626;
+  background: linear-gradient(135deg, #fef2f2 0%, #fecaca 100%);
+}
+
+.toast-notification.error .toast-icon {
+  color: #dc2626;
+}
+
+/* Warning Toast - Important Attention */
+.toast-notification.warning {
+  border-left: 4px solid #d97706;
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+}
+
+.toast-notification.warning .toast-icon {
+  color: #d97706;
+}
+
+/* Info Toast - Guidance & Tips */
+.toast-notification.info {
+  border-left: 4px solid #1e40af;
+  background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+}
+
+.toast-notification.info .toast-icon {
+  color: #1e40af;
+}
+```
+
+### Inline Validation System
+```css
+/* Inline Form Validation - Real-time feedback */
+.form-field {
+  position: relative;
+  transition: all 0.2s ease-in-out;
+}
+
+.form-field.error {
+  border-color: #dc2626;
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+}
+
+.form-field.success {
+  border-color: #059669;
+  box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.1);
+}
+
+/* Inline Error Messages */
+.field-error {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: #fef2f2;
+  color: #dc2626;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+  border: 1px solid #fecaca;
+  transform: translateY(-10px);
+  opacity: 0;
+  transition: all 0.2s ease-in-out;
+  z-index: 10;
+}
+
+.field-error.show {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+/* Success Indicators */
+.field-success {
+  position: absolute;
+  top: 50%;
+  right: 1rem;
+  transform: translateY(-50%);
+  color: #059669;
+  opacity: 0;
+  transition: opacity 0.2s ease-in-out;
+}
+
+.field-success.show {
+  opacity: 1;
+}
+```
+
+### Offline Status Indicators
+```css
+/* Offline Status Bar - Persistent indicator */
+.offline-status-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  color: white;
+  padding: 0.75rem 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 999;
+  transform: translateY(-100%);
+  transition: transform 0.3s ease-in-out;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.offline-status-bar.show {
+  transform: translateY(0);
+}
+
+.offline-status-bar .sync-status {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 500;
+}
+
+.offline-status-bar .btn-sync {
+  background: rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+
+.offline-status-bar .btn-sync:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: translateY(-1px);
+}
+```
+
+### Sync Progress Indicators
+```css
+/* Sync Progress Modal - Background sync feedback */
+.sync-progress-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 1001;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease-in-out;
+}
+
+.sync-progress-modal.show {
+  opacity: 1;
+  visibility: visible;
+}
+
+.sync-progress-modal .sync-animation {
+  position: relative;
+  width: 80px;
+  height: 80px;
+  margin-bottom: 2rem;
+}
+
+.sync-progress-modal .sync-spinner {
+  width: 80px;
+  height: 80px;
+  border: 4px solid rgba(59, 130, 246, 0.3);
+  border-top: 4px solid #3b82f6;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+.sync-progress-modal .sync-pulse {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 20px;
+  height: 20px;
+  background: #3b82f6;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.sync-progress-modal h3 {
+  color: white;
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+.sync-progress-modal .progress-bar {
+  width: 300px;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 1rem;
+}
+
+.sync-progress-modal .progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #3b82f6, #1d4ed8);
+  border-radius: 4px;
+  transition: width 0.3s ease-in-out;
+  width: 0%;
+}
+
+.sync-progress-modal p {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 1rem;
+  text-align: center;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes pulse {
+  0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+  50% { transform: translate(-50%, -50%) scale(1.5); opacity: 0.7; }
+}
+```
+
+### Legacy Sweet Alert Integration (For Critical Confirmations Only)
+```css
+/* Sweet Alert - Only for critical confirmations */
 .swal-success {
   --swal-icon-color: #059669; /* Success Green */
   --swal-background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
   --swal-border-color: #059669;
 }
 
-/* Error Alerts - Helpful Guidance */
 .swal-error {
   --swal-icon-color: #dc2626; /* Professional Error Red */
   --swal-background: linear-gradient(135deg, #fef2f2 0%, #fecaca 100%);
   --swal-border-color: #dc2626;
 }
 
-/* Warning Alerts - Important Attention */
 .swal-warning {
   --swal-icon-color: #d97706; /* Warning Amber */
   --swal-background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
   --swal-border-color: #d97706;
 }
 
-/* Info Alerts - Guidance & Tips */
 .swal-info {
   --swal-icon-color: #1e40af; /* Primary Blue */
   --swal-background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
   --swal-border-color: #1e40af;
 }
 
-/* Confirmation Dialogs - Decision Points */
+/* Confirmation Dialogs - Only for critical decisions */
 .swal-question {
   --swal-icon-color: #1e40af; /* Primary Blue */
   --swal-background: white;
