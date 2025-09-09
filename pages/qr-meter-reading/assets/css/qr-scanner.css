@@ -47,6 +47,15 @@
     border-radius: 0.75rem;
 }
 
+/* Scanner Visibility Classes */
+.scanner-hidden {
+    display: none !important;
+}
+
+.scanner-visible {
+    display: block !important;
+}
+
 /* Scanner Status Overlay */
 .scanner-overlay {
     position: absolute;

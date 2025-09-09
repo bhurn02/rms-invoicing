@@ -117,7 +117,7 @@ $currentCompany = getCurrentCompanyCode();
                             <?php echo strtoupper(substr($currentUser ?? 'U', 0, 1)); ?>
                         </div>
                         <div class="d-flex flex-column align-items-start">
-                            <span class="fw-semibold" style="font-size: 0.875rem;">
+                            <span class="fw-semibold user-info-text"></span>
                                 <?php echo htmlspecialchars($currentUser ?? 'Field Technician'); ?>
                             </span>                            
                         </div>
@@ -183,18 +183,18 @@ $currentCompany = getCurrentCompanyCode();
                         
                         <!-- Scanner Controls - Bootstrap grid -->
                         <div class="d-grid gap-2">
-                            <button id="start-scanner" class="btn btn-scan-primary btn-lg shadow-sm">
+                            <button id="start-scanner" class="btn btn-scan-primary btn-lg shadow-sm scanner-visible">
                                 <i class="bi bi-camera-fill me-2"></i>
                                 Start Scanner
                             </button>
-                            <button id="stop-scanner" class="btn btn-secondary btn-lg shadow-sm" style="display: none;">
+                            <button id="stop-scanner" class="btn btn-secondary btn-lg shadow-sm scanner-hidden">
                                 <i class="bi bi-stop-circle me-2"></i>
                                 Stop Scanner
                             </button>
                         </div>
                         
                         <!-- Scanner Status -->
-                        <div id="scanner-status" class="alert alert-info border-0 mt-3 shadow-sm" style="display: none;">
+                        <div id="scanner-status" class="alert alert-info border-0 mt-3 shadow-sm scanner-hidden">
                             <i class="bi bi-info-circle me-2"></i>
                             <span id="status-text">Ready to scan</span>
                         </div>
@@ -202,7 +202,7 @@ $currentCompany = getCurrentCompanyCode();
                 </div>
 
                 <!-- Reading Form Card - Bootstrap responsive -->
-                <div id="reading-form-card" class="card card-professional shadow-sm border-0" style="display: none;">
+                <div id="reading-form-card" class="card card-professional shadow-sm border-0 scanner-hidden">
                     <div class="card-header bg-success text-white border-0 py-3">
                         <h5 class="card-title mb-0 d-flex align-items-center">
                             <i class="bi bi-check-circle me-2 fs-5"></i>

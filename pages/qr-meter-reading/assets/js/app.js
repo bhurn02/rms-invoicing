@@ -12,6 +12,7 @@ class QRMeterReadingApp {
         this.offlineQueue = [];
         this.isAuthenticated = true; // Will be checked on initialization
         this.isSubmitting = false; // Prevent double form submission
+        this.activeCameraStream = null; // Track active camera stream
         
         this.init();
     }
@@ -82,6 +83,18 @@ class QRMeterReadingApp {
                 this.logout();
             });
         }
+
+        // Cleanup camera when page is unloaded
+        window.addEventListener('beforeunload', () => {
+            this.cleanupCameraStream();
+        });
+
+        // Cleanup camera when page becomes hidden (mobile browsers)
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden && this.isScanning) {
+                this.stopScanner();
+            }
+        });
     }
 
     async logout() {
@@ -138,6 +151,8 @@ class QRMeterReadingApp {
                         height: { ideal: 720 }
                     } 
                 });
+                // Store reference to the stream for cleanup
+                this.activeCameraStream = stream;
             } catch (cameraError) {
                 console.error('Camera permission denied:', cameraError);
                 if (cameraError.name === 'NotAllowedError') {
@@ -375,9 +390,44 @@ class QRMeterReadingApp {
                 this.updateScannerUI();
                 this.showStatus('Scanner stopped', 'info');
                 this.removeScanningAnimation();
+                
+                // Additional cleanup to ensure camera is fully released
+                this.cleanupCameraStream();
             }).catch(error => {
                 console.error('Error stopping scanner:', error);
+                // Even if stop fails, try to cleanup
+                this.isScanning = false;
+                this.updateScannerUI();
+                this.cleanupCameraStream();
             });
+        }
+    }
+
+    cleanupCameraStream() {
+        // Stop the tracked camera stream
+        if (this.activeCameraStream) {
+            this.activeCameraStream.getTracks().forEach(track => {
+                track.stop();
+                console.log('Camera track stopped:', track.kind);
+            });
+            this.activeCameraStream = null;
+        }
+        
+        // Also try to stop any other active video tracks as a fallback
+        if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+            navigator.mediaDevices.getUserMedia({ video: true })
+                .then(stream => {
+                    stream.getTracks().forEach(track => {
+                        if (track.readyState === 'live') {
+                            track.stop();
+                            console.log('Additional camera track stopped:', track.kind);
+                        }
+                    });
+                })
+                .catch(error => {
+                    // This is expected if no camera is active
+                    console.log('No additional camera streams to cleanup');
+                });
         }
     }
 
@@ -466,7 +516,8 @@ class QRMeterReadingApp {
         document.getElementById('meter-id').value = meterId || '';
         
         // Show the form
-        formCard.style.display = 'block';
+        formCard.classList.remove('scanner-hidden');
+        formCard.classList.add('scanner-visible');
         
         // Scroll to form
         formCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -635,7 +686,9 @@ class QRMeterReadingApp {
                 
                 // Reset form and hide
                 event.target.reset();
-                document.getElementById('reading-form-card').style.display = 'none';
+                const formCard = document.getElementById('reading-form-card');
+                formCard.classList.add('scanner-hidden');
+                formCard.classList.remove('scanner-visible');
                 
                 // Refresh recent readings table after a short delay
                 setTimeout(async () => {
@@ -856,7 +909,9 @@ class QRMeterReadingApp {
     }
 
     hideReadingForm() {
-        document.getElementById('reading-form-card').style.display = 'none';
+        const formCard = document.getElementById('reading-form-card');
+        formCard.classList.add('scanner-hidden');
+        formCard.classList.remove('scanner-visible');
     }
 
     updateScannerUI() {
@@ -865,12 +920,16 @@ class QRMeterReadingApp {
         const viewport = document.querySelector('.qr-viewport');
 
         if (this.isScanning) {
-            startBtn.style.display = 'none';
-            stopBtn.style.display = 'block';
+            startBtn.classList.add('scanner-hidden');
+            startBtn.classList.remove('scanner-visible');
+            stopBtn.classList.remove('scanner-hidden');
+            stopBtn.classList.add('scanner-visible');
             viewport.classList.add('active', 'scanning');
         } else {
-            startBtn.style.display = 'block';
-            stopBtn.style.display = 'none';
+            startBtn.classList.remove('scanner-hidden');
+            startBtn.classList.add('scanner-visible');
+            stopBtn.classList.add('scanner-hidden');
+            stopBtn.classList.remove('scanner-visible');
             viewport.classList.remove('active', 'scanning');
         }
     }
@@ -907,11 +966,13 @@ class QRMeterReadingApp {
         
         statusText.textContent = message;
         statusDiv.className = `alert alert-${type} mt-3`;
-        statusDiv.style.display = 'block';
+        statusDiv.classList.remove('scanner-hidden');
+        statusDiv.classList.add('scanner-visible');
         
         // Auto-hide after 5 seconds
         setTimeout(() => {
-            statusDiv.style.display = 'none';
+            statusDiv.classList.add('scanner-hidden');
+            statusDiv.classList.remove('scanner-visible');
         }, 5000);
     }
 
@@ -955,13 +1016,24 @@ class QRMeterReadingApp {
                         <i class="bi bi-pencil-square me-2"></i>
                         Manual Entry
                     </button>
-                    <button class="btn btn-outline-secondary" onclick="this.closest('.camera-permission').style.display='none'; document.getElementById('start-scanner').style.display='block';">
+                    <button class="btn btn-outline-secondary" onclick="qrMeterApp.hideCameraPermissionUI()">
                         <i class="bi bi-x-circle me-2"></i>
                         Cancel
                     </button>
                 </div>
             </div>
         `;
+    }
+
+    hideCameraPermissionUI() {
+        const cameraPermission = document.querySelector('.camera-permission');
+        if (cameraPermission) {
+            cameraPermission.remove();
+        }
+        // Show start scanner button
+        const startBtn = document.getElementById('start-scanner');
+        startBtn.classList.remove('scanner-hidden');
+        startBtn.classList.add('scanner-visible');
     }
 
     addScanningAnimation() {

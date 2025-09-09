@@ -123,7 +123,7 @@
                                 </form>
                                 
                                 <!-- QR Code Display Area -->
-                                <div id="qr-result" class="mt-4" style="display: none;">
+                                <div id="qr-result" class="mt-4 scanner-hidden">
                                     <div class="professional-qr" id="qr-display">
                                         <div class="qr-code-container">
                                             <div id="qrcode"></div>
@@ -195,12 +195,12 @@
                                     </div>
                                     
                                     <!-- Tenant Selection Table -->
-                                    <div id="tenant-table-container" style="display: none;">
+                                    <div id="tenant-table-container" class="scanner-hidden">
                                         <div class="table-responsive">
                                             <table class="table table-bordered table-striped table-sm small">
                                                 <thead class="table-dark">
                                                     <tr>
-                                                        <th style="width: 50px;">
+                                                        <th class="table-header-narrow">
                                                             <div class="form-check">
                                                                 <input class="form-check-input" type="checkbox" id="select-all-tenants">
                                                                 <label class="form-check-label" for="select-all-tenants"></label>
@@ -235,17 +235,17 @@
                                     </div>
                                     
                                     <!-- Error State -->
-                                    <div id="tenant-error" class="alert alert-danger" style="display: none;">
+                                    <div id="tenant-error" class="alert alert-danger scanner-hidden">
                                         <i class="bi bi-exclamation-triangle me-2"></i>
                                         <strong>Database Connection Error:</strong> Unable to load tenant data. Please check your database configuration.
                                     </div>
                                 </div>
                                 
                                 <!-- Batch Generation Progress -->
-                                <div id="batch-progress" class="mt-4" style="display: none;">
+                                <div id="batch-progress" class="mt-4 scanner-hidden">
                                     <h5>Generating QR Codes...</h5>
                                     <div class="progress mb-3">
-                                        <div class="progress-bar" role="progressbar" style="width: 0%" 
+                                        <div class="progress-bar" role="progressbar" 
                                              aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">0%</div>
                                     </div>
                                     <p class="text-muted mb-0">
@@ -255,7 +255,7 @@
                                 </div>
                                 
                                 <!-- Batch Results -->
-                                <div id="batch-results" class="mt-4" style="display: none;">
+                                <div id="batch-results" class="mt-4 scanner-hidden">
                                     <div class="alert alert-success">
                                         <i class="bi bi-check-circle me-2"></i>
                                         <strong>Batch Generation Complete!</strong> 

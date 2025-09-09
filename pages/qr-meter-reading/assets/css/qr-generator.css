@@ -6,6 +6,11 @@ body {
     min-height: 100vh;
 }
 
+/* Table Header Styling */
+.table-header-narrow {
+    width: 50px;
+}
+
 /* Executive Professional Navigation */
 .nav-pills-executive .nav-link {
     color: #374151;
