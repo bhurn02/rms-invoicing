@@ -41,14 +41,16 @@ $currentCompany = getCurrentCompanyCode();
     <title>QR Meter Reading System - RMS</title>
     
     <!-- Bootstrap 5.3+ CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="assets/css/bootstrap.min.css" rel="stylesheet">
     
     <!-- Bootstrap Icons -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="assets/css/bootstrap-icons.css" rel="stylesheet">
     
     <!-- Custom Executive Professional Theme -->
     <link href="assets/css/custom-theme.css" rel="stylesheet">
-    <link href="assets/css/qr-scanner.css" rel="stylesheet">
+    
+    <!-- QR Scanner Specific Styles with Cache-Busting -->
+    <link href="assets/css/qr-scanner.css?version=<?= time() ?>" rel="stylesheet">
     
     <!-- PWA Manifest -->
     <link rel="manifest" href="manifest.json">
@@ -56,163 +58,6 @@ $currentCompany = getCurrentCompanyCode();
     <!-- Favicon -->
     <link rel="icon" type="image/x-icon" href="assets/images/favicon.ico">
     
-    <!-- Professional Navigation Styling -->
-    <style>
-        /* Critical iOS fixes */
-        input[type="text"], input[type="email"], input[type="password"], 
-        input[type="number"], input[type="date"], textarea, select {
-            font-size: 16px !important;
-        }
-        
-        html { 
-            overflow-x: hidden;
-            -webkit-text-size-adjust: 100%; 
-        }
-        
-        body { 
-            overflow-x: hidden;
-            -webkit-overflow-scrolling: touch; 
-        }
-        
-        /* Professional User Dropdown */
-        .user-dropdown {
-            position: relative;
-        }
-        
-        .user-dropdown .dropdown-toggle {
-            border: none !important;
-            background: transparent !important;
-            color: white !important;
-            display: flex;
-            align-items: center;
-            padding: 0.5rem 0.75rem;
-            border-radius: 0.375rem;
-            transition: background-color 0.15s ease-in-out;
-        }
-        
-        .user-dropdown .dropdown-toggle:hover,
-        .user-dropdown .dropdown-toggle:focus {
-            background-color: rgba(255, 255, 255, 0.1) !important;
-            box-shadow: none !important;
-        }
-        
-        .user-dropdown .dropdown-toggle::after {
-            margin-left: 0.5rem;
-        }
-        
-        .user-dropdown .dropdown-menu {
-            border: none;
-            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
-            border-radius: 0.5rem;
-            padding: 0.5rem 0;
-            min-width: 200px;
-            margin-top: 0.5rem;
-        }
-        
-        .user-dropdown .dropdown-item {
-            padding: 0.75rem 1.25rem;
-            color: #374151;
-            font-weight: 500;
-            display: flex;
-            align-items: center;
-            transition: all 0.15s ease-in-out;
-        }
-        
-        .user-dropdown .dropdown-item:hover {
-            background-color: #f8f9fa;
-            color: #1e40af;
-        }
-        
-        .user-dropdown .dropdown-item i {
-            width: 1.25rem;
-            margin-right: 0.75rem;
-            color: #6b7280;
-        }
-        
-        .user-dropdown .dropdown-item:hover i {
-            color: #1e40af;
-        }
-        
-        .user-dropdown .dropdown-divider {
-            margin: 0.5rem 0;
-            border-color: #e5e7eb;
-        }
-        
-        .user-dropdown .dropdown-header {
-            padding: 0.75rem 1.25rem 0.5rem;
-            color: #6b7280;
-            font-size: 0.75rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-        
-        /* User avatar styling */
-        .user-avatar {
-            width: 32px;
-            height: 32px;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-right: 0.75rem;
-            font-size: 0.875rem;
-        }
-        
-        /* Tools dropdown */
-        .tools-dropdown .dropdown-menu {
-            border: none;
-            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
-            border-radius: 0.5rem;
-            padding: 0.5rem 0;
-            min-width: 180px;
-        }
-        
-        .tools-dropdown .dropdown-item {
-            padding: 0.75rem 1.25rem;
-            color: #374151;
-            font-weight: 500;
-            display: flex;
-            align-items: center;
-        }
-        
-        .tools-dropdown .dropdown-item i {
-            width: 1.25rem;
-            margin-right: 0.75rem;
-            color: #6b7280;
-        }
-        
-        .tools-dropdown .dropdown-item:hover {
-            background-color: #f8f9fa;
-            color: #1e40af;
-        }
-        
-        .tools-dropdown .dropdown-item:hover i {
-            color: #1e40af;
-        }
-        
-        /* Mobile responsive adjustments */
-        @media (max-width: 768px) {
-            .user-dropdown .dropdown-menu {
-                min-width: 160px;
-                right: 0;
-                left: auto;
-            }
-            
-            .user-dropdown .dropdown-item {
-                padding: 0.625rem 1rem;
-                font-size: 0.875rem;
-            }
-            
-            .user-avatar {
-                width: 28px;
-                height: 28px;
-                margin-right: 0.5rem;
-                font-size: 0.75rem;
-            }
-        }
-    </style>
 </head>
 <body class="bg-light">
     <!-- Professional Navigation with Dropdown Menus -->
@@ -486,16 +331,16 @@ $currentCompany = getCurrentCompanyCode();
     </footer>
 
     <!-- Bootstrap 5 JavaScript Bundle with Popper -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="assets/js/bootstrap.bundle.min.js"></script>
     
     <!-- SweetAlert2 for modern alerts -->
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="assets/js/sweetalert2.min.js"></script>
     
     <!-- QR Code Library -->
-    <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+    <script src="assets/js/html5-qrcode.min.js"></script>
     
-    <!-- Custom JavaScript -->
-    <script src="assets/js/app.js?v=<?php echo filemtime('assets/js/app.js'); ?>"></script>
+    <!-- Custom JavaScript with Cache-Busting -->
+    <script src="assets/js/app.js?version=<?= time() ?>"></script>
     
     <!-- Force reload of app.js to prevent caching issues -->
     <script>

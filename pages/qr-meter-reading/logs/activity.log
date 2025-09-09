@@ -197,3 +197,15 @@
 [2025-09-09 10:39:31] [CHRISTIAN_BRAVO/Christian] [::1] QR System Login - User christian_bravo logged in successfully from ::1
 [2025-09-09 11:55:17] [CHRISTIAN_BRAVO/Christian] [::1] QR System Login - User christian_bravo logged in successfully from ::1
 [2025-09-09 11:55:26] [DEV1/Aldrich] [::1] QR System Login - User dev1 logged in successfully from ::1
+[2025-09-09 16:24:04] [DEV1/Aldrich] [::1] QR System Logout - User DEV1 logged out from ::1
+[2025-09-09 16:24:10] [DEV1/Aldrich] [::1] QR System Login - User dev1 logged in successfully from ::1
+[2025-09-09 16:40:39] [DEV1/Aldrich] [::1] QR System Logout - User DEV1 logged out from ::1
+[2025-09-09 16:40:44] [DEV1/Aldrich] [::1] QR System Login - User dev1 logged in successfully from ::1
+[2025-09-09 16:40:54] [DEV1/Aldrich] [::1] QR System Logout - User DEV1 logged out from ::1
+[2025-09-09 16:40:57] [DEV1/Aldrich] [::1] QR System Login - User dev1 logged in successfully from ::1
+[2025-09-09 16:57:45] [DEV1/Aldrich] [::1] QR System Logout - User DEV1 logged out from ::1
+[2025-09-09 16:57:48] [DEV1/Aldrich] [::1] QR System Login - User dev1 logged in successfully from ::1
+[2025-09-09 17:11:34] [DEV1/Aldrich] [::1] QR System Logout - User DEV1 logged out from ::1
+[2025-09-09 17:11:39] [DEV1/Aldrich] [::1] QR System Login - User dev1 logged in successfully from ::1
+[2025-09-09 17:31:26] [DEV1/Aldrich] [::1] QR System Logout - User DEV1 logged out from ::1
+[2025-09-09 17:31:32] [DEV1/Aldrich] [::1] QR System Login - User dev1 logged in successfully from ::1

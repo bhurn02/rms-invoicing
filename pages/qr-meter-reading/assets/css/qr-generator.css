@@ -492,3 +492,37 @@ body {
 .select2-container--bootstrap-5 .select2-search--dropdown {
     padding: 0.75rem !important;
 }
+
+/* ===== QR GENERATOR - TENANT TABLE STYLES ===== */
+
+/* Clickable table rows for tenant selection */
+.tenant-row {
+    transition: background-color 0.2s ease;
+}
+
+.tenant-row:hover {
+    background-color: rgba(13, 110, 253, 0.1) !important;
+}
+
+.tenant-row.table-active {
+    background-color: rgba(13, 110, 253, 0.2) !important;
+}
+
+.tenant-row.table-active:hover {
+    background-color: rgba(13, 110, 253, 0.3) !important;
+}
+
+/* Make checkboxes slightly larger for better usability */
+.tenant-checkbox {
+    transform: scale(1.2);
+    margin: 0;
+}
+
+/* Ensure checkbox doesn't interfere with row click */
+.form-check {
+    pointer-events: none;
+}
+
+.form-check-input {
+    pointer-events: auto;
+}
