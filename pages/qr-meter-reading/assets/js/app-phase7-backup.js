@@ -658,12 +658,18 @@ class QRMeterReadingApp {
             const result = await response.json();
             
             if (result.success) {
-                // PHASE 7 FIX: Mobile-First Success Toast - Prominent notification for mobile users
-                // Following mobile UX best practices for scanning apps
-                this.showSuccessToast(
-                    'Reading Saved Successfully!',
-                    'Ready for next meter scan • Data saved to system'
-                );
+                // Show simple success message
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Reading Saved Successfully!',
+                    text: 'Your meter reading has been recorded and will appear in the Recent Readings table below.',
+                    confirmButtonText: 'Continue',
+                    confirmButtonColor: '#198754',
+                    width: '500px',
+                    customClass: {
+                        popup: 'swal2-popup-custom'
+                    }
+                });
                 
                 // Reset form and hide
                 event.target.reset();
@@ -671,14 +677,9 @@ class QRMeterReadingApp {
                 formCard.classList.add('scanner-hidden');
                 formCard.classList.remove('scanner-visible');
                 
-                // Auto-advance: Focus scanner for next reading after brief delay
-                setTimeout(() => {
-                    this.focusScannerForNext();
-                }, 800); // Slightly longer delay so user sees toast
-                
-                // Refresh recent readings table after a short delay with animation
+                // Refresh recent readings table after a short delay
                 setTimeout(async () => {
-                    await this.loadRecentReadings(true); // Pass true to trigger top row animation
+                    await this.loadRecentReadings();
                 }, 500);
                 
             } else {
@@ -757,8 +758,8 @@ class QRMeterReadingApp {
         }
     }
     
-    // Populate recent readings table with visual feedback
-    populateRecentReadingsTable(readings, isNewReading = false) {
+    // Populate recent readings table
+    populateRecentReadingsTable(readings) {
         const tbody = document.getElementById('readings-table-body');
         
         if (readings.length === 0) {
@@ -766,39 +767,18 @@ class QRMeterReadingApp {
             return;
         }
         
-        tbody.innerHTML = readings.map((reading, index) => {
-            // Apply animation class only to the top row if this is a new reading
-            const rowClass = (isNewReading && index === 0) ? 'new-reading-row' : '';
-            
-            return `
-                <tr class="${rowClass}">
-                    <td>${reading.real_property_name}</td>
-                    <td>${reading.unit_no}</td>
-                    <td>${reading.tenant_name}</td>
-                    <td>${reading.current_reading}</td>
-                    <td>${new Date(reading.reading_date).toLocaleDateString()}</td>
-                    <td>
-                        <span class="badge bg-success">Saved</span>
-                    </td>
-                </tr>
-            `;
-        }).join('');
-
-        // PHASE 7 ENHANCEMENT: Highlight only the top row after successful save
-        if (isNewReading) {
-            const firstRow = tbody.querySelector('tr.new-reading-row');
-            if (firstRow) {
-                // After the slide-in animation, start the fade-out highlight
-                setTimeout(() => {
-                    firstRow.classList.add('fade-highlight');
-                    
-                    // Remove all animation classes after fade-out completes
-                    setTimeout(() => {
-                        firstRow.classList.remove('new-reading-row', 'fade-highlight');
-                    }, 3000);
-                }, 800); // Wait for slide-in animation to complete
-            }
-        }
+        tbody.innerHTML = readings.map(reading => `
+            <tr>
+                <td>${reading.real_property_name}</td>
+                <td>${reading.unit_no}</td>
+                <td>${reading.tenant_name}</td>
+                <td>${reading.current_reading}</td>
+                <td>${new Date(reading.reading_date).toLocaleDateString()}</td>
+                <td>
+                    <span class="badge bg-success">Saved</span>
+                </td>
+            </tr>
+        `).join('');
     }
 
 
@@ -880,7 +860,7 @@ class QRMeterReadingApp {
         }
     }
 
-    async loadRecentReadings(isNewReading = false) {
+    async loadRecentReadings() {
         try {
             console.log('Loading recent readings...');
             const response = await fetch('api/get-recent-readings.php');
@@ -895,7 +875,7 @@ class QRMeterReadingApp {
                 const result = await response.json();
                 console.log('Recent readings response:', result);
                 if (result.success) {
-                    this.displayRecentReadings(result.data, isNewReading);
+                    this.displayRecentReadings(result.data);
                 }
             } else {
                 console.error('Failed to load recent readings:', response.status, response.statusText);
@@ -905,7 +885,7 @@ class QRMeterReadingApp {
         }
     }
 
-    displayRecentReadings(readings, isNewReading = false) {
+    displayRecentReadings(readings) {
         console.log('Displaying recent readings:', readings);
         const tbody = document.getElementById('readings-table-body');
         
@@ -915,41 +895,18 @@ class QRMeterReadingApp {
             return;
         }
 
-        tbody.innerHTML = readings.map((reading, index) => {
-            // Apply animation class only to the top row if this is a new reading
-            const rowClass = (isNewReading && index === 0) ? 'new-reading-row' : '';
-            
-            return `
-                <tr class="${rowClass}">
-                    <td>${reading.propertyName || reading.propertyId || 'N/A'}</td>
-                    <td>${reading.unitNumber || 'N/A'}</td>
-                    <td>${reading.tenantName || 'N/A'}</td>
-                    <td>${reading.meterReading ? reading.meterReading.toLocaleString() : 'N/A'}</td>
-                    <td>${this.formatDate(reading.readingDate)}</td>
-                    <td>
-                        <span class="badge bg-success">Submitted</span>
-                    </td>
-                </tr>
-            `;
-        }).join('');
-
-        // PHASE 7 ENHANCEMENT: Highlight only the top row after successful save
-        if (isNewReading) {
-            const firstRow = tbody.querySelector('tr.new-reading-row');
-            if (firstRow) {
-                console.log('Applying new reading animation to top row');
-                
-                // After the slide-in animation, start the fade-out highlight
-                setTimeout(() => {
-                    firstRow.classList.add('fade-highlight');
-                    
-                    // Remove all animation classes after fade-out completes
-                    setTimeout(() => {
-                        firstRow.classList.remove('new-reading-row', 'fade-highlight');
-                    }, 3000);
-                }, 800); // Wait for slide-in animation to complete
-            }
-        }
+        tbody.innerHTML = readings.map(reading => `
+            <tr>
+                <td>${reading.propertyName || reading.propertyId || 'N/A'}</td>
+                <td>${reading.unitNumber || 'N/A'}</td>
+                <td>${reading.tenantName || 'N/A'}</td>
+                <td>${reading.meterReading ? reading.meterReading.toLocaleString() : 'N/A'}</td>
+                <td>${this.formatDate(reading.readingDate)}</td>
+                <td>
+                    <span class="badge bg-success">Submitted</span>
+                </td>
+            </tr>
+        `).join('');
     }
 
     formatDate(dateString) {
@@ -1030,47 +987,11 @@ class QRMeterReadingApp {
         statusDiv.classList.remove('scanner-hidden');
         statusDiv.classList.add('scanner-visible');
         
-        // Use 5 seconds for all status messages (not success toasts)
+        // Auto-hide after 5 seconds
         setTimeout(() => {
             statusDiv.classList.add('scanner-hidden');
             statusDiv.classList.remove('scanner-visible');
         }, 5000);
-    }
-
-    // PHASE 7 FIX: Mobile-First Success Toast for prominent mobile feedback
-    showSuccessToast(title, subtitle = '') {
-        // Remove any existing toast
-        const existingToast = document.querySelector('.success-toast');
-        if (existingToast) {
-            existingToast.remove();
-        }
-
-        // Create toast element
-        const toast = document.createElement('div');
-        toast.className = 'success-toast';
-        
-        toast.innerHTML = `
-            <div class="d-flex align-items-center justify-content-center">
-                <i class="bi bi-check-circle-fill toast-icon"></i>
-                <div>
-                    <div class="toast-message">${title}</div>
-                    ${subtitle ? `<div class="toast-subtitle">${subtitle}</div>` : ''}
-                </div>
-            </div>
-        `;
-        
-        // Add to document
-        document.body.appendChild(toast);
-        
-        // Auto-remove after 6 seconds (mobile-friendly duration)
-        setTimeout(() => {
-            toast.classList.add('fade-out');
-            setTimeout(() => {
-                if (toast.parentNode) {
-                    toast.parentNode.removeChild(toast);
-                }
-            }, 400); // Wait for fade-out animation
-        }, 6000);
     }
 
     showCameraPermissionUI(message = 'Camera access required') {
@@ -1151,40 +1072,6 @@ class QRMeterReadingApp {
     // Check if context is secure (HTTPS or localhost)
     isSecureContext() {
         return window.isSecureContext || location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1';
-    }
-
-    // PHASE 7: Auto-advance functionality - Focus scanner for next reading
-    // Following Enhanced UX Flow: "Scanner refocuses for next scan"
-    focusScannerForNext() {
-        try {
-            // Show scanner controls
-            const startBtn = document.getElementById('start-scanner');
-            const stopBtn = document.getElementById('stop-scanner');
-            
-            if (startBtn && !this.isScanning) {
-                startBtn.classList.remove('scanner-hidden');
-                startBtn.classList.add('scanner-visible');
-                
-                // Auto-start scanner for seamless workflow
-                setTimeout(() => {
-                    if (!this.isScanning) {
-                        this.startScanner();
-                    }
-                }, 300);
-            }
-            
-            // Show status message encouraging next scan
-            this.showStatus('Scanner ready for next meter reading', 'info');
-            
-        } catch (error) {
-            console.error('Error focusing scanner for next reading:', error);
-            // Fallback: just show the start button
-            const startBtn = document.getElementById('start-scanner');
-            if (startBtn) {
-                startBtn.classList.remove('scanner-hidden');
-                startBtn.classList.add('scanner-visible');
-            }
-        }
     }
 }
 

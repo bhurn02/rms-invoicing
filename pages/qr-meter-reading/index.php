@@ -277,8 +277,12 @@ $currentCompany = getCurrentCompanyCode();
                     <div class="card-header bg-light">
                         <h5 class="card-title mb-0">
                             <i class="bi bi-clock-history me-2"></i>
-                            Recent Readings
+                            Recent QR Readings
                         </h5>
+                        <small class="text-muted mt-1 d-block">
+                            <i class="bi bi-info-circle me-1"></i>
+                            Latest 10 meter readings from all QR system users
+                        </small>
                     </div>
                     <div class="card-body">
                         <div id="recent-readings" class="table-responsive">

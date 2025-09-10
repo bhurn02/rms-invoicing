@@ -56,6 +56,92 @@
     display: block !important;
 }
 
+/* PHASE 7 FIX: Mobile-First Success Toast Notifications */
+.success-toast {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 9999;
+    min-width: 90%;
+    max-width: 400px;
+    padding: 16px 20px;
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: white;
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(16, 185, 129, 0.3);
+    font-weight: 500;
+    text-align: center;
+    animation: slideInDown 0.4s ease-out;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.success-toast .toast-icon {
+    font-size: 1.5rem;
+    margin-right: 12px;
+    animation: checkmarkBounce 0.6s ease-out 0.2s both;
+}
+
+.success-toast .toast-message {
+    font-size: 1rem;
+    line-height: 1.4;
+}
+
+.success-toast .toast-subtitle {
+    font-size: 0.875rem;
+    opacity: 0.9;
+    margin-top: 4px;
+}
+
+/* Toast animations */
+@keyframes slideInDown {
+    from {
+        opacity: 0;
+        transform: translateX(-50%) translateY(-30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+    }
+}
+
+@keyframes checkmarkBounce {
+    0% { transform: scale(0); }
+    50% { transform: scale(1.2); }
+    100% { transform: scale(1); }
+}
+
+/* Toast fade out animation */
+.success-toast.fade-out {
+    animation: slideOutUp 0.4s ease-in forwards;
+}
+
+@keyframes slideOutUp {
+    from {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateX(-50%) translateY(-30px);
+    }
+}
+
+/* Mobile optimizations */
+@media (max-width: 576px) {
+    .success-toast {
+        top: 15px;
+        min-width: 95%;
+        padding: 20px 16px;
+        font-size: 1.1rem;
+    }
+    
+    .success-toast .toast-icon {
+        font-size: 1.75rem;
+        margin-right: 10px;
+    }
+}
+
 /* Scanner Status Overlay */
 .scanner-overlay {
     position: absolute;
@@ -782,5 +868,88 @@ body {
         height: 28px;
         margin-right: 0.5rem;
         font-size: 0.75rem;
+    }
+}
+
+/* Recent readings table highlight animation */
+.recent-readings-highlight {
+    animation: tableHighlight 2s ease-out;
+}
+
+@keyframes tableHighlight {
+    0% { 
+        background-color: rgba(16, 185, 129, 0.1);
+        transform: scale(1.01);
+    }
+    50% { 
+        background-color: rgba(16, 185, 129, 0.05);
+    }
+    100% { 
+        background-color: transparent;
+        transform: scale(1);
+    }
+}
+
+/* New reading row highlight - only for top row after successful save */
+.new-reading-row {
+    animation: newReadingSlideIn 0.8s ease-out;
+    background: linear-gradient(90deg, 
+        rgba(16, 185, 129, 0.15) 0%, 
+        rgba(16, 185, 129, 0.08) 50%, 
+        rgba(16, 185, 129, 0.03) 100%);
+    border-left: 4px solid #10b981;
+}
+
+@keyframes newReadingSlideIn {
+    0% {
+        opacity: 0;
+        transform: translateY(-20px) scale(0.95);
+        background: linear-gradient(90deg, 
+            rgba(16, 185, 129, 0.3) 0%, 
+            rgba(16, 185, 129, 0.2) 50%, 
+            rgba(16, 185, 129, 0.1) 100%);
+    }
+    30% {
+        opacity: 0.7;
+        transform: translateY(-5px) scale(0.98);
+        background: linear-gradient(90deg, 
+            rgba(16, 185, 129, 0.25) 0%, 
+            rgba(16, 185, 129, 0.15) 50%, 
+            rgba(16, 185, 129, 0.08) 100%);
+    }
+    60% {
+        opacity: 1;
+        transform: translateY(0) scale(1.02);
+        background: linear-gradient(90deg, 
+            rgba(16, 185, 129, 0.2) 0%, 
+            rgba(16, 185, 129, 0.12) 50%, 
+            rgba(16, 185, 129, 0.06) 100%);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+        background: linear-gradient(90deg, 
+            rgba(16, 185, 129, 0.15) 0%, 
+            rgba(16, 185, 129, 0.08) 50%, 
+            rgba(16, 185, 129, 0.03) 100%);
+    }
+}
+
+/* Fade out animation for new reading highlight */
+.new-reading-row.fade-highlight {
+    animation: fadeHighlight 3s ease-out forwards;
+}
+
+@keyframes fadeHighlight {
+    0% {
+        background: linear-gradient(90deg, 
+            rgba(16, 185, 129, 0.15) 0%, 
+            rgba(16, 185, 129, 0.08) 50%, 
+            rgba(16, 185, 129, 0.03) 100%);
+        border-left-color: #10b981;
+    }
+    100% {
+        background: transparent;
+        border-left-color: transparent;
     }
 }
