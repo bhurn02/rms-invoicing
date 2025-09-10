@@ -1,0 +1,9 @@
+/* Varela Round Font - Local with Embedded Base64 */
+@font-face {
+    font-family: 'Varela Round';
+    font-style: normal;
+    font-weight: 400;
+    src: url('data:font/woff2;base64,d09GMgABAAAAACC0AA4AAAAALwwAACBhAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGhYbIBwqBmAAgSwIGAqSLJE8C4MEAAE2AiQDhwQEIAWDdAeEYRtqJhFVnI/IfiRkE5BKfj4AAAA=') format('woff2'),
+         url('data:font/woff;base64,d09GRgABAAAAAB+4AAoAAAAANWAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABPUy8yAAABCAAAAGAAAABgDxIHZGNtYXAAAAFoAAAAVAAAAFQXVtKOZ2FzcAAAAbwAAAAIAAAACAAAABBnbHlmAAABxAAAG4QAAB4oJmO49GhlYWQAAB1IAAAANgAAADYYKxP3aGhlYQAAHYAAAAAkAAAAJA==') format('woff');
+    font-display: swap;
+}

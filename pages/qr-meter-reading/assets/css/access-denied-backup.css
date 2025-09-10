@@ -1,0 +1,419 @@
+/**
+ * RMS QR Meter Reading System - Access Denied Page Styles
+ * Modern UX design following Enhanced UX Flows and global standards
+ * Phase 5: Access Denied Page Responsive Design - FIXED
+ */
+
+/* ===== MODERN ACCESS DENIED DESIGN ===== */
+/* Following Enhanced UX Flows: Professional responsive access denied page */
+
+body {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 1rem;
+}
+
+.access-denied-card {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-radius: 16px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    width: 100%;
+    max-width: 480px;
+    margin: 0 auto;
+}
+
+/* ===== COMPACT HEADER ===== */
+.access-denied-header {
+    background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+    color: white;
+    border-radius: 16px 16px 0 0;
+    padding: 2rem 2rem 1.5rem;
+    text-align: center;
+}
+
+.access-denied-icon {
+    font-size: 3rem;
+    margin-bottom: 0.75rem;
+    opacity: 0.9;
+}
+
+.access-denied-header h2 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+    line-height: 1.2;
+}
+
+.access-denied-header p {
+    font-size: 0.875rem;
+    margin-bottom: 0;
+    opacity: 0.75;
+    line-height: 1.4;
+}
+
+/* ===== COMPACT CONTENT ===== */
+.card-body {
+    padding: 2rem;
+}
+
+/* ===== SIMPLIFIED USER INFO ===== */
+.user-info {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+    border-left: 4px solid #6c757d;
+    text-align: center;
+}
+
+.user-info h6 {
+    font-size: 0.875rem;
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+    color: #495057;
+}
+
+.user-info small {
+    font-size: 0.75rem;
+    color: #6c757d;
+}
+
+/* ===== CONCISE MESSAGE ===== */
+.main-message {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.main-message h5 {
+    font-size: 1.125rem;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+    color: #212529;
+}
+
+.main-message p {
+    font-size: 0.875rem;
+    line-height: 1.5;
+    color: #6c757d;
+    margin-bottom: 0;
+}
+
+/* ===== PROFESSIONAL ACTION BUTTONS ===== */
+.button-container {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    margin-bottom: 1.5rem;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    border-radius: 12px;
+    padding: 14px 24px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    min-height: 48px;
+    min-width: 140px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    color: white;
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-primary::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.5s;
+}
+
+.btn-primary:hover::before {
+    left: 100%;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(102, 126, 234, 0.4);
+    background: linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%);
+    color: white;
+}
+
+.btn-primary:active {
+    transform: translateY(0);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.btn-outline-secondary {
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 12px 22px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    min-height: 48px;
+    min-width: 140px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    color: #64748b;
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(10px);
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-outline-secondary::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 0;
+    height: 100%;
+    background: #6c757d;
+    transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: -1;
+}
+
+.btn-outline-secondary:hover::before {
+    width: 100%;
+}
+
+.btn-outline-secondary:hover {
+    transform: translateY(-2px);
+    border-color: #6c757d;
+    color: white;
+    box-shadow: 0 8px 24px rgba(108, 117, 125, 0.2);
+}
+
+.btn-outline-secondary:active {
+    transform: translateY(0);
+    box-shadow: 0 4px 12px rgba(108, 117, 125, 0.1);
+}
+
+/* ===== MINIMAL FOOTER ===== */
+.additional-info {
+    text-align: center;
+}
+
+.additional-info small {
+    font-size: 0.75rem;
+    color: #6c757d;
+    line-height: 1.4;
+}
+
+/* ===== RESPONSIVE BREAKPOINTS ===== */
+
+/* Small devices (landscape phones, 576px and up) */
+@media (min-width: 576px) {
+    .access-denied-card {
+        max-width: 420px;
+    }
+    
+    .access-denied-header {
+        padding: 2.5rem 2rem 2rem;
+    }
+    
+    .access-denied-icon {
+        font-size: 3.5rem;
+        margin-bottom: 1rem;
+    }
+    
+    .access-denied-header h2 {
+        font-size: 1.75rem;
+    }
+    
+    .card-body {
+        padding: 2.5rem;
+    }
+    
+    .button-container {
+        gap: 1.25rem;
+    }
+    
+    .btn-primary,
+    .btn-outline-secondary {
+        min-width: 150px;
+        padding: 15px 26px;
+        font-size: 0.925rem;
+    }
+}
+
+/* Medium devices (tablets, 768px and up) */
+@media (min-width: 768px) {
+    .access-denied-card {
+        max-width: 480px;
+    }
+    
+    .access-denied-header {
+        padding: 3rem 2.5rem 2.5rem;
+    }
+    
+    .access-denied-icon {
+        font-size: 4rem;
+        margin-bottom: 1.25rem;
+    }
+    
+    .access-denied-header h2 {
+        font-size: 2rem;
+    }
+    
+    .card-body {
+        padding: 3rem;
+    }
+    
+    .button-container {
+        gap: 1.5rem;
+    }
+    
+    .btn-primary,
+    .btn-outline-secondary {
+        min-width: 160px;
+        padding: 16px 28px;
+        font-size: 0.95rem;
+    }
+}
+
+/* Large devices (desktops, 992px and up) */
+@media (min-width: 992px) {
+    .access-denied-card {
+        max-width: 520px;
+    }
+    
+    .access-denied-header {
+        padding: 3.5rem 3rem 3rem;
+    }
+    
+    .access-denied-icon {
+        font-size: 4.5rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .access-denied-header h2 {
+        font-size: 2.25rem;
+    }
+    
+    .card-body {
+        padding: 3.5rem;
+    }
+    
+    .button-container {
+        gap: 2rem;
+    }
+    
+    .btn-primary,
+    .btn-outline-secondary {
+        min-width: 180px;
+        padding: 18px 32px;
+        font-size: 1rem;
+    }
+}
+
+/* Extra large devices (large desktops, 1200px and up) */
+@media (min-width: 1200px) {
+    .access-denied-card {
+        max-width: 560px;
+    }
+    
+    .access-denied-header {
+        padding: 4rem 3.5rem 3.5rem;
+    }
+    
+    .access-denied-icon {
+        font-size: 5rem;
+        margin-bottom: 1.75rem;
+    }
+    
+    .access-denied-header h2 {
+        font-size: 2.5rem;
+    }
+    
+    .card-body {
+        padding: 4rem;
+    }
+    
+    .button-container {
+        gap: 2.5rem;
+    }
+    
+    .btn-primary,
+    .btn-outline-secondary {
+        min-width: 200px;
+        padding: 20px 36px;
+        font-size: 1.05rem;
+    }
+}
+
+/* ===== ACCESSIBILITY IMPROVEMENTS ===== */
+.btn-primary:focus,
+.btn-outline-secondary:focus {
+    outline: 3px solid #1e40af;
+    outline-offset: 2px;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+    .access-denied-card {
+        background: white;
+        border: 2px solid #000;
+    }
+    
+    .user-info {
+        background: #f8f9fa;
+        border-left: 6px solid #6c757d;
+    }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+    .btn-primary,
+    .btn-outline-secondary {
+        transition: none;
+    }
+    
+    .btn-primary:hover,
+    .btn-outline-secondary:hover {
+        transform: none;
+    }
+}
+
+/* ===== PRINT STYLES ===== */
+@media print {
+    body {
+        background: white;
+        padding: 0;
+    }
+    
+    .access-denied-card {
+        box-shadow: none;
+        border: 1px solid #000;
+        background: white;
+    }
+    
+    .access-denied-header {
+        background: #f8f9fa;
+        color: #000;
+    }
+    
+    .btn-primary,
+    .btn-outline-secondary {
+        display: none;
+    }
+}
