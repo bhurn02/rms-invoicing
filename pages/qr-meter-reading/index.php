@@ -150,44 +150,30 @@ $currentCompany = getCurrentCompanyCode();
         </div>
     </nav>
 
-    <!-- Main Content - Bootstrap responsive -->
-    <main class="container-fluid p-3 p-md-4">
-        <div class="row justify-content-center g-3">
+    <!-- Main Content - Mobile-First Responsive -->
+    <main class="container-fluid p-2 p-md-4">
+        <div class="row justify-content-center g-2 g-md-3">
             <div class="col-12 col-lg-8 col-xl-6">
                 
-                <!-- Welcome Card - Bootstrap responsive -->
+                <!-- Compact Scanner Card - Primary Focus -->
                 <div class="card card-professional shadow-sm border-0 mb-3">
-                    <div class="card-body text-center p-4">
-                        <div class="mb-3">
-                            <i class="bi bi-camera-video-fill text-primary display-4"></i>
-                        </div>
-                        <h1 class="card-title page-title mb-2">Meter Reading Scanner</h1>
-                        <p class="card-text body-text text-muted">
-                            Welcome, <?php echo htmlspecialchars($currentUser ?? 'Field Technician'); ?>! 
-                            Scan the QR code on the meter to automatically populate the reading form
-                        </p>
+                    <div class="card-header bg-primary text-white border-0 py-2 py-md-3">
+                        <h6 class="card-title mb-0 d-flex align-items-center">
+                            <i class="bi bi-qr-code-scan me-2"></i>
+                            QR Scanner
+                        </h6>
                     </div>
-                </div>
-
-                <!-- Scanner Card - Bootstrap responsive -->
-                <div class="card card-professional shadow-sm border-0 mb-3">
-                    <div class="card-header bg-primary text-white border-0 py-3">
-                        <h5 class="card-title mb-0 d-flex align-items-center">
-                            <i class="bi bi-qr-code-scan me-2 fs-5"></i>
-                            QR Code Scanner
-                        </h5>
-                    </div>
-                    <div class="card-body p-4">
-                        <!-- Camera Viewport - proper QR scanner styling -->
+                    <div class="card-body p-3 p-md-4">
+                        <!-- Camera Viewport - Maximized -->
                         <div id="qr-reader" class="qr-viewport mb-3"></div>
                         
-                        <!-- Scanner Controls - Bootstrap grid -->
-                        <div class="d-grid gap-2">
-                            <button id="start-scanner" class="btn btn-scan-primary btn-lg shadow-sm scanner-visible">
+                        <!-- Primary Action - Immediately Visible -->
+                        <div class="d-grid">
+                            <button id="start-scanner" class="btn btn-primary btn-lg touch-target scanner-visible">
                                 <i class="bi bi-camera-fill me-2"></i>
                                 Start Scanner
                             </button>
-                            <button id="stop-scanner" class="btn btn-secondary btn-lg shadow-sm scanner-hidden">
+                            <button id="stop-scanner" class="btn btn-secondary btn-lg touch-target scanner-hidden">
                                 <i class="bi bi-stop-circle me-2"></i>
                                 Stop Scanner
                             </button>
@@ -274,11 +260,11 @@ $currentCompany = getCurrentCompanyCode();
                             
                             <!-- Form Actions -->
                             <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                                <button type="button" class="btn btn-secondary btn-lg" 
+                                <button type="button" class="btn btn-secondary btn-lg touch-target" 
                                         onclick="qrMeterApp.cancelReadingForm()">
                                     <i class="bi bi-x-circle me-2"></i>Cancel
                                 </button>
-                                <button type="submit" class="btn btn-success btn-lg">
+                                <button type="submit" class="btn btn-success btn-lg touch-target">
                                     <i class="bi bi-check-circle me-2"></i>Submit Reading
                                 </button>
                             </div>

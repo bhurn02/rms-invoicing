@@ -212,6 +212,188 @@
     z-index: 5;
 }
 
+/* ===== MOBILE-FIRST RESPONSIVE DESIGN ===== */
+
+/* Touch Target Requirements - Minimum 44px */
+.touch-target {
+    min-height: 44px;
+    min-width: 44px;
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+    line-height: 1.2;
+}
+
+/* Mobile-First Base Styles */
+@media (max-width: 576px) {
+    .container-fluid {
+        padding-left: 0.5rem;
+        padding-right: 0.5rem;
+    }
+    
+    .card-body {
+        padding: 1rem;
+    }
+    
+    .card-header {
+        padding: 0.75rem 1rem;
+    }
+    
+    /* Touch-optimized buttons */
+    .btn-lg.touch-target {
+        min-height: 3.5rem;
+        font-size: 1.125rem;
+        padding: 0.875rem 1.25rem;
+    }
+    
+    /* Form field spacing */
+    .form-control {
+        min-height: 44px;
+        font-size: 16px; /* Prevents zoom on iOS */
+    }
+    
+    /* Grid spacing */
+    .row.g-2 > * {
+        padding: 0.25rem;
+    }
+}
+
+/* Small devices (landscape phones, 576px and up) */
+@media (min-width: 576px) and (max-width: 767px) {
+    .container-fluid {
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+    
+    .card-body {
+        padding: 1.25rem;
+    }
+    
+    .btn-lg.touch-target {
+        min-height: 3.25rem;
+        font-size: 1.1rem;
+    }
+}
+
+/* Medium devices (tablets, 768px and up) */
+@media (min-width: 768px) {
+    .container-fluid {
+        padding-left: 1.5rem;
+        padding-right: 1.5rem;
+    }
+    
+    .card-body {
+        padding: 1.5rem;
+    }
+    
+    .btn-lg.touch-target {
+        min-height: 3rem;
+        font-size: 1rem;
+    }
+}
+
+/* Large devices (desktops, 992px and up) */
+@media (min-width: 992px) {
+    .container-fluid {
+        padding-left: 2rem;
+        padding-right: 2rem;
+    }
+    
+    .card-body {
+        padding: 2rem;
+    }
+}
+
+/* Extra large devices (large desktops, 1200px and up) */
+@media (min-width: 1200px) {
+    .container-fluid {
+        padding-left: 2.5rem;
+        padding-right: 2.5rem;
+    }
+}
+
+/* ===== CENTERED LAYOUT SYSTEM ===== */
+
+/* Ensure all content is properly centered */
+.container-fluid {
+    max-width: 100%;
+    margin: 0 auto;
+}
+
+.row.justify-content-center {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+}
+
+.col-12.col-lg-8.col-xl-6 {
+    max-width: 100%;
+    margin: 0 auto;
+}
+
+/* Card centering */
+.card {
+    margin: 0 auto;
+    max-width: 100%;
+}
+
+/* Form centering */
+.form-control {
+    text-align: left;
+}
+
+/* Button centering */
+.d-grid {
+    display: grid;
+    place-items: center;
+}
+
+.d-grid .btn {
+    width: 100%;
+    max-width: 100%;
+}
+
+/* Mobile-specific centering */
+@media (max-width: 768px) {
+    .container-fluid {
+        padding-left: 0.5rem;
+        padding-right: 0.5rem;
+    }
+    
+    .row.justify-content-center {
+        margin: 0;
+    }
+    
+    .col-12 {
+        padding-left: 0.5rem;
+        padding-right: 0.5rem;
+    }
+    
+    .card {
+        margin-bottom: 1rem;
+    }
+}
+
+/* Tablet centering */
+@media (min-width: 768px) and (max-width: 991px) {
+    .container-fluid {
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+    
+    .col-lg-8 {
+        max-width: 83.333333%;
+        margin: 0 auto;
+    }
+}
+
+/* Desktop centering */
+@media (min-width: 992px) {
+    .col-xl-6 {
+        max-width: 50%;
+        margin: 0 auto;
+    }
+}
+
 /* ===== RESPONSIVE SCANNER ===== */
 @media (max-width: 768px) {
     .qr-viewport {
