@@ -165,7 +165,13 @@ try {
                     </div>
                     
                     <div class="card-body p-4">
-                        <form method="POST" action="">
+                        <!-- Subtle Error Message Area -->
+                        <div id="login-error-message" class="alert alert-danger d-none mb-3" role="alert" style="font-size: 0.875rem; padding: 0.75rem;">
+                            <i class="bi bi-exclamation-triangle me-2"></i>
+                            <span id="error-text"></span>
+                        </div>
+                        
+                        <form method="POST" action="" id="login-form">
                             <div class="mb-3">
                                 <label for="username" class="form-label">
                                     <i class="bi bi-person me-2"></i>Username
@@ -173,6 +179,7 @@ try {
                                 <input type="text" class="form-control" id="username" name="username" 
                                        value="<?php echo htmlspecialchars($_POST['username'] ?? ''); ?>" 
                                        required autofocus>
+                                <div id="username-error" class="invalid-feedback d-none" style="font-size: 0.8rem;"></div>
                             </div>
                             
                             <div class="mb-3">
@@ -180,6 +187,7 @@ try {
                                     <i class="bi bi-lock me-2"></i>Password
                                 </label>
                                 <input type="password" class="form-control" id="password" name="password" required>
+                                <div id="password-error" class="invalid-feedback d-none" style="font-size: 0.8rem;"></div>
                             </div>
                             
                             <div class="mb-4 d-none">
@@ -234,28 +242,124 @@ try {
     <!-- Bootstrap 5.3+ JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     
-    <!-- SweetAlert2 for modern alerts -->
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    
     <script>
-        // Replace Bootstrap alerts with SweetAlert
-        <?php if (!empty($error_message)): ?>
-        Swal.fire({
-            icon: 'error',
-            title: 'Login Error',
-            text: '<?php echo addslashes($error_message); ?>',
-            confirmButtonText: 'OK'
+        // Modern UX: Inline error handling instead of SweetAlert
+        document.addEventListener('DOMContentLoaded', function() {
+            const loginForm = document.getElementById('login-form');
+            const errorMessage = document.getElementById('login-error-message');
+            const errorText = document.getElementById('error-text');
+            const usernameField = document.getElementById('username');
+            const passwordField = document.getElementById('password');
+            const usernameError = document.getElementById('username-error');
+            const passwordError = document.getElementById('password-error');
+            
+            // Show server-side error message if present
+            <?php if (!empty($error_message)): ?>
+            showInlineError('<?php echo addslashes($error_message); ?>');
+            <?php endif; ?>
+            
+            // Real-time validation on blur
+            usernameField.addEventListener('blur', function() {
+                validateUsername();
+            });
+            
+            passwordField.addEventListener('blur', function() {
+                validatePassword();
+            });
+            
+            // Form submission with inline validation
+            loginForm.addEventListener('submit', function(e) {
+                let hasErrors = false;
+                
+                // Clear previous errors
+                clearAllErrors();
+                
+                // Validate username
+                if (!validateUsername()) {
+                    hasErrors = true;
+                }
+                
+                // Validate password
+                if (!validatePassword()) {
+                    hasErrors = true;
+                }
+                
+                if (hasErrors) {
+                    e.preventDefault();
+                    return false;
+                }
+            });
+            
+            function validateUsername() {
+                const username = usernameField.value.trim();
+                if (username.length === 0) {
+                    showFieldError(usernameField, usernameError, 'Please enter your username');
+                    return false;
+                } else if (username.length < 3) {
+                    showFieldError(usernameField, usernameError, 'Username too short');
+                    return false;
+                } else {
+                    clearFieldError(usernameField, usernameError);
+                    return true;
+                }
+            }
+            
+            function validatePassword() {
+                const password = passwordField.value.trim();
+                if (password.length === 0) {
+                    showFieldError(passwordField, passwordError, 'Please enter your password');
+                    return false;
+                } else if (password.length < 4) {
+                    showFieldError(passwordField, passwordError, 'Password too short');
+                    return false;
+                } else {
+                    clearFieldError(passwordField, passwordError);
+                    return true;
+                }
+            }
+            
+            function showFieldError(field, errorElement, message) {
+                field.classList.add('is-invalid');
+                errorElement.textContent = message;
+                errorElement.classList.remove('d-none');
+            }
+            
+            function clearFieldError(field, errorElement) {
+                field.classList.remove('is-invalid');
+                errorElement.classList.add('d-none');
+            }
+            
+            function showInlineError(message) {
+                errorText.textContent = message;
+                errorMessage.classList.remove('d-none');
+                
+                // Smooth fade-in animation
+                errorMessage.style.opacity = '0';
+                errorMessage.style.transform = 'translateY(-10px)';
+                setTimeout(() => {
+                    errorMessage.style.transition = 'all 0.3s ease';
+                    errorMessage.style.opacity = '1';
+                    errorMessage.style.transform = 'translateY(0)';
+                }, 10);
+                
+                // Auto-hide after 4 seconds with fade-out
+                setTimeout(function() {
+                    errorMessage.style.transition = 'all 0.3s ease';
+                    errorMessage.style.opacity = '0';
+                    errorMessage.style.transform = 'translateY(-10px)';
+                    setTimeout(() => {
+                        errorMessage.classList.add('d-none');
+                        errorMessage.style.transition = '';
+                    }, 300);
+                }, 4000);
+            }
+            
+            function clearAllErrors() {
+                errorMessage.classList.add('d-none');
+                clearFieldError(usernameField, usernameError);
+                clearFieldError(passwordField, passwordError);
+            }
         });
-        <?php endif; ?>
-        
-        <?php if (!empty($success_message)): ?>
-        Swal.fire({
-            icon: 'success',
-            title: 'Success',
-            text: '<?php echo addslashes($success_message); ?>',
-            confirmButtonText: 'OK'
-        });
-        <?php endif; ?>
     </script>
 </body>
 </html>
