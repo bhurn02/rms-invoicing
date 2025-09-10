@@ -709,6 +709,37 @@ class QRMeterReadingApp {
         }
     }
     
+    // Cancel reading form and reset scanner state
+    cancelReadingForm() {
+        // Reset form
+        const form = document.getElementById('reading-form');
+        if (form) {
+            form.reset();
+        }
+        
+        // Hide the reading form card
+        const formCard = document.getElementById('reading-form-card');
+        if (formCard) {
+            formCard.classList.add('scanner-hidden');
+            formCard.classList.remove('scanner-visible');
+        }
+        
+        // Clear current reading data
+        this.currentReading = null;
+        
+        // Show scanner controls again
+        this.updateScannerUI();
+        
+        // Show status message
+        this.showStatus('Reading form cancelled. Ready to scan again.', 'info');
+        
+        // Scroll back to scanner
+        const scannerCard = document.querySelector('.card:has(#qr-reader)');
+        if (scannerCard) {
+            scannerCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+    }
+    
     // Update recent readings table
     async updateRecentReadings() {
         try {

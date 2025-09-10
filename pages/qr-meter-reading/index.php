@@ -275,7 +275,7 @@ $currentCompany = getCurrentCompanyCode();
                             <!-- Form Actions -->
                             <div class="d-grid gap-2 d-md-flex justify-content-md-end">
                                 <button type="button" class="btn btn-secondary btn-lg" 
-                                        onclick="document.getElementById('reading-form-card').style.display='none'">
+                                        onclick="qrMeterApp.cancelReadingForm()">
                                     <i class="bi bi-x-circle me-2"></i>Cancel
                                 </button>
                                 <button type="submit" class="btn btn-success btn-lg">

@@ -6,6 +6,7 @@
 ## Recently Completed
 - **Phase 1: CSS File Organization** is now complete. Archive: [docs/archive/enhancements/2025-09/phase1-css-organization-20250909.md](../docs/archive/enhancements/2025-09/phase1-css-organization-20250909.md)
 - **Phase 2: Smart Alert Strategy - Logout UX** is now complete. Archive: [docs/archive/enhancements/2025-09/phase2-logout-ux-20250909.md](../docs/archive/enhancements/2025-09/phase2-logout-ux-20250909.md)
+- **🔧 CRITICAL BUG FIX**: Cancel button functionality restored - now properly resets scanner state and shows controls again
 
 ## Current Task
 **PRIORITY 1**: Structured Phase Implementation (23 Phases):
