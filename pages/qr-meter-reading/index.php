@@ -279,8 +279,22 @@ $currentCompany = getCurrentCompanyCode();
                             </div>
                             
                             <!-- Form Actions -->
-                            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                                <button type="button" class="btn btn-secondary btn-lg touch-target" 
+                            <!-- Mobile Layout - Stacked Buttons -->
+                            <div class="d-grid gap-2 d-md-none">
+                                <!-- Primary Action - Submit Button (Mobile First) -->
+                                <button type="submit" class="btn btn-success btn-lg touch-target">
+                                    <i class="bi bi-check-circle me-2"></i>Submit Reading
+                                </button>
+                                <!-- Secondary Action - Cancel Button -->
+                                <button type="button" class="btn btn-outline-secondary btn-lg touch-target" 
+                                        onclick="qrMeterApp.cancelReadingForm()">
+                                    <i class="bi bi-x-circle me-2"></i>Cancel
+                                </button>
+                            </div>
+                            
+                            <!-- Desktop Layout - Side by Side -->
+                            <div class="d-none d-md-flex gap-2 justify-content-md-end">
+                                <button type="button" class="btn btn-outline-secondary btn-lg touch-target" 
                                         onclick="qrMeterApp.cancelReadingForm()">
                                     <i class="bi bi-x-circle me-2"></i>Cancel
                                 </button>
