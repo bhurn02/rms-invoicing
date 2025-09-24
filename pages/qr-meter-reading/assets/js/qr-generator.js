@@ -297,21 +297,40 @@ function loadDemoTenants() {
             tenant_name: 'John Doe',
             real_property_code: 'PROP1',
             real_property_name: 'Main Building Complex',
-            unit_no: 'UNIT001'
+            unit_no: 'UNIT001',
+            terminated: 'N',
+            meter_number: 'M001',
+            unit_type: 'Residential'
         },
         {
             tenant_code: 'T002',
             tenant_name: 'Jane Smith',
             real_property_code: 'PROP1',
             real_property_name: 'Main Building Complex',
-            unit_no: 'UNIT002'
+            unit_no: 'UNIT002',
+            terminated: 'N',
+            meter_number: 'M002',
+            unit_type: 'Commercial'
         },
         {
             tenant_code: 'T003',
             tenant_name: 'Bob Johnson',
             real_property_code: 'PROP2',
             real_property_name: 'Secondary Complex',
-            unit_no: 'UNIT101'
+            unit_no: 'UNIT101',
+            terminated: 'Y',
+            meter_number: 'M101',
+            unit_type: 'Residential'
+        },
+        {
+            tenant_code: null,
+            tenant_name: null,
+            real_property_code: 'PROP2',
+            real_property_name: 'Secondary Complex',
+            unit_no: 'UNIT102',
+            terminated: 'Y',
+            meter_number: 'M102',
+            unit_type: 'Commercial'
         }
     ];
 
@@ -378,11 +397,21 @@ function createTenantRow(tenant) {
     const tr = document.createElement('tr');
     tr.className = 'tenant-row';
     tr.style.cursor = 'pointer';
+    
+    // Determine status badge
+    const statusBadge = tenant.terminated === 'Y' 
+        ? '<span class="badge bg-warning">Terminated</span>' 
+        : '<span class="badge bg-success">Active</span>';
+    
+    // Handle empty tenant info
+    const tenantCode = tenant.tenant_code || 'N/A';
+    const tenantName = tenant.tenant_name || 'No Tenant';
+    
     tr.innerHTML = `
         <td>
             <div class="form-check">
                 <input class="form-check-input tenant-checkbox" type="checkbox" 
-                       value="${tenant.tenant_code}" data-tenant='${JSON.stringify(tenant)}'>
+                       value="${tenantCode}" data-tenant='${JSON.stringify(tenant)}'>
             </div>
         </td>
         <td>
@@ -390,8 +419,9 @@ function createTenantRow(tenant) {
             <small class="text-muted">${tenant.real_property_name}</small>
         </td>
         <td><span class="badge bg-primary">${tenant.unit_no}</span></td>
-        <td><span class="badge bg-info">${tenant.tenant_code || 'N/A'}</span></td>
-        <td>${tenant.tenant_name}</td>
+        <td><span class="badge bg-info">${tenantCode}</span></td>
+        <td>${tenantName}</td>
+        <td>${statusBadge}</td>
     `;
 
     // Add event listener to checkbox
@@ -556,7 +586,7 @@ async function generateBatchQR() {
 
         for (let i = 0; i < selectedTenants.length; i++) {
             const tenant = selectedTenants[i];
-            currentTenantSpan.textContent = `${tenant.tenant_name} (${tenant.unit_no})`;
+            currentTenantSpan.textContent = `${tenant.real_property_code} - ${tenant.unit_no}${tenant.tenant_name ? ' (' + tenant.tenant_name + ')' : ''}`;
             progressCurrentSpan.textContent = i + 1;
             
             const progress = ((i + 1) / selectedTenants.length) * 100;
@@ -568,17 +598,18 @@ async function generateBatchQR() {
             const qrData = {
                 propertyId: tenant.real_property_code,
                 unitNumber: tenant.unit_no,
-                meterId: null,
-                tenantCode: tenant.tenant_code, // Add tenant code for uniqueness
+                meterId: tenant.meter_number || null,
+                tenantCode: tenant.tenant_code || null, // May be null for units without tenants
                 timestamp: Date.now() + i, // Add unique timestamp for each tenant
                 type: 'batch',
-                index: i
+                index: i,
+                terminated: tenant.terminated === 'Y'
             };
 
             const qrText = JSON.stringify(qrData);
             
-            console.log('Batch QR data for tenant:', tenant.tenant_name, ':', qrData);
-            console.log('Batch QR text for tenant:', tenant.tenant_name, ':', qrText);
+            console.log('Batch QR data for unit:', tenant.unit_no, ':', qrData);
+            console.log('Batch QR text for unit:', tenant.unit_no, ':', qrText);
             
             // Create the display column first
             const col = document.createElement('div');
@@ -591,8 +622,8 @@ async function generateBatchQR() {
                         </div>
                     </div>
                     <div class="qr-footer">
-                        <p class="scan-instruction">Scan for Meter Reading</p>
-                        <small class="qr-data">${tenant.real_property_code}|${tenant.unit_no}</small>
+                        <p class="qr-data">${tenant.real_property_code}|${tenant.unit_no}${tenant.meter_number ? '|' + tenant.meter_number : ''}</p>
+                        <small class="scan-instruction">Scan for Meter Reading</small>
                     </div>
                 </div>
             `;
@@ -604,7 +635,7 @@ async function generateBatchQR() {
             const qrWrapper = qrContainer.querySelector('.qr-code-wrapper');
             
             try {
-                console.log('Creating QR code for tenant:', tenant.tenant_name, 'in container:', qrWrapper.id);
+                console.log('Creating QR code for unit:', tenant.unit_no, 'in container:', qrWrapper.id);
                 
                 // Clear any existing QR code in the wrapper
                 qrWrapper.innerHTML = '';
@@ -619,7 +650,7 @@ async function generateBatchQR() {
                     correctLevel: QRCode.CorrectLevel.M
                 });
 
-                console.log('QRCode instance created for:', tenant.tenant_name);
+                console.log('QRCode instance created for unit:', tenant.unit_no);
 
                 // Small delay to ensure canvas is rendered
                 await new Promise(resolve => setTimeout(resolve, 150));
@@ -630,10 +661,10 @@ async function generateBatchQR() {
 
                 // Verify QR code was generated
                 const canvas = qrWrapper.querySelector('canvas');
-                console.log('Canvas found for tenant:', tenant.tenant_name, 'Canvas:', canvas);
+                console.log('Canvas found for unit:', tenant.unit_no, 'Canvas:', canvas);
                 
                 if (!canvas) {
-                    console.error('No canvas found in QR container for tenant:', tenant.tenant_name);
+                    console.error('No canvas found in QR container for unit:', tenant.unit_no);
                     console.log('QR container contents:', qrWrapper.innerHTML);
                     qrWrapper.innerHTML = '<div style="color: red; padding: 20px;">QR Code generation failed</div>';
                     continue;
@@ -647,7 +678,7 @@ async function generateBatchQR() {
                 canvas.style.height = 'auto';
                 canvas.style.margin = '0 auto';
 
-                console.log('QR code generated successfully for:', tenant.tenant_name);
+                console.log('QR code generated successfully for unit:', tenant.unit_no);
                 console.log('Canvas dimensions:', canvas.width, 'x', canvas.height);
 
                 batchQRCodes.push({
@@ -657,7 +688,7 @@ async function generateBatchQR() {
                     qrContainer: qrContainer
                 });
             } catch (qrError) {
-                console.error('Error generating QR for tenant:', tenant.tenant_name, qrError);
+                console.error('Error generating QR for unit:', tenant.unit_no, qrError);
                 qrWrapper.innerHTML = '<div style="color: red; padding: 20px;">QR Code generation failed</div>';
                 continue;
             }
@@ -752,12 +783,12 @@ function printQR() {
                 .qr-footer { 
                     font-size: 8pt; color: #666; margin: 1mm 0 0 0; 
                 }
-                .scan-instruction { 
-                    font-size: 9pt; color: #333; margin-bottom: 1mm; 
-                    font-weight: bold;
-                }
                 .qr-data { 
-                    font-size: 8pt; color: #666; font-family: monospace; 
+                    font-size: 12pt; color: #1e40af; font-family: monospace; 
+                    font-weight: 600; margin-bottom: 1mm; letter-spacing: 0.05em;
+                }
+                .scan-instruction { 
+                    font-size: 8pt; color: #666; margin-bottom: 0; 
                 }
             </style>
         </head>
@@ -767,8 +798,8 @@ function printQR() {
                     <img src="${qrImageDataURL}" alt="QR Code">
                 </div>
                 <div class="qr-footer">
-                    <p class="scan-instruction">Scan for Meter Reading</p>
-                    <small class="qr-data">${qrData}</small>
+                    <p class="qr-data">${qrData}</p>
+                    <small class="scan-instruction">Scan for Meter Reading</small>
                 </div>
             </div>
         </body>
@@ -860,8 +891,8 @@ function printBatchQR() {
                         <img src="${qrImageDataURL}" alt="QR Code">
                     </div>
                     <div class="qr-footer">
-                        <p class="scan-instruction">Scan for Meter Reading</p>
-                        <small class="qr-data">${tenant.real_property_code}|${tenant.unit_no}</small>
+                        <p class="qr-data">${tenant.real_property_code}|${tenant.unit_no}${tenant.meter_number ? '|' + tenant.meter_number : ''}</p>
+                        <small class="scan-instruction">Scan for Meter Reading</small>
                     </div>
                 </div>
             `;
@@ -981,16 +1012,18 @@ function printBatchQR() {
                     color: #666; 
                     margin: 1mm 0 0 0; 
                 }
-                .scan-instruction { 
-                    font-size: 9pt; 
-                    color: #333; 
-                    margin-bottom: 1mm; 
-                    font-weight: bold;
-                }
                 .qr-data { 
+                    font-size: 12pt; 
+                    color: #1e40af; 
+                    font-family: monospace; 
+                    font-weight: 600; 
+                    margin-bottom: 1mm; 
+                    letter-spacing: 0.05em;
+                }
+                .scan-instruction { 
                     font-size: 8pt; 
                     color: #666; 
-                    font-family: monospace; 
+                    margin-bottom: 0; 
                 }
             </style>
         </head>
