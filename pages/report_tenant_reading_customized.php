@@ -152,7 +152,7 @@ if ($strMode != "") {
 			}
 			
 			// echo $strCondition . "***" . $strSortBy . "***" . $strGroupBy;
-			// die();
+			// die($strCondition);
 			//exit();
 			
 			$creport->ParameterFields(1)->AddCurrentValue ($strCondition);

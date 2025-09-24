@@ -117,7 +117,7 @@ function sendSMTPMail($SenderEmail, $SenderName, $SendTo, $SendToName, $SendCC, 
 		// $mail->Username = "thc-spn3\\thcsmtp";
 		// $mail->Username = "thcsmtp@tanholdings.com";
 		//Password to use for SMTP authentication
-		$mail->Password = "K)133718112951oy"; // for rms_noreply@tanholdings.com
+		$mail->Password = "K)133718112951oy"; // for rms_noreply@tanholdings.com -- 2025-09-04
 		// $mail->Password = "@welcome123"; // for hr2admin@tanholdings.com
 		// $mail->Password = "@xrx123";
 		// $mail->SMTPDebug = 0;

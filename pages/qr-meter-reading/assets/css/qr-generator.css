@@ -1,0 +1,533 @@
+/* Enhanced QR Code Generator - Professional Styles */
+
+body {
+    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    min-height: 100vh;
+}
+
+/* Table Header Styling */
+.table-header-narrow {
+    width: 50px;
+}
+
+/* Executive Professional Navigation */
+.nav-pills-executive .nav-link {
+    color: #374151;
+    font-weight: 500;
+    padding: 0.75rem 1.5rem;
+    margin-right: 0.5rem;
+    border-radius: 0.75rem;
+    border: 2px solid transparent;
+    transition: all 0.2s ease-in-out;
+}
+
+.nav-pills-executive .nav-link:hover {
+    color: #1e40af;
+    background-color: rgba(59, 130, 246, 0.1);
+    border-color: rgba(59, 130, 246, 0.2);
+}
+
+.nav-pills-executive .nav-link.active {
+    background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+    color: white;
+    box-shadow: 0 4px 14px 0 rgba(30, 64, 175, 0.2);
+}
+
+/* Professional Card Styling */
+.generator-card {
+    background: white;
+    border-radius: 1rem;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    border: 1px solid rgba(243, 244, 246, 0.8);
+    margin-bottom: 2rem;
+    transition: all 0.3s ease-in-out;
+}
+
+.generator-card:hover {
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    transform: translateY(-2px);
+}
+
+.generator-card .card-header {
+    background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+    color: white;
+    border-radius: 1rem 1rem 0 0;
+    padding: 1.5rem 2rem;
+    border: none;
+}
+
+.generator-card .card-body {
+    padding: 2rem;
+}
+
+/* Professional QR Display */
+.professional-qr {
+    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+    border: 2px solid #e5e7eb;
+    border-radius: 1rem;
+    padding: 1rem;
+    text-align: center;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease-in-out;
+    max-width: 400px;
+    margin: 0 auto 1.5rem auto;
+    display: flex;
+    flex-direction: column;
+    min-height: 380px;
+}
+
+.professional-qr:hover {
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+}
+
+.qr-code-container {
+    margin: 1rem 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 320px;
+    flex: 1;
+}
+
+/* Batch QR Specific Styling */
+.batch-qr {
+    min-height: 300px;
+    overflow: hidden; /* Prevent overflow */
+}
+
+.batch-qr .qr-code-container {
+    min-height: 200px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden; /* Prevent overflow */
+}
+
+.batch-qr .qr-code-wrapper {
+    width: 200px !important;
+    height: 200px !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    overflow: hidden !important;
+}
+
+.qr-code-container canvas {
+    max-width: 100%;
+    max-height: 320px;
+    width: auto !important;
+    height: auto !important;
+}
+
+/* Batch QR canvas containment */
+.batch-qr .qr-code-wrapper canvas {
+    max-width: 100% !important;
+    max-height: 100% !important;
+    width: auto !important;
+    height: auto !important;
+    margin: 0 auto !important;
+    display: block !important;
+}
+
+/* Hide any duplicate image elements */
+.qr-code-container img,
+.qr-code-wrapper img,
+#qrcode img {
+    display: none !important;
+}
+
+/* Ensure only canvas is visible */
+.qr-code-container canvas,
+.qr-code-wrapper canvas,
+#qrcode canvas {
+    display: block !important;
+}
+
+.qr-footer {
+    margin-top: 1rem;
+}
+
+.scan-instruction {
+    color: #374151;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+}
+
+.qr-data {
+    color: #6b7280;
+    font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, monospace;
+    font-size: 0.875rem;
+}
+
+/* Professional Form Styling */
+.form-control {
+    border: 2px solid #e5e7eb;
+    border-radius: 0.75rem;
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+    transition: all 0.2s ease-in-out;
+}
+
+.form-control:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    background-color: #fafbfc;
+}
+
+.form-label {
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 0.5rem;
+}
+
+/* Professional Button Styling */
+.btn-primary {
+    background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+    border: none;
+    border-radius: 0.75rem;
+    padding: 0.75rem 2rem;
+    font-weight: 600;
+    box-shadow: 0 4px 14px 0 rgba(30, 64, 175, 0.2);
+    transition: all 0.2s ease-in-out;
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px 0 rgba(30, 64, 175, 0.3);
+}
+
+.btn-secondary {
+    background: white;
+    color: #374151;
+    border: 2px solid #d1d5db;
+    border-radius: 0.75rem;
+    padding: 0.75rem 2rem;
+    font-weight: 500;
+    transition: all 0.2s ease-in-out;
+}
+
+.btn-secondary:hover {
+    border-color: #1e40af;
+    color: #1e40af;
+    box-shadow: 0 4px 14px 0 rgba(30, 64, 175, 0.1);
+}
+
+/* Batch Generation Interface */
+.tenant-selection-interface {
+    background: white;
+    border-radius: 1rem;
+    padding: 2rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    margin-bottom: 2rem;
+}
+
+.tenant-selection-table {
+    border-radius: 0.75rem;
+    overflow: hidden;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.tenant-selection-table th {
+    background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+    color: white;
+    font-weight: 600;
+    padding: 1rem;
+    border: none;
+}
+
+.tenant-selection-table td {
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid #e5e7eb;
+    vertical-align: middle;
+}
+
+.tenant-selection-table tbody tr:hover {
+    background-color: rgba(59, 130, 246, 0.05);
+}
+
+/* QR Scanner Test Styling */
+.scanner-container {
+    background: white;
+    border-radius: 1rem;
+    padding: 2rem;
+    text-align: center;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+#qr-reader {
+    width: 100%;
+    max-width: 500px;
+    margin: 0 auto;
+    border-radius: 0.75rem;
+    overflow: hidden;
+}
+
+/* Progress Bar Styling */
+.progress {
+    height: 0.75rem;
+    border-radius: 0.5rem;
+    background-color: #e5e7eb;
+}
+
+.progress-bar {
+    background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+    border-radius: 0.5rem;
+}
+
+/* Alert Styling */
+.alert {
+    border: none;
+    border-radius: 0.75rem;
+    padding: 1rem 1.5rem;
+}
+
+.alert-success {
+    background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+    border-left: 4px solid #059669;
+    color: #065f46;
+}
+
+.alert-danger {
+    background: linear-gradient(135deg, #fef2f2 0%, #fecaca 100%);
+    border-left: 4px solid #dc2626;
+    color: #991b1b;
+}
+
+.alert-info {
+    background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+    border-left: 4px solid #1e40af;
+    color: #1e3a8a;
+}
+
+/* Print Media Styles */
+@media print {
+    .professional-qr {
+        width: 60mm;
+        height: 80mm;
+        border: 2px solid #1e40af;
+        border-radius: 8px;
+        padding: 3mm;
+        margin: 10mm;
+        background: white;
+        page-break-inside: avoid;
+        display: inline-block;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+    
+    .qr-code-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin: 1mm 0;
+        flex: 1;
+    }
+    
+    .qr-code-container canvas {
+        width: 50mm !important;
+        height: 50mm !important;
+        max-width: 50mm !important;
+        max-height: 50mm !important;
+    }
+    
+    .qr-footer {
+        font-size: 8pt;
+        color: #666;
+        margin-top: 2mm;
+    }
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+    .generator-card .card-body {
+        padding: 1rem;
+    }
+    
+    .nav-pills-executive .nav-link {
+        padding: 0.5rem 1rem;
+        margin-right: 0.25rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .professional-qr {
+        padding: 1rem;
+    }
+    
+    .tenant-selection-interface {
+        padding: 1rem;
+    }
+}
+
+/* Table and Select2 Styles */
+/* Consistent Input Sizing */
+.form-control-lg, .form-select-lg {
+    height: 3.5rem;
+    padding: 0.75rem 1rem;
+    font-size: 1.125rem;
+    border-radius: 0.75rem;
+}
+
+/* Fix table alignment and readability */
+.table-responsive {
+    max-height: 60vh;
+    overflow-y: auto;
+}
+
+.table {
+    margin-bottom: 0;
+}
+
+.table-dark th {
+    background-color: #343a40;
+    color: white;
+    border-color: #454d55;
+}
+
+.table-striped > tbody > tr:nth-of-type(odd) {
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
+.table-striped > tbody > tr:nth-of-type(even) {
+    background-color: white;
+}
+
+.table td {
+    color: #333;
+    border-color: #dee2e6;
+}
+
+.table th {
+    border-color: #454d55;
+}
+
+/* Compact table styling */
+.table-sm th,
+.table-sm td {
+    padding: 0.5rem;
+}
+
+.table-sm small {
+    font-size: 0.875em;
+}
+
+/* Remove the old tenant-selection-table styles */
+.tenant-selection-table {
+    border-radius: 0;
+    overflow: visible;
+    box-shadow: none;
+}
+
+.tenant-selection-table th {
+    background: inherit;
+    color: inherit;
+    font-weight: inherit;
+    padding: inherit;
+    border: inherit;
+}
+
+.tenant-selection-table td {
+    padding: inherit;
+    border-bottom: inherit;
+    vertical-align: inherit;
+}
+
+.tenant-selection-table tbody tr:hover {
+    background-color: inherit;
+}
+
+/* Consistent form control sizing - both search and select2 */
+.form-control-lg, .form-select-lg, .form-control.form-select-lg {
+    height: 3.5rem !important;
+    padding: 0.75rem 1rem !important;
+    font-size: 1.125rem !important;
+    line-height: 1.5 !important;
+    border-radius: 0.375rem !important;
+    border: 1px solid #dee2e6 !important;
+    box-sizing: border-box !important;
+}
+
+.form-control-lg:focus, .form-select-lg:focus, .form-control.form-select-lg:focus {
+    border-color: #86b7fe !important;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25) !important;
+    outline: none !important;
+}
+
+/* Ensure search input has same size as select2 */
+#tenant-search {
+    height: 3rem !important;
+    padding: 0.75rem 1rem !important;
+    font-size: 1.125rem !important;
+    line-height: 1.5 !important;
+    border-radius: 0.375rem !important;
+    border: 1px solid #dee2e6 !important;
+    box-sizing: border-box !important;
+}
+
+#tenant-search:focus {
+    border-color: #86b7fe !important;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25) !important;
+    outline: none !important;
+}
+
+/* Select2 search field sizing and focus */
+.select2-container--bootstrap-5 .select2-search--dropdown .select2-search__field {
+    height: 3.5rem !important;
+    padding: 0.75rem 1rem !important;
+    font-size: 1.125rem !important;
+    line-height: 1.5 !important;
+    border-radius: 0.375rem !important;
+    border: 1px solid #dee2e6 !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+    background-color: #fff !important;
+    color: #212529 !important;
+}
+
+.select2-container--bootstrap-5 .select2-search--dropdown .select2-search__field:focus {
+    border-color: #86b7fe !important;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25) !important;
+    outline: none !important;
+}
+
+/* Ensure search field gets proper focus */
+.select2-container--bootstrap-5 .select2-search--dropdown {
+    padding: 0.75rem !important;
+}
+
+/* ===== QR GENERATOR - TENANT TABLE STYLES ===== */
+
+/* Clickable table rows for tenant selection */
+.tenant-row {
+    transition: background-color 0.2s ease;
+}
+
+.tenant-row:hover {
+    background-color: rgba(13, 110, 253, 0.1) !important;
+}
+
+.tenant-row.table-active {
+    background-color: rgba(13, 110, 253, 0.2) !important;
+}
+
+.tenant-row.table-active:hover {
+    background-color: rgba(13, 110, 253, 0.3) !important;
+}
+
+/* Make checkboxes slightly larger for better usability */
+.tenant-checkbox {
+    transform: scale(1.2);
+    margin: 0;
+}
+
+/* Ensure checkbox doesn't interfere with row click */
+.form-check {
+    pointer-events: none;
+}
+
+.form-check-input {
+    pointer-events: auto;
+}
