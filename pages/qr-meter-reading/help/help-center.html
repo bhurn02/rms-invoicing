@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR Meter Reading System - Help Center</title>
+    
+    <!-- Bootstrap 5.3+ CSS -->
+    <link href="../assets/css/bootstrap.min.css" rel="stylesheet">
+    <link href="../assets/css/bootstrap-icons.css" rel="stylesheet">
+    <link href="../assets/css/custom-theme.css" rel="stylesheet">
+    
+    <style>
+        .help-center {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        .help-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .help-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+        .help-header {
+            background: linear-gradient(135deg, #1e40af, #3b82f6);
+            color: white;
+            padding: 1.5rem;
+            text-align: center;
+        }
+        .help-content {
+            padding: 2rem;
+        }
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+        .help-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+        .help-item {
+            background: #f8fafc;
+            border-radius: 8px;
+            padding: 1.5rem;
+            text-align: center;
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+        .help-item:hover {
+            border-color: #1e40af;
+            background: #f0f9ff;
+        }
+        .help-item-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+        .quick-actions {
+            background: linear-gradient(135deg, #059669, #10b981);
+            color: white;
+            border-radius: 12px;
+            padding: 2rem;
+            margin: 2rem 0;
+        }
+    </style>
+</head>
+<body class="bg-light">
+    <div class="container-fluid py-4">
+        <div class="help-center">
+            <!-- Header -->
+            <div class="help-card">
+                <div class="help-header">
+                    <i class="bi bi-question-circle feature-icon"></i>
+                    <h1 class="display-4 fw-bold mb-3">Help Center</h1>
+                    <p class="lead mb-0">Complete documentation and support for the QR Meter Reading System</p>
+                </div>
+                <div class="help-content">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <h3 class="mb-3">Welcome to the Help Center</h3>
+                            <p class="lead">Find everything you need to use the QR Meter Reading System effectively. Our documentation follows global standards for help systems and provides comprehensive support for all users.</p>
+                            
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h6 class="text-primary">For Field Technicians</h6>
+                                    <ul class="list-unstyled">
+                                        <li><i class="bi bi-check-circle text-success me-2"></i>Quick start guides</li>
+                                        <li><i class="bi bi-check-circle text-success me-2"></i>Step-by-step instructions</li>
+                                        <li><i class="bi bi-check-circle text-success me-2"></i>Troubleshooting tips</li>
+                                    </ul>
+                                </div>
+                                <div class="col-md-6">
+                                    <h6 class="text-primary">For Administrators</h6>
+                                    <ul class="list-unstyled">
+                                        <li><i class="bi bi-check-circle text-success me-2"></i>Complete system documentation</li>
+                                        <li><i class="bi bi-check-circle text-success me-2"></i>Technical specifications</li>
+                                        <li><i class="bi bi-check-circle text-success me-2"></i>Support procedures</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 text-center">
+                            <div class="quick-actions">
+                                <h5 class="mb-3">Quick Actions</h5>
+                                <a href="quick-reference.html" class="btn btn-light btn-lg mb-2 w-100">
+                                    <i class="bi bi-lightning-charge me-2"></i>Quick Start
+                                </a>
+                                <a href="troubleshooting.html" class="btn btn-outline-light btn-lg w-100">
+                                    <i class="bi bi-tools me-2"></i>Fix Issues
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Help Resources Grid -->
+            <div class="help-grid">
+                <!-- User Manual -->
+                <div class="help-item">
+                    <i class="bi bi-book help-item-icon text-primary"></i>
+                    <h4 class="mb-3">Complete User Manual</h4>
+                    <p class="mb-3">Comprehensive documentation covering all features and functionality of the QR Meter Reading System.</p>
+                    <ul class="list-unstyled text-start mb-4">
+                        <li><i class="bi bi-check text-success me-2"></i>System overview and features</li>
+                        <li><i class="bi bi-check text-success me-2"></i>Step-by-step instructions</li>
+                        <li><i class="bi bi-check text-success me-2"></i>QR scanning workflow</li>
+                        <li><i class="bi bi-check text-success me-2"></i>QR generator usage</li>
+                        <li><i class="bi bi-check text-success me-2"></i>Frequently asked questions</li>
+                    </ul>
+                    <a href="index.html" class="btn btn-primary btn-lg">
+                        <i class="bi bi-book me-2"></i>Read Manual
+                    </a>
+                </div>
+                
+                <!-- Quick Reference -->
+                <div class="help-item">
+                    <i class="bi bi-lightning-charge help-item-icon text-success"></i>
+                    <h4 class="mb-3">Quick Reference Guide</h4>
+                    <p class="mb-3">Fast access to essential information for field technicians who need quick answers.</p>
+                    <ul class="list-unstyled text-start mb-4">
+                        <li><i class="bi bi-check text-success me-2"></i>5-step quick start process</li>
+                        <li><i class="bi bi-check text-success me-2"></i>QR code format reference</li>
+                        <li><i class="bi bi-check text-success me-2"></i>Common troubleshooting</li>
+                        <li><i class="bi bi-check text-success me-2"></i>Pro tips and best practices</li>
+                        <li><i class="bi bi-check text-success me-2"></i>Emergency contact information</li>
+                    </ul>
+                    <a href="quick-reference.html" class="btn btn-success btn-lg">
+                        <i class="bi bi-lightning-charge me-2"></i>Quick Start
+                    </a>
+                </div>
+                
+                <!-- Troubleshooting -->
+                <div class="help-item">
+                    <i class="bi bi-tools help-item-icon text-warning"></i>
+                    <h4 class="mb-3">Troubleshooting Guide</h4>
+                    <p class="mb-3">Technical support documentation for resolving common issues and problems.</p>
+                    <ul class="list-unstyled text-start mb-4">
+                        <li><i class="bi bi-check text-success me-2"></i>Camera and scanning issues</li>
+                        <li><i class="bi bi-check text-success me-2"></i>Network connectivity problems</li>
+                        <li><i class="bi bi-check text-success me-2"></i>Access and permission issues</li>
+                        <li><i class="bi bi-check text-success me-2"></i>Error message explanations</li>
+                        <li><i class="bi bi-check text-success me-2"></i>Prevention and maintenance tips</li>
+                    </ul>
+                    <a href="troubleshooting.html" class="btn btn-warning btn-lg">
+                        <i class="bi bi-tools me-2"></i>Fix Issues
+                    </a>
+                </div>
+            </div>
+            
+            <!-- System Information -->
+            <div class="help-card">
+                <div class="help-content">
+                    <h3 class="mb-4 text-center">
+                        <i class="bi bi-info-circle me-2 text-primary"></i>System Information
+                    </h3>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5 class="text-primary">Supported Devices</h5>
+                            <ul class="list-unstyled">
+                                <li><i class="bi bi-phone text-primary me-2"></i>Samsung A15 (Primary)</li>
+                                <li><i class="bi bi-phone text-primary me-2"></i>iPhone 14 Pro Max</li>
+                                <li><i class="bi bi-laptop text-primary me-2"></i>Desktop/Laptop browsers</li>
+                                <li><i class="bi bi-tablet text-primary me-2"></i>Tablet devices</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h5 class="text-success">Key Features</h5>
+                            <ul class="list-unstyled">
+                                <li><i class="bi bi-check-circle text-success me-2"></i>Mobile QR scanning</li>
+                                <li><i class="bi bi-check-circle text-success me-2"></i>Offline functionality</li>
+                                <li><i class="bi bi-check-circle text-success me-2"></i>Automatic tenant lookup</li>
+                                <li><i class="bi bi-check-circle text-success me-2"></i>Real-time validation</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Navigation -->
+            <div class="text-center mt-4">
+                <div class="row">
+                    <div class="col-md-4">
+                        <a href="../index.php" class="btn btn-primary btn-lg w-100">
+                            <i class="bi bi-qr-code-scan me-2"></i>Back to Scanner
+                        </a>
+                    </div>
+                    <div class="col-md-4">
+                        <a href="../qr-generator.html" class="btn btn-success btn-lg w-100">
+                            <i class="bi bi-qr-code me-2"></i>QR Generator
+                        </a>
+                    </div>
+                    <div class="col-md-4">
+                        <a href="../auth/logout.php" class="btn btn-outline-secondary btn-lg w-100">
+                            <i class="bi bi-box-arrow-right me-2"></i>Logout
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Footer -->
+            <footer class="text-center mt-5 pt-4 border-top">
+                <p class="text-muted">
+                    <i class="bi bi-shield-check me-2"></i>
+                    QR Meter Reading System v1.2 - Help Documentation
+                </p>
+                <p class="small text-muted">
+                    For technical support, contact your system administrator.
+                </p>
+            </footer>
+        </div>
+    </div>
+    
+    <!-- Bootstrap JS -->
+    <script src="../assets/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

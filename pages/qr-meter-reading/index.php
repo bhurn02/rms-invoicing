@@ -107,6 +107,26 @@ $currentCompany = getCurrentCompanyCode();
                                 QR Test Utility
                             </a>
                         </li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><h6 class="dropdown-header">Help & Support</h6></li>
+                        <li>
+                            <a class="dropdown-item" href="help/help-center.html" target="_blank">
+                                <i class="bi bi-question-circle"></i>
+                                Help Center
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="help/quick-reference.html" target="_blank">
+                                <i class="bi bi-lightning-charge"></i>
+                                Quick Reference
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="help/troubleshooting.html" target="_blank">
+                                <i class="bi bi-tools"></i>
+                                Troubleshooting
+                            </a>
+                        </li>
                     </ul>
                 </div>
 
