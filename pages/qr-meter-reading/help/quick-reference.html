@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR Meter Reading - Quick Reference</title>
+    
+    <!-- Bootstrap 5.3+ CSS -->
+    <link href="../assets/css/bootstrap.min.css" rel="stylesheet">
+    <link href="../assets/css/bootstrap-icons.css" rel="stylesheet">
+    <link href="../assets/css/custom-theme.css" rel="stylesheet">
+    
+    <style>
+        .quick-ref-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .step-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            margin-bottom: 1.5rem;
+            overflow: hidden;
+        }
+        .step-header {
+            background: linear-gradient(135deg, #1e40af, #3b82f6);
+            color: white;
+            padding: 1rem 1.5rem;
+            font-weight: 600;
+        }
+        .step-content {
+            padding: 1.5rem;
+        }
+        .icon-large {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+        .highlight-box {
+            background: #f0f9ff;
+            border: 2px solid #0ea5e9;
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1rem 0;
+        }
+        .warning-box {
+            background: #fef3c7;
+            border: 2px solid #f59e0b;
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1rem 0;
+        }
+        .success-box {
+            background: #d1fae5;
+            border: 2px solid #10b981;
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1rem 0;
+        }
+    </style>
+</head>
+<body class="bg-light">
+    <div class="container-fluid py-4">
+        <div class="quick-ref-container">
+            <!-- Header -->
+            <div class="text-center mb-4">
+                <h1 class="display-5 fw-bold text-primary mb-2">
+                    <i class="bi bi-lightning-charge me-3"></i>Quick Reference Guide
+                </h1>
+                <p class="lead text-muted">Field Technician Quick Start Guide</p>
+                <div class="badge bg-success fs-6">QR Meter Reading System</div>
+            </div>
+            
+            <!-- Quick Start Steps -->
+            <div class="step-card">
+                <div class="step-header">
+                    <h4 class="mb-0">
+                        <i class="bi bi-play-circle me-2"></i>Quick Start - 5 Steps
+                    </h4>
+                </div>
+                <div class="step-content">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="text-center mb-3">
+                                <i class="bi bi-camera-fill icon-large text-primary"></i>
+                                <h5>1. Start Scanner</h5>
+                                <p class="text-muted">Click "Start Scanner" button</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="text-center mb-3">
+                                <i class="bi bi-qr-code-scan icon-large text-success"></i>
+                                <h5>2. Scan QR Code</h5>
+                                <p class="text-muted">Point camera at meter QR code</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="text-center mb-3">
+                                <i class="bi bi-speedometer2 icon-large text-warning"></i>
+                                <h5>3. Enter Reading</h5>
+                                <p class="text-muted">Type current meter value</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="text-center mb-3">
+                                <i class="bi bi-check-circle icon-large text-success"></i>
+                                <h5>4. Submit</h5>
+                                <p class="text-muted">Click "Submit Reading"</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="text-center">
+                        <div class="success-box">
+                            <h6 class="mb-2">
+                                <i class="bi bi-arrow-repeat me-2"></i>Ready for Next Meter
+                            </h6>
+                            <p class="mb-0">Form resets automatically - scan next QR code!</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- QR Code Format -->
+            <div class="step-card">
+                <div class="step-header">
+                    <h4 class="mb-0">
+                        <i class="bi bi-qr-code me-2"></i>QR Code Format
+                    </h4>
+                </div>
+                <div class="step-content">
+                    <div class="highlight-box">
+                        <h6 class="mb-2">
+                            <i class="bi bi-info-circle me-2"></i>QR Code Contains:
+                        </h6>
+                        <div class="row">
+                            <div class="col-md-4 text-center">
+                                <div class="badge bg-primary fs-6 p-2">Property Code</div>
+                                <p class="small mt-2">e.g., GCA</p>
+                            </div>
+                            <div class="col-md-4 text-center">
+                                <div class="badge bg-success fs-6 p-2">Unit Number</div>
+                                <p class="small mt-2">e.g., 101</p>
+                            </div>
+                            <div class="col-md-4 text-center">
+                                <div class="badge bg-warning fs-6 p-2">Meter ID</div>
+                                <p class="small mt-2">e.g., M001</p>
+                            </div>
+                        </div>
+                        <div class="text-center mt-3">
+                            <code class="fs-5">GCA|101|M001</code>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Troubleshooting -->
+            <div class="step-card">
+                <div class="step-header">
+                    <h4 class="mb-0">
+                        <i class="bi bi-tools me-2"></i>Quick Troubleshooting
+                    </h4>
+                </div>
+                <div class="step-content">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="warning-box">
+                                <h6 class="text-warning mb-2">
+                                    <i class="bi bi-exclamation-triangle me-2"></i>Camera Issues
+                                </h6>
+                                <ul class="small mb-0">
+                                    <li>Allow camera permissions</li>
+                                    <li>Check good lighting</li>
+                                    <li>Hold device steady</li>
+                                    <li>Clean QR code if dirty</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="warning-box">
+                                <h6 class="text-warning mb-2">
+                                    <i class="bi bi-exclamation-triangle me-2"></i>Scanning Issues
+                                </h6>
+                                <ul class="small mb-0">
+                                    <li>Try different angles</li>
+                                    <li>Move closer/farther</li>
+                                    <li>Ensure QR code is flat</li>
+                                    <li>Check QR code quality</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Offline Mode -->
+            <div class="step-card">
+                <div class="step-header">
+                    <h4 class="mb-0">
+                        <i class="bi bi-wifi-off me-2"></i>Offline Mode
+                    </h4>
+                </div>
+                <div class="step-content">
+                    <div class="success-box">
+                        <h6 class="mb-2">
+                            <i class="bi bi-check-circle me-2"></i>Works Offline!
+                        </h6>
+                        <p class="mb-2">The system automatically saves readings offline when there's no internet connection.</p>
+                        <ul class="small mb-0">
+                            <li>Look for offline indicator in navigation</li>
+                            <li>Readings sync automatically when online</li>
+                            <li>No data loss - everything is saved</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Pro Tips -->
+            <div class="step-card">
+                <div class="step-header">
+                    <h4 class="mb-0">
+                        <i class="bi bi-lightbulb me-2"></i>Pro Tips
+                    </h4>
+                </div>
+                <div class="step-content">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6 class="text-primary">Efficiency Tips</h6>
+                            <ul class="small">
+                                <li>Scan QR codes in sequence</li>
+                                <li>Use "Recent Readings" to verify</li>
+                                <li>Add remarks for unusual readings</li>
+                                <li>Keep device charged</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="text-success">Best Practices</h6>
+                            <ul class="small">
+                                <li>Double-check meter readings</li>
+                                <li>Report damaged QR codes</li>
+                                <li>Use consistent reading format</li>
+                                <li>Take photos if needed</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Emergency Contacts -->
+            <div class="step-card">
+                <div class="step-header">
+                    <h4 class="mb-0">
+                        <i class="bi bi-telephone me-2"></i>Need Help?
+                    </h4>
+                </div>
+                <div class="step-content">
+                    <div class="row text-center">
+                        <div class="col-md-4">
+                            <i class="bi bi-person-gear icon-large text-primary"></i>
+                            <h6>System Admin</h6>
+                            <p class="small text-muted">Technical issues</p>
+                        </div>
+                        <div class="col-md-4">
+                            <i class="bi bi-building icon-large text-success"></i>
+                            <h6>Property Manager</h6>
+                            <p class="small text-muted">Tenant questions</p>
+                        </div>
+                        <div class="col-md-4">
+                            <i class="bi bi-headset icon-large text-warning"></i>
+                            <h6>IT Support</h6>
+                            <p class="small text-muted">Device problems</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Navigation -->
+            <div class="text-center mt-4">
+                <a href="index.html" class="btn btn-primary btn-lg me-3">
+                    <i class="bi bi-book me-2"></i>Full Manual
+                </a>
+                <a href="../index.php" class="btn btn-success btn-lg">
+                    <i class="bi bi-qr-code-scan me-2"></i>Start Scanning
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Bootstrap JS -->
+    <script src="../assets/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

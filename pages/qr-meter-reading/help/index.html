@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR Meter Reading System - User Manual</title>
+    
+    <!-- Bootstrap 5.3+ CSS -->
+    <link href="../assets/css/bootstrap.min.css" rel="stylesheet">
+    <link href="../assets/css/bootstrap-icons.css" rel="stylesheet">
+    <link href="../assets/css/custom-theme.css" rel="stylesheet">
+    
+    <style>
+        .help-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .help-nav {
+            position: sticky;
+            top: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 1.5rem;
+        }
+        .help-content {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 2rem;
+        }
+        .step-number {
+            background: #1e40af;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+        .feature-card {
+            border-left: 4px solid #1e40af;
+            background: #f8fafc;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            border-radius: 0 8px 8px 0;
+        }
+        .warning-box {
+            background: #fef3c7;
+            border: 1px solid #f59e0b;
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1rem 0;
+        }
+        .success-box {
+            background: #d1fae5;
+            border: 1px solid #10b981;
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1rem 0;
+        }
+        .code-block {
+            background: #1f2937;
+            color: #f9fafb;
+            padding: 1rem;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            margin: 1rem 0;
+        }
+    </style>
+</head>
+<body class="bg-light">
+    <div class="container-fluid py-4">
+        <div class="help-container">
+            <div class="row">
+                <!-- Navigation Sidebar -->
+                <div class="col-lg-3">
+                    <div class="help-nav">
+                        <h5 class="mb-3">
+                            <i class="bi bi-book me-2"></i>User Manual
+                        </h5>
+                        <nav class="nav flex-column">
+                            <a class="nav-link" href="#overview">
+                                <i class="bi bi-info-circle me-2"></i>System Overview
+                            </a>
+                            <a class="nav-link" href="#getting-started">
+                                <i class="bi bi-play-circle me-2"></i>Getting Started
+                            </a>
+                            <a class="nav-link" href="#qr-scanning">
+                                <i class="bi bi-qr-code-scan me-2"></i>QR Scanning
+                            </a>
+                            <a class="nav-link" href="#qr-generator">
+                                <i class="bi bi-qr-code me-2"></i>QR Generator
+                            </a>
+                            <a class="nav-link" href="#troubleshooting">
+                                <i class="bi bi-tools me-2"></i>Troubleshooting
+                            </a>
+                            <a class="nav-link" href="#faq">
+                                <i class="bi bi-question-circle me-2"></i>FAQ
+                            </a>
+                        </nav>
+                        
+                        <hr class="my-4">
+                        
+                        <div class="text-center">
+                            <a href="../index.php" class="btn btn-primary">
+                                <i class="bi bi-arrow-left me-2"></i>Back to Scanner
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Main Content -->
+                <div class="col-lg-9">
+                    <div class="help-content">
+                        <!-- Header -->
+                        <div class="text-center mb-5">
+                            <h1 class="display-4 fw-bold text-primary mb-3">
+                                <i class="bi bi-qr-code-scan me-3"></i>QR Meter Reading System
+                            </h1>
+                            <p class="lead text-muted">Complete User Manual & Guide</p>
+                            <div class="badge bg-success fs-6">Version 1.2</div>
+                        </div>
+                        
+                        <!-- System Overview -->
+                        <section id="overview" class="mb-5">
+                            <h2 class="h3 mb-4">
+                                <i class="bi bi-info-circle me-2 text-primary"></i>System Overview
+                            </h2>
+                            
+                            <div class="feature-card">
+                                <h5 class="mb-3">What is the QR Meter Reading System?</h5>
+                                <p>The QR Meter Reading System is a mobile-friendly web application that allows field technicians to scan QR codes on utility meters and quickly input meter readings. This eliminates the need for manual data entry and reduces errors in the billing process.</p>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h5 class="mb-3">Key Features</h5>
+                                    <ul class="list-unstyled">
+                                        <li class="mb-2">
+                                            <i class="bi bi-check-circle text-success me-2"></i>
+                                            Mobile QR code scanning
+                                        </li>
+                                        <li class="mb-2">
+                                            <i class="bi bi-check-circle text-success me-2"></i>
+                                            Automatic tenant lookup
+                                        </li>
+                                        <li class="mb-2">
+                                            <i class="bi bi-check-circle text-success me-2"></i>
+                                            Offline capability
+                                        </li>
+                                        <li class="mb-2">
+                                            <i class="bi bi-check-circle text-success me-2"></i>
+                                            Real-time validation
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div class="col-md-6">
+                                    <h5 class="mb-3">Supported Devices</h5>
+                                    <ul class="list-unstyled">
+                                        <li class="mb-2">
+                                            <i class="bi bi-phone text-primary me-2"></i>
+                                            Samsung A15 (Primary)
+                                        </li>
+                                        <li class="mb-2">
+                                            <i class="bi bi-phone text-primary me-2"></i>
+                                            iPhone 14 Pro Max
+                                        </li>
+                                        <li class="mb-2">
+                                            <i class="bi bi-laptop text-primary me-2"></i>
+                                            Desktop/Laptop browsers
+                                        </li>
+                                        <li class="mb-2">
+                                            <i class="bi bi-tablet text-primary me-2"></i>
+                                            Tablet devices
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </section>
+                        
+                        <!-- Getting Started -->
+                        <section id="getting-started" class="mb-5">
+                            <h2 class="h3 mb-4">
+                                <i class="bi bi-play-circle me-2 text-primary"></i>Getting Started
+                            </h2>
+                            
+                            <div class="warning-box">
+                                <h6 class="mb-2">
+                                    <i class="bi bi-exclamation-triangle me-2"></i>Before You Begin
+                                </h6>
+                                <p class="mb-0">Ensure you have proper access permissions to the QR Meter Reading System. Contact your system administrator if you cannot access the application.</p>
+                            </div>
+                            
+                            <h5 class="mb-3">Step-by-Step Setup</h5>
+                            
+                            <div class="mb-4">
+                                <h6 class="mb-2">
+                                    <span class="step-number">1</span>Access the System
+                                </h6>
+                                <p>Navigate to the QR Meter Reading System URL provided by your administrator. The system will automatically redirect you to the login page if you're not authenticated.</p>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <h6 class="mb-2">
+                                    <span class="step-number">2</span>Login Authentication
+                                </h6>
+                                <p>Enter your username and password. The system uses real-time validation, so you'll see inline error messages if there are any issues with your credentials.</p>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <h6 class="mb-2">
+                                    <span class="step-number">3</span>Permission Verification
+                                </h6>
+                                <p>After successful login, the system will verify your access permissions. If you don't have QR Meter Reading access, you'll see an "Access Denied" page with instructions.</p>
+                            </div>
+                            
+                            <div class="success-box">
+                                <h6 class="mb-2">
+                                    <i class="bi bi-check-circle me-2"></i>Ready to Use
+                                </h6>
+                                <p class="mb-0">Once authenticated and authorized, you'll see the main QR Scanner interface with the "Start Scanner" button prominently displayed.</p>
+                            </div>
+                        </section>
+                        
+                        <!-- QR Scanning -->
+                        <section id="qr-scanning" class="mb-5">
+                            <h2 class="h3 mb-4">
+                                <i class="bi bi-qr-code-scan me-2 text-primary"></i>QR Scanning Process
+                            </h2>
+                            
+                            <div class="feature-card">
+                                <h5 class="mb-3">How QR Scanning Works</h5>
+                                <p>The QR scanning process is designed for efficiency and accuracy. Each QR code contains property and unit information that automatically populates the meter reading form.</p>
+                            </div>
+                            
+                            <h5 class="mb-3">Complete Scanning Workflow</h5>
+                            
+                            <div class="mb-4">
+                                <h6 class="mb-2">
+                                    <span class="step-number">1</span>Start the Scanner
+                                </h6>
+                                <p>Click the "Start Scanner" button to activate your device's camera. The system will request camera permissions if this is your first time using the scanner.</p>
+                                <div class="warning-box">
+                                    <small><i class="bi bi-info-circle me-1"></i>Allow camera access when prompted for the scanner to work properly.</small>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <h6 class="mb-2">
+                                    <span class="step-number">2</span>Scan QR Code
+                                </h6>
+                                <p>Point your camera at the QR code on the meter. The scanner will automatically detect and process the QR code. You'll see a green border around the QR code when it's successfully detected.</p>
+                                <div class="code-block">
+                                    QR Code Format: PROPERTY_CODE|UNIT_NUMBER|METER_ID
+                                    Example: GCA|101|M001
+                                </div>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <h6 class="mb-2">
+                                    <span class="step-number">3</span>Review Auto-Populated Data
+                                </h6>
+                                <p>After scanning, the form will automatically populate with:</p>
+                                <ul>
+                                    <li>Property ID</li>
+                                    <li>Unit Number</li>
+                                    <li>Meter ID (if included in QR code)</li>
+                                    <li>Current tenant information</li>
+                                    <li>Last meter reading (if available)</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <h6 class="mb-2">
+                                    <span class="step-number">4</span>Enter Current Reading
+                                </h6>
+                                <p>The cursor will automatically focus on the "Current Meter Reading" field. Enter the current meter reading value as displayed on the physical meter.</p>
+                                <div class="warning-box">
+                                    <small><i class="bi bi-exclamation-triangle me-1"></i>Reading Date is automatically set by the system and cannot be modified to ensure data integrity.</small>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <h6 class="mb-2">
+                                    <span class="step-number">5</span>Add Remarks (Optional)
+                                </h6>
+                                <p>You can add any relevant notes or observations about the reading in the Remarks field. This is optional but recommended for audit purposes.</p>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <h6 class="mb-2">
+                                    <span class="step-number">6</span>Submit Reading
+                                </h6>
+                                <p>Click "Submit Reading" to save the meter reading to the system. You'll see a success notification confirming the reading has been saved.</p>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <h6 class="mb-2">
+                                    <span class="step-number">7</span>Continue to Next Meter
+                                </h6>
+                                <p>After successful submission, the form will automatically reset and the scanner will refocus, ready for the next meter reading. This creates a seamless workflow for multiple readings.</p>
+                            </div>
+                            
+                            <div class="success-box">
+                                <h6 class="mb-2">
+                                    <i class="bi bi-lightbulb me-2"></i>Pro Tips
+                                </h6>
+                                <ul class="mb-0">
+                                    <li>Hold your device steady when scanning for better QR code detection</li>
+                                    <li>Ensure good lighting conditions for optimal scanning</li>
+                                    <li>Clean the QR code if it's dirty or damaged</li>
+                                    <li>Use the "Recent QR Readings" section to verify your submissions</li>
+                                </ul>
+                            </div>
+                        </section>
+                        
+                        <!-- QR Generator -->
+                        <section id="qr-generator" class="mb-5">
+                            <h2 class="h3 mb-4">
+                                <i class="bi bi-qr-code me-2 text-primary"></i>QR Code Generator
+                            </h2>
+                            
+                            <div class="feature-card">
+                                <h5 class="mb-3">About the QR Generator</h5>
+                                <p>The QR Code Generator allows you to create QR codes for meters that don't have them yet. You can generate individual QR codes or batch generate multiple codes for efficiency.</p>
+                            </div>
+                            
+                            <h5 class="mb-3">Individual QR Code Generation</h5>
+                            
+                            <div class="mb-4">
+                                <h6 class="mb-2">
+                                    <span class="step-number">1</span>Access QR Generator
+                                </h6>
+                                <p>From the main scanner page, click on "Tools" in the navigation menu, then select "QR Generator" to open the generator interface.</p>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <h6 class="mb-2">
+                                    <span class="step-number">2</span>Fill Required Information
+                                </h6>
+                                <p>In the Individual QR Code Generator tab, fill in the required fields:</p>
+                                <ul>
+                                    <li><strong>Property ID:</strong> The unique identifier for the property (e.g., GCA, PROP1)</li>
+                                    <li><strong>Unit Number:</strong> The specific unit number (e.g., 101, A01)</li>
+                                    <li><strong>Meter ID:</strong> Optional meter identifier</li>
+                                    <li><strong>Property Name:</strong> Optional display name for the property</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <h6 class="mb-2">
+                                    <span class="step-number">3</span>Generate QR Code
+                                </h6>
+                                <p>Click "Generate QR Code" to create the QR code. The system will display the generated QR code with the encoded data visible below it.</p>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <h6 class="mb-2">
+                                    <span class="step-number">4</span>Download or Print
+                                </h6>
+                                <p>Use the action buttons to:</p>
+                                <ul>
+                                    <li><strong>Download PNG:</strong> Save the QR code as an image file</li>
+                                    <li><strong>Print QR Code:</strong> Print the QR code directly</li>
+                                    <li><strong>Copy Data:</strong> Copy the encoded data to clipboard</li>
+                                </ul>
+                            </div>
+                            
+                            <h5 class="mb-3">Batch QR Code Generation</h5>
+                            
+                            <div class="mb-4">
+                                <h6 class="mb-2">
+                                    <span class="step-number">1</span>Switch to Batch Tab
+                                </h6>
+                                <p>Click on the "Batch Generation" tab to access the batch generation interface.</p>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <h6 class="mb-2">
+                                    <span class="step-number">2</span>Select Property Filter
+                                </h6>
+                                <p>Use the property filter dropdown to select a specific property, or leave it blank to include all properties.</p>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <h6 class="mb-2">
+                                    <span class="step-number">3</span>Choose Tenants
+                                </h6>
+                                <p>Select the tenants for whom you want to generate QR codes. You can:</p>
+                                <ul>
+                                    <li>Select individual tenants from the list</li>
+                                    <li>Use "Select All" to choose all tenants</li>
+                                    <li>Use "Clear Selection" to deselect all</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <h6 class="mb-2">
+                                    <span class="step-number">4</span>Generate Batch QR Codes
+                                </h6>
+                                <p>Click "Generate Selected QR Codes" to create QR codes for all selected tenants. The system will display all generated QR codes in a grid layout.</p>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <h6 class="mb-2">
+                                    <span class="step-number">5</span>Download All QR Codes
+                                </h6>
+                                <p>Use the "Download All QR Codes" button to download a ZIP file containing all generated QR codes as individual PNG files.</p>
+                            </div>
+                            
+                            <div class="success-box">
+                                <h6 class="mb-2">
+                                    <i class="bi bi-lightbulb me-2"></i>Best Practices
+                                </h6>
+                                <ul class="mb-0">
+                                    <li>Test generated QR codes by scanning them with the main scanner</li>
+                                    <li>Use high-quality printing for physical QR code labels</li>
+                                    <li>Ensure QR codes are properly sized (minimum 2cm x 2cm)</li>
+                                    <li>Protect QR codes from damage with clear labels or laminating</li>
+                                </ul>
+                            </div>
+                        </section>
+                        
+                        <!-- Troubleshooting -->
+                        <section id="troubleshooting" class="mb-5">
+                            <h2 class="h3 mb-4">
+                                <i class="bi bi-tools me-2 text-primary"></i>Troubleshooting
+                            </h2>
+                            
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h5 class="mb-3">Common Issues</h5>
+                                    
+                                    <div class="mb-3">
+                                        <h6 class="text-danger">Camera Not Working</h6>
+                                        <p><strong>Solution:</strong> Check browser permissions, ensure camera is not being used by another application, and try refreshing the page.</p>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <h6 class="text-danger">QR Code Not Scanning</h6>
+                                        <p><strong>Solution:</strong> Ensure good lighting, clean the QR code, hold device steady, and try different angles.</p>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <h6 class="text-danger">Form Not Auto-Populating</h6>
+                                        <p><strong>Solution:</strong> Check if the QR code format is correct (Property|Unit|Meter), verify tenant exists in system.</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <h5 class="mb-3">Error Messages</h5>
+                                    
+                                    <div class="mb-3">
+                                        <h6 class="text-warning">"No Active Tenant Found"</h6>
+                                        <p><strong>Meaning:</strong> The property/unit combination doesn't have an active tenant.</p>
+                                        <p><strong>Action:</strong> Contact administrator to verify tenant assignment.</p>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <h6 class="text-warning">"Invalid QR Code Format"</h6>
+                                        <p><strong>Meaning:</strong> The QR code doesn't contain the expected data format.</p>
+                                        <p><strong>Action:</strong> Generate a new QR code using the QR Generator.</p>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <h6 class="text-warning">"Network Error"</h6>
+                                        <p><strong>Meaning:</strong> Connection to server is lost.</p>
+                                        <p><strong>Action:</strong> Check internet connection, data will be saved offline and synced when connection is restored.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+                        
+                        <!-- FAQ -->
+                        <section id="faq" class="mb-5">
+                            <h2 class="h3 mb-4">
+                                <i class="bi bi-question-circle me-2 text-primary"></i>Frequently Asked Questions
+                            </h2>
+                            
+                            <div class="accordion" id="faqAccordion">
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header">
+                                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">
+                                            Can I use the system offline?
+                                        </button>
+                                    </h2>
+                                    <div id="faq1" class="accordion-collapse collapse show" data-bs-parent="#faqAccordion">
+                                        <div class="accordion-body">
+                                            Yes! The system works offline and will automatically sync your readings when the connection is restored. You'll see an offline indicator in the navigation bar when working offline.
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header">
+                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">
+                                            What if I scan the wrong QR code?
+                                        </button>
+                                    </h2>
+                                    <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                                        <div class="accordion-body">
+                                            Simply click "Cancel" to clear the form and scan the correct QR code. The system won't save any data until you click "Submit Reading".
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header">
+                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq3">
+                                            How do I know if my reading was saved?
+                                        </button>
+                                    </h2>
+                                    <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                                        <div class="accordion-body">
+                                            You'll see a success notification after submitting, and the reading will appear in the "Recent QR Readings" table. The form will also reset automatically for the next reading.
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header">
+                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq4">
+                                            Can I edit a reading after submitting?
+                                        </button>
+                                    </h2>
+                                    <div id="faq4" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                                        <div class="accordion-body">
+                                            No, readings cannot be edited after submission to maintain data integrity. If you need to correct a reading, contact your administrator who can void the incorrect reading and you can submit a new one.
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header">
+                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq5">
+                                            What browsers are supported?
+                                        </button>
+                                    </h2>
+                                    <div id="faq5" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                                        <div class="accordion-body">
+                                            The system works best with Chrome, Safari, and Edge browsers. Make sure you're using a recent version for optimal performance and security.
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+                        
+                        <!-- Footer -->
+                        <footer class="text-center mt-5 pt-4 border-top">
+                            <p class="text-muted">
+                                <i class="bi bi-shield-check me-2"></i>
+                                QR Meter Reading System v1.2 - Secure & Reliable
+                            </p>
+                            <p class="small text-muted">
+                                For technical support, contact your system administrator.
+                            </p>
+                        </footer>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Bootstrap JS -->
+    <script src="../assets/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Smooth scrolling for navigation links -->
+    <script>
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
