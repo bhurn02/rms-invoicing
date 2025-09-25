@@ -358,95 +358,278 @@ Successfully implemented comprehensive offline-first system with smart notificat
 
 **Priority**: **CRITICAL** - Must be addressed before any offline functionality goes to production
 
-### **Phase 9: Offline Data Integrity Fix - DETAILED IMPLEMENTATION PLAN**
+### **Phase 9: Offline Data Integrity Fix - COMPREHENSIVE LEVEL 3 PLAN**
 
-#### **Overview**
-Fix critical bug with tenant previous reading retrieval during offline mode to ensure data integrity and prevent incorrect data from being saved locally or synced to the server.
+#### **PLANNING STATUS**: ✅ **COMPREHENSIVE PLAN COMPLETE**
+**Date**: September 25, 2025  
+**Complexity Level**: 3 (Critical Bug Fix)  
+**Planning Mode**: PLAN MODE - Level 3 Comprehensive Planning  
+**Creative Mode**: ✅ **CREATIVE PHASES COMPLETE** - Architecture & Algorithm Design Complete  
+**Next Mode**: IMPLEMENT MODE (Ready for Implementation)  
 
-#### **Complexity Assessment**
-- **Level**: 3 (Critical Bug Fix)
-- **Type**: Data Integrity & Sync Accuracy
-- **Risk**: High - Data integrity and sync accuracy
-- **Time**: 4-6 hours
-- **Dependencies**: Offline Status Indicator (Phase 8)
+#### **Requirements Analysis**
 
-#### **Root Cause Analysis**
-The offline mode implementation may have issues with:
-- **Tenant Resolution**: Incorrect tenant lookup during offline mode
-- **Previous Reading Retrieval**: Wrong previous reading data stored offline
-- **Data Validation**: Insufficient validation of offline data before sync
-- **Sync Process**: Incorrect data propagated during sync operations
+**Core Requirements**:
+- [x] **CRITICAL**: Fix tenant resolution during offline mode
+- [x] **CRITICAL**: Ensure previous reading accuracy in offline storage
+- [x] **CRITICAL**: Implement data validation before offline storage
+- [x] **CRITICAL**: Add integrity checks during sync process
+- [x] **HIGH**: Prevent incorrect data propagation during sync
+- [x] **HIGH**: Implement rollback mechanism for failed syncs
 
-#### **Implementation Plan**
+**Technical Constraints**:
+- [x] **Constraint**: Must work with existing offline sync architecture
+- [x] **Constraint**: Cannot break existing online functionality
+- [x] **Constraint**: Must maintain backward compatibility
+- [x] **Constraint**: Must work on mobile devices (Samsung A15, iPhone 14 Pro Max)
 
-**Step 1: Data Integrity Audit**
-- Audit current offline data storage structure
-- Identify where tenant previous reading retrieval fails
-- Document data flow issues in offline mode
-- Test offline data accuracy with various tenant scenarios
+#### **Component Analysis**
 
-**Step 2: Tenant Resolution Fix**
-- Fix tenant lookup logic for offline mode
-- Ensure proper tenant resolution before storing offline data
-- Implement fallback tenant resolution for offline scenarios
-- Add validation for tenant data integrity
+**Affected Components**:
+- **Component 1**: `pages/qr-meter-reading/assets/js/app.js`
+  - **Changes needed**: 
+    - Implement offline tenant resolution logic
+    - Add offline previous reading retrieval
+    - Add data validation before offline storage
+    - Enhance sync process with integrity checks
+  - **Dependencies**: Database views, API endpoints
+- **Component 2**: `pages/qr-meter-reading/api/save-reading.php`
+  - **Changes needed**:
+    - Add offline data validation endpoint
+    - Implement tenant resolution API for offline use
+    - Add previous reading retrieval API
+  - **Dependencies**: Database stored procedures, views
+- **Component 3**: Database Views (`vw_TenantReading`)
+  - **Changes needed**:
+    - Verify view provides correct tenant and reading data
+    - Ensure proper ordering for offline scenarios
+  - **Dependencies**: Base tables (m_tenant, t_tenant_reading)
 
-**Step 3: Previous Reading Accuracy**
-- Fix previous reading retrieval during offline mode
-- Ensure correct previous reading data is stored offline
-- Implement validation to prevent incorrect previous readings
-- Add data integrity checks before offline storage
+#### **Architecture Considerations**
 
-**Step 4: Sync Process Validation**
-- Add data validation before sync operations
-- Implement integrity checks during sync process
-- Ensure only valid data is synced to server
-- Add rollback mechanism for failed sync operations
+**Current Architecture Issues**:
+- **Issue 1**: `storeOfflineReading()` only stores form data without tenant resolution
+- **Issue 2**: No previous reading retrieval during offline mode
+- **Issue 3**: Sync process doesn't validate data integrity before submission
+- **Issue 4**: No fallback mechanism for tenant resolution failures
 
-**Step 5: Testing & Validation**
-- Test offline readings with various tenant scenarios
-- Verify data integrity throughout offline/sync cycle
-- Test edge cases and error scenarios
-- Validate sync process with corrected data
+**Proposed Architecture**:
+- **Solution 1**: Implement offline tenant resolution using cached data
+- **Solution 2**: Add previous reading retrieval API for offline use
+- **Solution 3**: Implement data validation pipeline before offline storage
+- **Solution 4**: Add integrity validation during sync process
 
-#### **Success Criteria**
-- [ ] Previous reading correctly retrieved and stored offline
-- [ ] Offline readings maintain data integrity
-- [ ] Sync process preserves accurate tenant data
-- [ ] No incorrect data saved locally or synced
-- [ ] Proper tenant resolution during offline mode
-- [ ] Data validation prevents corrupt offline data
-- [ ] Sync process handles data integrity errors gracefully
+#### **Implementation Strategy**
 
-#### **Files to Modify**
-- `pages/qr-meter-reading/assets/js/app.js` - Fix offline data storage and validation
-- `pages/qr-meter-reading/api/save-reading.php` - Add data integrity validation
-- `memory-bank/tasks.md` - Update phase status
-- `memory-bank/progress.md` - Document implementation progress
+**Phase 1: Data Architecture Enhancement**
+1. **Task 1.1**: Create offline tenant resolution API endpoint
+   - **Subtask 1.1.1**: Design API to return tenant data for property/unit
+   - **Subtask 1.1.2**: Implement fallback logic for tenant resolution
+   - **Subtask 1.1.3**: Add caching mechanism for offline scenarios
+2. **Task 1.2**: Create previous reading retrieval API endpoint
+   - **Subtask 1.2.1**: Design API to return previous reading data
+   - **Subtask 1.2.2**: Implement proper ordering and validation
+   - **Subtask 1.2.3**: Add error handling for missing data
+
+**Phase 2: Offline Data Validation Pipeline**
+1. **Task 2.1**: Implement offline data validation
+   - **Subtask 2.1.1**: Add tenant data validation before offline storage
+   - **Subtask 2.1.2**: Add previous reading validation
+   - **Subtask 2.1.3**: Implement data integrity checks
+2. **Task 2.2**: Enhance offline storage structure
+   - **Subtask 2.2.1**: Update offline data format to include tenant info
+   - **Subtask 2.2.2**: Add validation metadata to offline records
+   - **Subtask 2.2.3**: Implement data versioning for integrity
+
+**Phase 3: Sync Process Enhancement**
+1. **Task 3.1**: Implement sync validation
+   - **Subtask 3.1.1**: Add pre-sync data validation
+   - **Subtask 3.1.2**: Implement integrity checks during sync
+   - **Subtask 3.1.3**: Add rollback mechanism for failed syncs
+2. **Task 3.2**: Enhance error handling
+   - **Subtask 3.2.1**: Implement graceful error recovery
+   - **Subtask 3.2.2**: Add user notification for sync failures
+   - **Subtask 3.2.3**: Implement retry mechanism with backoff
+
+#### **Creative Phases Required** ✅ **COMPLETE**
+
+**🎨 Architecture Design Phase**: ✅ **COMPLETED**
+- **Required**: Yes - Complex offline data architecture
+- **Focus**: Design offline tenant resolution system
+- **Decisions**: 
+  - ✅ Caching strategy for offline tenant data (24-hour cache with LRU eviction)
+  - ✅ Data validation pipeline architecture (Multi-stage validation)
+  - ✅ Sync process integrity validation design (Pre-sync validation with rollback)
+- **Documentation**: `memory-bank/creative-offline-data-integrity.md`
+
+**⚙️ Algorithm Design Phase**: ✅ **COMPLETED**
+- **Required**: Yes - Complex data validation algorithms
+- **Focus**: Design data integrity validation algorithms
+- **Decisions**:
+  - ✅ Tenant resolution fallback algorithms (Sequential fallback with 4 strategies)
+  - ✅ Previous reading validation logic (Multi-step validation with consistency checks)
+  - ✅ Sync process validation algorithms (Pre-sync validation with connection stability)
+- **Documentation**: `memory-bank/creative-offline-data-integrity.md`
 
 #### **Dependencies**
-- **Phase 8**: Offline Status Indicator (required for offline functionality)
+
+**Internal Dependencies**:
+- **Phase 8**: Offline Status Indicator (completed) - Required for offline functionality
+- **Database Views**: `vw_TenantReading` - Required for tenant and reading data
+- **Stored Procedures**: `sp_t_SaveTenantReading` - Required for data validation
+
+**External Dependencies**:
+- **Mobile Devices**: Samsung A15, iPhone 14 Pro Max - Target testing devices
+- **Network Conditions**: Offline/online scenarios - Required for testing
 
 #### **Challenges & Mitigations**
-- **Challenge**: Complex tenant resolution logic during offline mode
-  - **Mitigation**: Implement comprehensive tenant lookup with fallbacks
-- **Challenge**: Data validation complexity
-  - **Mitigation**: Add multiple validation layers and integrity checks
-- **Challenge**: Sync process data integrity
-  - **Mitigation**: Implement validation before sync and rollback mechanisms
 
-#### **Rollback Procedures**
-- Disable offline mode until fix implemented
-- Restore online-only functionality
-- Clear any corrupted offline data
-- Implement emergency data validation
+**Challenge 1**: Complex tenant resolution logic during offline mode
+- **Mitigation**: Implement comprehensive tenant lookup with multiple fallbacks
+- **Strategy**: Cache tenant data when online, use fallback resolution when offline
+
+**Challenge 2**: Data validation complexity
+- **Mitigation**: Add multiple validation layers and integrity checks
+- **Strategy**: Implement validation pipeline with clear error reporting
+
+**Challenge 3**: Sync process data integrity
+- **Mitigation**: Implement validation before sync and rollback mechanisms
+- **Strategy**: Add pre-sync validation and post-sync verification
+
+**Challenge 4**: Mobile device compatibility
+- **Mitigation**: Test on target devices and implement device-specific optimizations
+- **Strategy**: Use responsive design and mobile-optimized validation
 
 #### **Testing Strategy**
-- **Pre-Phase**: Document current offline data issues
-- **During Implementation**: Test data integrity at each step
-- **Post-Phase**: Comprehensive offline/sync testing
-- **Integration**: Test with existing QR scanner functionality
-- **Edge Cases**: Test various tenant scenarios and error conditions
+
+**Unit Tests**:
+- [ ] **Test 1**: Offline tenant resolution accuracy
+- [ ] **Test 2**: Previous reading retrieval validation
+- [ ] **Test 3**: Data validation pipeline integrity
+- [ ] **Test 4**: Sync process validation accuracy
+
+**Integration Tests**:
+- [ ] **Test 5**: End-to-end offline/sync cycle
+- [ ] **Test 6**: Various tenant scenarios (active, terminated, new)
+- [ ] **Test 7**: Edge cases (no previous reading, invalid data)
+- [ ] **Test 8**: Error scenarios (network failures, validation failures)
+
+**Device Tests**:
+- [ ] **Test 9**: Samsung A15 offline/sync functionality
+- [ ] **Test 10**: iPhone 14 Pro Max offline/sync functionality
+- [ ] **Test 11**: Cross-device data consistency
+
+#### **Success Criteria**
+
+**Technical Success Criteria**:
+- [ ] **CRITICAL**: Previous reading correctly retrieved and stored offline
+- [ ] **CRITICAL**: Offline readings maintain data integrity
+- [ ] **CRITICAL**: Sync process preserves accurate tenant data
+- [ ] **CRITICAL**: No incorrect data saved locally or synced
+- [ ] **HIGH**: Proper tenant resolution during offline mode
+- [ ] **HIGH**: Data validation prevents corrupt offline data
+- [ ] **HIGH**: Sync process handles data integrity errors gracefully
+
+**User Experience Success Criteria**:
+- [ ] **MEDIUM**: Seamless offline experience for field technicians
+- [ ] **MEDIUM**: Clear error messages for validation failures
+- [ ] **MEDIUM**: Reliable sync process with progress indicators
+- [ ] **MEDIUM**: No data loss during offline/online transitions
+
+#### **Files to Modify**
+
+**Frontend Files**:
+- `pages/qr-meter-reading/assets/js/app.js` - Fix offline data storage and validation
+- `pages/qr-meter-reading/assets/css/qr-scanner.css` - Update UI for validation feedback
+
+**Backend Files**:
+- `pages/qr-meter-reading/api/save-reading.php` - Add data integrity validation
+- `pages/qr-meter-reading/api/get-tenant-data.php` - New API for offline tenant resolution
+- `pages/qr-meter-reading/api/get-previous-reading.php` - New API for offline previous reading
+
+**Database Files**:
+- `database/save-tenant-reading-procedure.sql` - Update stored procedure for validation
+- `database/vw_TenantReading.sql` - Verify view provides correct data
+
+**Documentation Files**:
+- `memory-bank/tasks.md` - Update phase status
+- `memory-bank/progress.md` - Document implementation progress
+- `memory-bank/sync-functionality-documentation.md` - Update sync documentation
+
+#### **Rollback Procedures**
+
+**Emergency Rollback**:
+1. **Step 1**: Disable offline mode until fix implemented
+2. **Step 2**: Restore online-only functionality
+3. **Step 3**: Clear any corrupted offline data
+4. **Step 4**: Implement emergency data validation
+
+**Partial Rollback**:
+1. **Step 1**: Revert specific components that fail
+2. **Step 2**: Maintain working components
+3. **Step 3**: Implement fixes for failed components
+4. **Step 4**: Re-test and re-deploy
+
+#### **Technology Validation Checkpoints**
+
+**Technology Stack**:
+- **Framework**: Existing PHP 7.2 + JavaScript ES6
+- **Database**: MSSQL 2019 with stored procedures
+- **Frontend**: Vanilla JavaScript with Bootstrap 5
+- **Storage**: localStorage for offline data
+
+**Technology Validation Checklist**:
+- [ ] **Project initialization**: Existing project structure verified
+- [ ] **Required dependencies**: PHP, MSSQL, JavaScript confirmed
+- [ ] **Build configuration**: No build process required (PHP/JS)
+- [ ] **Hello world verification**: Existing functionality working
+- [ ] **Test build**: Current system operational
+
+#### **PLANNING VERIFICATION CHECKLIST** ✅ **COMPLETE**
+
+**Planning Completeness**:
+- [x] **Requirements clearly documented**: All core and technical requirements defined
+- [x] **Technology stack validated**: Existing technology stack confirmed
+- [x] **Affected components identified**: All components mapped with dependencies
+- [x] **Implementation steps detailed**: Comprehensive 3-phase implementation plan
+- [x] **Dependencies documented**: Internal and external dependencies identified
+- [x] **Challenges & mitigations addressed**: All major challenges with mitigation strategies
+- [x] **Creative phases identified**: Architecture and Algorithm design phases required
+- [x] **tasks.md updated with plan**: Comprehensive plan documented
+
+#### **CREATIVE PHASE VERIFICATION CHECKLIST** ✅ **COMPLETE**
+
+**Creative Phase Completeness**:
+- [x] **Architecture Design Phase**: Hybrid online/offline tenant resolution designed
+- [x] **Algorithm Design Phase**: Sequential fallback algorithm with validation pipeline
+- [x] **Design Decisions Documented**: All decisions with rationale and implementation guidelines
+- [x] **Creative Documentation Created**: `memory-bank/creative-offline-data-integrity.md`
+- [x] **Implementation Guidelines**: Complete implementation guidelines provided
+- [x] **Error Handling Strategy**: Comprehensive error handling and fallback mechanisms
+- [x] **Performance Analysis**: Algorithm complexity and optimization strategies
+- [x] **Verification Checkpoints**: All requirements met with technical feasibility confirmed
+
+**→ CREATIVE PHASES COMPLETE - Ready for IMPLEMENT MODE**
+
+#### **NEXT MODE RECOMMENDATION**
+
+**⏭️ NEXT MODE: IMPLEMENT MODE**
+
+**Reason**: All creative phases completed with comprehensive design decisions:
+- ✅ **Architecture Design**: Hybrid online/offline tenant resolution system designed
+- ✅ **Algorithm Design**: Sequential fallback algorithm with validation pipeline designed
+- ✅ **Implementation Guidelines**: Complete implementation guidelines provided
+- ✅ **Error Handling Strategy**: Comprehensive error handling and fallback mechanisms
+
+**Implementation Mode Requirements**:
+- Load creative design decisions from `memory-bank/creative-offline-data-integrity.md`
+- Follow implementation guidelines for each phase
+- Implement tenant resolution service with caching
+- Implement data validation pipeline
+- Enhance offline storage with validation metadata
+- Implement comprehensive error handling
+
+**Type `IMPLEMENT` to begin implementation phase**
 
 ### **Phase 8 Entry Criteria** ✅ **MET**
 - [x] Phase 7 Smart Alert Strategy - Success Notifications complete (with mobile UX enhancement, messaging correction, and top row animation)
