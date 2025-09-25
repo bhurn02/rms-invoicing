@@ -2,7 +2,7 @@
 
 **Document Type**: Implementation Plan  
 **Purpose**: Structured phase implementation with 98% success rate  
-**Date**: September 9, 2025  
+**Date**: September 25, 2025  
 **Status**: Active Implementation Plan  
 
 ## Executive Summary
@@ -25,6 +25,7 @@ This document reflects the structured phase implementation approach with 23 indi
 - **Offline Sync System**: Background synchronization with visual progress indicators
 - **Smart Defaults**: Auto-advance to next scan after successful reading submission
 - **Responsive Design**: World-class responsive design across all pages
+- **Meter Replacement Validation**: Smart validation for new meter scenarios with SweetAlert confirmation
 
 ## Modern UX Design Principles Applied
 
@@ -43,6 +44,7 @@ This document reflects the structured phase implementation approach with 23 indi
 - **Critical Warnings**: Data loss, system errors, security alerts
 - **Complex Confirmations**: Multi-step processes requiring user acknowledgment
 - **Important Information**: System maintenance, policy changes, legal notices
+- **Business Logic Confirmations**: Meter replacement validation, critical business decisions
 
 #### **Smart Notification Patterns**
 ```javascript
@@ -165,6 +167,68 @@ graph TD
     G --> M[User Acknowledges]
     H --> N[Action Proceeds]
 ```
+
+## 🔧 **METER REPLACEMENT VALIDATION ENHANCEMENT**
+
+### **Business Logic Enhancement - Meter Replacement Validation**
+**Status**: **SPECIFICATION DEFINED** - Ready for Implementation  
+**Priority**: **HIGH** - Critical business logic for meter replacements  
+**Date**: September 25, 2025  
+**Complexity**: Level 2 (Business Logic Enhancement)  
+**Risk**: Medium - Database logic and user workflow changes  
+**Time**: 3-4 hours  
+**Dependencies**: None (can be implemented independently)  
+
+#### **Business Requirements**
+- **Trigger Condition**: Current reading < Previous reading
+- **User Prompt**: SweetAlert dialog asking "Is this a new meter?"
+- **User Options**: 
+  - **Yes**: Proceed with meter replacement logic (add remark, set previous reading to 0)
+  - **No**: Block submission, inform user to provide valid reading
+- **Meter Replacement Logic**: 
+  - Add remark about new meter installation with current date
+  - Set previous reading to 0 in database
+  - Allow submission to proceed
+  - Flag reading as meter replacement for audit trail
+
+#### **Technical Implementation**
+- **Frontend Validation**: JavaScript validation in `app.js` before form submission
+- **SweetAlert Integration**: Context-appropriate dialog for meter replacement confirmation
+- **Database Logic**: Modify `sp_t_SaveTenantReading` stored procedure to handle previous reading = 0
+- **Remarks Integration**: Automatic remark addition for new meter scenarios
+- **Audit Trail**: Flag meter replacement readings in `t_tenant_reading_ext` table
+
+#### **Success Criteria**
+- [ ] Validation triggers when current reading < previous reading
+- [ ] SweetAlert dialog appears with "Is this a new meter?" prompt
+- [ ] "No" option blocks submission and shows error message
+- [ ] "Yes" option proceeds with meter replacement logic
+- [ ] Remarks automatically updated with new meter information and current date
+- [ ] Previous reading set to 0 in database for new meters
+- [ ] Meter replacement flag added to audit trail
+- [ ] User experience is clear and intuitive
+- [ ] No impact on normal meter reading workflow
+
+#### **Files to Modify**
+- `pages/qr-meter-reading/assets/js/app.js` - Add validation logic
+- `database/save-tenant-reading-procedure.sql` - Update stored procedure (create separate meter replacement procedure during implementation)
+- `pages/qr-meter-reading/api/save-reading.php` - Handle meter replacement flag
+- `memory-bank/tasks.md` - Update specification status
+- `memory-bank/progress.md` - Document implementation progress
+
+#### **Business Impact**
+- **Critical Issue Resolution**: Addresses Issue 11 (Electric Meter Replacement Scenario)
+- **Data Accuracy**: Prevents incorrect usage calculations for meter replacements
+- **User Guidance**: Provides clear workflow for meter replacement scenarios
+- **Audit Trail**: Maintains proper remarks for meter replacement documentation
+
+#### **Implementation Notes**
+- **SweetAlert Usage**: This is appropriate use of SweetAlert for critical business confirmation
+- **User Education**: Consider adding help text about meter replacement scenarios
+- **Testing**: Must test with various meter replacement scenarios
+- **Documentation**: Update user guides with meter replacement procedures
+
+---
 
 ## 🎯 STRUCTURED PHASE IMPLEMENTATION (23 Phases)
 

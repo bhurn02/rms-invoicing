@@ -267,7 +267,7 @@ Successfully implemented the exact CodePen template (403-acess-denied.html) for 
 - **Status**: ✅ **COMPLETED** - Requirements fulfilled by Phase 4
 
 ## Current Task
-**Phase 8: Offline Status Indicator** ⭐⭐ **MODERATE**
+**Phase 8: Offline Status Indicator** ⭐⭐ **MODERATE** - **READY FOR IMPLEMENTATION**
 
 ### **Phase 8 Entry Criteria** ✅ **MET**
 - [x] Phase 7 Smart Alert Strategy - Success Notifications complete (with mobile UX enhancement, messaging correction, and top row animation)
@@ -276,6 +276,133 @@ Successfully implemented the exact CodePen template (403-acess-denied.html) for 
 - [x] Touch targets meet 44px minimum
 - [x] Responsive design system established
 - [x] Toast notification system implemented and enhanced
+
+### **Phase 8: Offline Status Indicator - DETAILED IMPLEMENTATION PLAN**
+
+#### **Overview**
+Implement offline status indicator in navigation header following Creative Mode design decisions for Offline-First Architecture. This phase establishes the foundation for offline functionality and background sync capabilities.
+
+#### **Complexity Assessment**
+- **Level**: 2 (Simple Enhancement)
+- **Type**: UX Enhancement with Technical Implementation
+- **Risk**: Medium - Navigation changes and offline detection
+- **Time**: 2-3 hours
+- **Dependencies**: CSS File Organization (Phase 1), Responsive Layout Fixes (Phase 4)
+
+#### **Technology Stack**
+- **Framework**: Vanilla JavaScript (existing system)
+- **Storage**: localStorage for offline data tracking
+- **Detection**: Navigator.onLine API with event listeners
+- **UI Framework**: Bootstrap 5 (existing)
+- **Styling**: CSS with mobile-first responsive design
+
+#### **Technology Validation Checkpoints**
+- [x] Navigator.onLine API available in target browsers (Samsung A15, iPhone 14 Pro Max)
+- [x] localStorage available for offline data tracking
+- [x] Bootstrap 5 components available for indicator styling
+- [x] CSS responsive design system established
+- [x] JavaScript event handling capabilities confirmed
+
+#### **Creative Mode Design Integration**
+Based on `memory-bank/creative-modern-ux-enhancements.md` and `memory-bank/enhanced-ux-flows.md`:
+
+**Offline-First Architecture Implementation Requirements**:
+- **Offline Detection**: Detect network status changes using Navigator.onLine
+- **Visual Indicator**: Show offline status in navigation header
+- **Pending Count**: Display number of pending offline readings
+- **Manual Sync Button**: Allow users to trigger sync manually
+- **Professional Appearance**: Consistent with existing design system
+
+**Enhanced UX Flow - Offline Sync Flow**:
+- **Offline Detection**: Real-time network status monitoring
+- **Local Storage**: Track pending readings when offline
+- **Status Indicator**: Visual feedback in header navigation
+- **Sync Options**: Manual and automatic sync capabilities
+
+#### **Implementation Plan**
+
+**Step 1: Offline Detection System**
+- Implement Navigator.onLine API monitoring
+- Add event listeners for online/offline status changes
+- Create offline data tracking system using localStorage
+- Test offline detection on target devices
+
+**Step 2: Navigation Header Integration**
+- Add offline status indicator to existing navigation header
+- Implement responsive design for mobile and desktop
+- Create visual states for online/offline/pending sync
+- Ensure 44px minimum touch targets
+
+**Step 3: Pending Count System**
+- Track pending offline readings in localStorage
+- Display count in status indicator
+- Update count when readings are saved offline
+- Clear count when sync is successful
+
+**Step 4: Manual Sync Interface**
+- Add manual sync button to offline indicator
+- Implement sync trigger functionality
+- Create visual feedback during sync process
+- Handle sync success/failure states
+
+**Step 5: Visual Design & Animation**
+- Create professional offline indicator design
+- Implement smooth transitions for status changes
+- Add loading animations for sync process
+- Ensure accessibility compliance
+
+#### **Success Criteria**
+- [ ] Offline indicator appears in header when offline
+- [ ] Shows pending count of unsynced readings
+- [ ] Manual sync button available and functional
+- [ ] Professional appearance consistent with design system
+- [ ] Offline/online transitions tested on target devices
+- [ ] 44px minimum touch targets maintained
+- [ ] Responsive design works on all screen sizes
+- [ ] No impact on existing QR scanner functionality
+
+#### **Files to Modify**
+- `pages/qr-meter-reading/index.php` - Add offline status indicator to navigation header
+- `pages/qr-meter-reading/assets/js/app.js` - Implement offline detection and sync logic
+- `pages/qr-meter-reading/assets/css/qr-scanner.css` - Add offline indicator styling
+- `memory-bank/tasks.md` - Update phase status
+- `memory-bank/progress.md` - Document implementation progress
+
+#### **Dependencies**
+- **Phase 1**: CSS File Organization (required for proper styling)
+- **Phase 4**: Responsive Layout Fixes (required for mobile optimization)
+- **Phase 7**: Success Notifications (required for sync feedback)
+
+#### **Challenges & Mitigations**
+- **Challenge**: Cross-browser offline detection compatibility
+  - **Mitigation**: Use Navigator.onLine with fallback polling mechanism
+- **Challenge**: Mobile device offline detection reliability
+  - **Mitigation**: Test extensively on Samsung A15 and iPhone 14 Pro Max
+- **Challenge**: localStorage data persistence
+  - **Mitigation**: Implement data validation and cleanup mechanisms
+- **Challenge**: Navigation header layout impact
+  - **Mitigation**: Use responsive design to prevent layout breaks
+
+#### **Rollback Procedures**
+- Remove offline indicator from navigation header
+- Remove offline detection JavaScript code
+- Remove offline indicator CSS styling
+- Restore original navigation header layout
+- Clear localStorage offline data
+
+#### **Testing Strategy**
+- **Pre-Phase**: Document current navigation header layout
+- **During Implementation**: Test offline detection on target devices
+- **Post-Phase**: Verify offline indicator functionality and responsive design
+- **Integration**: Test with existing QR scanner functionality
+- **Device Testing**: Samsung A15, iPhone 14 Pro Max, desktop browsers
+
+#### **Creative Mode Integration Success**
+- [ ] **Offline-First Architecture**: Foundation established for PWA features
+- [ ] **Enhanced UX Flow**: Offline Sync Flow pattern implemented
+- [ ] **Mobile Optimization**: Touch-friendly interface maintained
+- [ ] **Smart Alert Strategy**: Context-appropriate sync notifications
+- [ ] **Responsive Design**: Works across all target devices
 
 ### **✅ Phase 7: Smart Alert Strategy - Success Notifications - COMPLETED & ARCHIVED**
 **Date**: 2025-09-10  
@@ -358,6 +485,75 @@ All Phase 6 success criteria were met during Phase 4 implementation.
 - **Form Validation**: Existing validation must continue working
 - **Database Operations**: All database operations must remain functional
 - **User Authentication**: Login/logout must work correctly
+
+## 🔧 **SEPARATE ENHANCEMENTS (Independent of Phase Structure)**
+
+### **Meter Replacement Validation Enhancement** ⭐⭐ **MODERATE**
+**Status**: **SPECIFICATION DEFINED** - Ready for Implementation  
+**Priority**: **HIGH** - Critical business logic for meter replacements  
+**Date**: 2025-09-25  
+**Complexity**: Level 2 (Business Logic Enhancement)  
+**Risk**: Medium - Database logic and user workflow changes  
+**Time**: 3-4 hours  
+**Dependencies**: None (can be implemented independently)  
+
+#### **Overview**
+Implement validation for meter replacement scenarios when current reading is less than previous reading. This addresses the critical business case where electric meters are replaced and start at 0.
+
+#### **Business Requirements**
+- **Trigger Condition**: Current reading < Previous reading
+- **User Prompt**: SweetAlert dialog asking "Is this a new meter?"
+- **User Options**: 
+  - **Yes**: Proceed with meter replacement logic
+  - **No**: Block submission, inform user to provide valid reading
+- **Meter Replacement Logic**: 
+  - Add remark about new meter installation with current date
+  - Set previous reading to 0 in database
+  - Allow submission to proceed
+  - Flag reading as meter replacement for audit trail
+
+#### **Implementation Requirements**
+- **Frontend Validation**: JavaScript validation before form submission
+- **SweetAlert Integration**: Context-appropriate dialog for meter replacement confirmation
+- **Database Logic**: Modify stored procedure to handle previous reading = 0 for new meters
+- **Remarks Integration**: Automatic remark addition for new meter scenarios
+- **User Experience**: Clear messaging about meter replacement process
+
+#### **Technical Implementation**
+- **Validation Location**: `pages/qr-meter-reading/assets/js/app.js`
+- **Database Changes**: Create separate meter replacement stored procedure (based on `save-tenant-reading-procedure.sql`)
+- **UI Integration**: SweetAlert dialog with Yes/No options
+- **Data Flow**: Current reading validation → User confirmation → Database save with adjusted previous reading
+
+#### **Success Criteria**
+- [ ] Validation triggers when current reading < previous reading
+- [ ] SweetAlert dialog appears with "Is this a new meter?" prompt
+- [ ] "No" option blocks submission and shows error message
+- [ ] "Yes" option proceeds with meter replacement logic
+- [ ] Remarks automatically updated with new meter information and current date
+- [ ] Previous reading set to 0 in database for new meters
+- [ ] Meter replacement flag added to audit trail
+- [ ] User experience is clear and intuitive
+- [ ] No impact on normal meter reading workflow
+
+#### **Files to Modify**
+- `pages/qr-meter-reading/assets/js/app.js` - Add validation logic
+- `database/save-tenant-reading-procedure.sql` - Update stored procedure (create separate meter replacement procedure during implementation)
+- `pages/qr-meter-reading/api/save-reading.php` - Handle meter replacement flag
+- `memory-bank/tasks.md` - Update specification status
+- `memory-bank/progress.md` - Document implementation progress
+
+#### **Business Impact**
+- **Critical Issue Resolution**: Addresses Issue 11 (Electric Meter Replacement Scenario)
+- **Data Accuracy**: Prevents incorrect usage calculations for meter replacements
+- **User Guidance**: Provides clear workflow for meter replacement scenarios
+- **Audit Trail**: Maintains proper remarks for meter replacement documentation
+
+#### **Implementation Notes**
+- **SweetAlert Usage**: This is appropriate use of SweetAlert for critical business confirmation
+- **User Education**: Consider adding help text about meter replacement scenarios
+- **Testing**: Must test with various meter replacement scenarios
+- **Documentation**: Update user guides with meter replacement procedures
 
 ## Total Project Estimate
 - **Total Phases**: 23

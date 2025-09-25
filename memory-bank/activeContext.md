@@ -1,12 +1,12 @@
 # Active Context ✅ PHASE 7 ARCHIVED - QR Meter Reading System
 
 ## Current Focus
-**IMPLEMENTATION v1.2**: Structured Phase Implementation with 23 individual phases, each focused on a single specific task to ensure 98% success rate. Phase 7 (Smart Alert Strategy - Success Notifications) has been completed, reflected, and archived successfully with mobile UX enhancement, messaging correction, and elegant top row animation. **Ready to begin Phase 8 (Offline Status Indicator)**.
+**IMPLEMENTATION v1.2**: Structured Phase Implementation with 23 individual phases, each focused on a single specific task to ensure 98% success rate. Phase 7 (Smart Alert Strategy - Success Notifications) has been completed, reflected, and archived successfully with mobile UX enhancement, messaging correction, and elegant top row animation. **Phase 8 (Offline Status Indicator) planning is complete and ready for implementation**.
 
 ## Progress Summary (Updated 2025-09-10)
 - **Total Phases**: 23
 - **Completed Phases**: 7 (Phases 1-7, all completed successfully with reflection and archiving)
-- **Current Phase**: Phase 8 (Offline Status Indicator) - Ready to Start  
+- **Current Phase**: Phase 8 (Offline Status Indicator) - Planning Complete, Ready for Implementation  
 - **Success Rate**: 100% (7/7 phases completed successfully)
 - **Next Milestone**: Complete Week 2 Core UX Improvements (Phases 8-9)
 
@@ -98,21 +98,35 @@
    - **Archive**: [docs/archive/enhancements/2025-09/phase4-responsive-layout-20250910.md](../docs/archive/enhancements/2025-09/phase4-responsive-layout-20250910.md)
 
 ## Current Focus
-**Phase 7: Smart Alert Strategy - Success Notifications** ⭐ **EASY** - **READY TO START**
+**Phase 8: Offline Status Indicator** ⭐⭐ **MODERATE** - **PLANNING COMPLETE, READY FOR IMPLEMENTATION**
 
-### **Phase 7 Entry Criteria** ✅ **MET**
-- [x] Phase 6 QR scanner page UX optimization complete (completed as part of Phase 4)
+### **Phase 8 Entry Criteria** ✅ **MET**
+- [x] Phase 7 Smart Alert Strategy - Success Notifications complete (with mobile UX enhancement, messaging correction, and top row animation)
 - [x] CSS file organization complete
 - [x] Mobile-first design implemented
 - [x] Touch targets meet 44px minimum
 - [x] Responsive design system established
+- [x] Toast notification system implemented and enhanced
 
-### **Phase 7 Success Criteria** (To Be Achieved)
-- [ ] Success messages don't interrupt workflow
-- [ ] Toast notifications positioned correctly
-- [ ] Auto-dismiss after 3 seconds
-- [ ] No blocking dialogs for success
-- [ ] Success scenarios tested
+### **Phase 8 Implementation Plan** ✅ **COMPLETE**
+- [x] Technology stack validated (Navigator.onLine API, localStorage, Bootstrap 5)
+- [x] Implementation steps defined (5 detailed steps)
+- [x] Creative Mode design decisions integrated (Offline-First Architecture, Enhanced UX Flows)
+- [x] Success criteria established (8 specific criteria)
+- [x] Files to modify identified (index.php, app.js, qr-scanner.css)
+- [x] Challenges and mitigations documented
+- [x] Rollback procedures established
+- [x] Testing strategy defined
+
+### **Phase 8 Success Criteria** (To Be Achieved)
+- [ ] Offline indicator appears in header when offline
+- [ ] Shows pending count of unsynced readings
+- [ ] Manual sync button available and functional
+- [ ] Professional appearance consistent with design system
+- [ ] Offline/online transitions tested on target devices
+- [ ] 44px minimum touch targets maintained
+- [ ] Responsive design works on all screen sizes
+- [ ] No impact on existing QR scanner functionality
 
 ## Critical Issues Status ✅
 
@@ -207,16 +221,24 @@
 ## Next Immediate Actions
 
 ### **🎯 Current Phase**
-1. **Phase 5: Access Denied Page Responsive Design**: READY TO START (2025-09-10)
-   - **Entry Criteria**: ✅ MET - Phase 4 complete, responsive layout system in place
-   - **Success Criteria**: Responsive design works on all screen sizes, professional appearance on wide screens, proper visual hierarchy, touch-friendly on mobile devices, wide screen real estate utilized effectively
-   - **Time**: 3-4 hours
-   - **Risk**: Medium - Layout changes
-   - **Dependencies**: Responsive Layout Fixes (Phase 4)
-   - **Rollback**: Restore previous access denied page design
+1. **Phase 8: Offline Status Indicator**: READY FOR IMPLEMENTATION (2025-09-10)
+   - **Entry Criteria**: ✅ MET - Phase 7 complete, responsive layout system established
+   - **Success Criteria**: Offline indicator appears in header, shows pending count, manual sync button functional, professional appearance, offline/online transitions tested, 44px touch targets maintained, responsive design, no impact on existing functionality
+   - **Time**: 2-3 hours
+   - **Risk**: Medium - Navigation changes and offline detection
+   - **Dependencies**: CSS File Organization (Phase 1), Responsive Layout Fixes (Phase 4), Success Notifications (Phase 7)
+   - **Rollback**: Remove offline indicator, restore original navigation header, clear localStorage data
 
 ### **📋 Upcoming Actions**
-2. **End-to-End Testing**: Test complete QR reading flow with real data including:
+2. **Meter Replacement Validation Enhancement**: Implement critical business logic for meter replacements
+   - **Priority**: HIGH - Addresses Issue 11 (Electric Meter Replacement Scenario)
+   - **Implementation**: JavaScript validation + SweetAlert dialog + database logic
+   - **Business Logic**: When current reading < previous reading, prompt user if new meter
+   - **Database Changes**: Set previous reading to 0 for new meters
+   - **User Experience**: Clear workflow for meter replacement scenarios
+   - **Time**: 3-4 hours (independent of phase structure)
+
+3. **End-to-End Testing**: Test complete QR reading flow with real data including:
    - First-time readings (new units)
    - Regular monthly readings
    - Tenant transition readings (move-in/move-out)
@@ -224,16 +246,17 @@
    - User access rights validation
    - **NEW**: Offline functionality and sync testing
    - **NEW**: Modern UX workflow testing
+   - **NEW**: Meter replacement validation testing
 
-3. **Tenant Readings Management Page**: Implement comprehensive reading management interface
+4. **Tenant Readings Management Page**: Implement comprehensive reading management interface
    - Reading review and edit capabilities with billing protection
    - Instructions to use existing invoice void interface for billed readings
    - Export options (Excel, PDF, Print)
    - Meter replacement handling via edit interface
 
-4. **Production Deployment**: Deploy to production environment
+5. **Production Deployment**: Deploy to production environment
 
-5. **Documentation Updates**: Update user and technical documentation
+6. **Documentation Updates**: Update user and technical documentation
    - **NEW**: Modern UX guidelines and best practices
    - **NEW**: Offline functionality documentation
    - **NEW**: Mobile optimization guidelines 

@@ -87,6 +87,151 @@ sequenceDiagram
 
 ---
 
+## 7) Complete QR Scanning Flow with Meter Replacement Validation
+
+### **Comprehensive QR Meter Reading Flow**
+```mermaid
+flowchart TD
+    A[User Opens QR Scanner App] --> B[Check Authentication]
+    B -->|Not Authenticated| C[Show Login Form]
+    B -->|Authenticated| D[Check QR Access Permissions]
+    C --> E[Real-time Login Validation]
+    E -->|Valid| D
+    E -->|Invalid| F[Show Inline Error Messages]
+    F --> C
+    D -->|Has Access| G[Show QR Scanner Interface]
+    D -->|No Access| H[Show Access Denied Page]
+    
+    G --> I[User Clicks Start Scanner]
+    I --> J[Camera Activates]
+    J --> K[User Scans QR Code]
+    K --> L[Parse QR Data]
+    L --> M[Auto-populate Form Fields]
+    M --> N[Focus Current Reading Input]
+    N --> O[User Enters Current Reading]
+    O --> P[Validate Current Reading]
+    P -->|Valid| Q[Check if Current < Previous]
+    P -->|Invalid| R[Show Inline Validation Error]
+    R --> O
+    
+    Q -->|Current >= Previous| S[Normal Reading Process]
+    Q -->|Current < Previous| T[Meter Replacement Validation]
+    
+    T --> U[Show SweetAlert: Is this a new meter?]
+    U -->|Yes| V[Add Meter Replacement Remark]
+    U -->|No| W[Block Submission - Show Error]
+    W --> X[Inform User: Provide Valid Reading]
+    X --> O
+    
+    V --> Y[Set Previous Reading to 0]
+    Y --> S
+    
+    S --> Z[Calculate Reading Periods]
+    Z --> AA[Save to Database]
+    AA --> BB[Show Success Toast Notification]
+    BB --> CC[Auto-reset Form]
+    CC --> DD[Focus Scanner for Next Reading]
+    DD --> K
+    
+    H --> II[User Clicks Login Button]
+    II --> C
+    
+    style T fill:#ffeb3b,stroke:#f57f17,color:black
+    style U fill:#ffeb3b,stroke:#f57f17,color:black
+    style V fill:#4caf50,stroke:#2e7d32,color:white
+    style W fill:#f44336,stroke:#c62828,color:white
+    style Y fill:#4caf50,stroke:#2e7d32,color:white
+```
+
+### **Meter Replacement Validation Logic**
+```mermaid
+flowchart TD
+    A[Current Reading Entered] --> B{Current < Previous?}
+    B -->|No| C[Proceed with Normal Flow]
+    B -->|Yes| D[Trigger Meter Replacement Validation]
+    
+    D --> E[Show SweetAlert Dialog]
+    E --> F[Title: Meter Replacement Detected]
+    F --> G[Message: Current reading is less than previous reading. Is this a new meter?]
+    G --> H[Options: Yes / No]
+    
+    H -->|User Selects: No| I[Block Form Submission]
+    I --> J[Show Error Message]
+    J --> K[Message: Please provide a valid current reading]
+    K --> L[Return to Form Input]
+    
+    H -->|User Selects: Yes| M[Proceed with Meter Replacement]
+    M --> N["Add Remark: New meter installed on date"]
+    N --> O[Set Previous Reading to 0]
+    O --> P[Allow Form Submission]
+    P --> Q[Save with Adjusted Data]
+    
+    style D fill:#ff9800,stroke:#e65100,color:white
+    style E fill:#ff9800,stroke:#e65100,color:white
+    style M fill:#4caf50,stroke:#2e7d32,color:white
+    style I fill:#f44336,stroke:#c62828,color:white
+    style N fill:#4caf50,stroke:#2e7d32,color:white
+    style O fill:#4caf50,stroke:#2e7d32,color:white
+```
+
+### **Database Integration for Meter Replacement**
+```mermaid
+sequenceDiagram
+    participant UI as Frontend
+    participant API as save-reading.php
+    participant DB as MSSQL Database
+    
+    UI->>API: POST { currentReading, remarks, meterReplacement: true }
+    API->>API: Validate meter replacement flag
+    API->>DB: UPDATE previous_reading = 0 WHERE meter_replacement = true
+    API->>DB: INSERT INTO t_tenant_reading (prev_reading = 0, remarks = 'New meter installed on date')
+    DB-->>API: reading_id
+    API->>DB: INSERT INTO t_tenant_reading_ext (reading_id, meter_replacement_flag = true)
+    DB-->>API: success
+    API-->>UI: { success: true, message: 'Meter replacement reading saved successfully' }
+```
+
+---
+
+## 8) Meter Replacement Validation Specification
+
+### **Business Requirements**
+- **Trigger Condition**: Current reading < Previous reading
+- **User Prompt**: SweetAlert dialog asking "Is this a new meter?"
+- **User Options**: 
+  - **Yes**: Proceed with meter replacement logic
+  - **No**: Block submission, inform user to provide valid reading
+- **Meter Replacement Logic**: 
+  - Add remark about new meter installation with current date
+  - Set previous reading to 0 in database
+  - Allow submission to proceed
+  - Flag reading as meter replacement for audit trail
+
+### **Technical Implementation**
+- **Frontend Validation**: JavaScript validation in `app.js` before form submission
+- **SweetAlert Integration**: Context-appropriate dialog for meter replacement confirmation
+- **Database Logic**: Create separate meter replacement stored procedure (based on `save-tenant-reading-procedure.sql`) to handle previous reading = 0
+- **Remarks Integration**: Automatic remark addition for new meter scenarios
+- **Audit Trail**: Flag meter replacement readings in `t_tenant_reading_ext` table
+
+### **Implementation Files**
+- `pages/qr-meter-reading/assets/js/app.js` - Add validation logic
+- `database/save-tenant-reading-procedure.sql` - Reference for creating separate meter replacement procedure
+- `pages/qr-meter-reading/api/save-reading.php` - Handle meter replacement flag
+
+### **Success Criteria**
+- [ ] Validation triggers when current reading < previous reading
+- [ ] SweetAlert dialog appears with "Is this a new meter?" prompt
+- [ ] "No" option blocks submission and shows error message
+- [ ] "Yes" option proceeds with meter replacement logic
+- [ ] Remarks automatically updated with new meter information and current date
+- [ ] Previous reading set to 0 in database for new meters
+- [ ] Meter replacement flag added to audit trail
+- [ ] User experience is clear and intuitive
+- [ ] No impact on normal meter reading workflow
+
+---
+
 ## 6) Reporting Linkage
 - Report endpoint queries `t_tenant_reading` (+ join `t_tenant_reading_ext`) by date range/property/technician
 - Usage = `current_reading - prev_reading`

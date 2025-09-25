@@ -56,7 +56,120 @@
 - ✅ **Reflection**: Completed - Comprehensive reflection document with technical and process insights
 - ✅ **Archiving**: Completed - Task fully documented and archived with future considerations
 
-**Next**: Phase 8 - Offline Status Indicator
+**Next**: Phase 8 - Offline Status Indicator - **PLANNING COMPLETE**
+
+### **Phase 8: Offline Status Indicator - PLANNING COMPLETE**
+**Status**: **PLANNING COMPLETE** - Ready for Implementation  
+**Date**: 2025-09-10  
+**Complexity**: Level 2 (Simple Enhancement)  
+**Risk**: Medium - Navigation changes and offline detection  
+**Time**: 2-3 hours  
+**Dependencies**: CSS File Organization (Phase 1), Responsive Layout Fixes (Phase 4), Success Notifications (Phase 7)  
+
+#### **Planning Summary**
+Comprehensive implementation plan created following Creative Mode design decisions for Offline-First Architecture. Plan includes:
+
+**Technology Stack Validated**:
+- ✅ Navigator.onLine API available in target browsers
+- ✅ localStorage available for offline data tracking  
+- ✅ Bootstrap 5 components available for indicator styling
+- ✅ CSS responsive design system established
+- ✅ JavaScript event handling capabilities confirmed
+
+**Implementation Plan Created**:
+- ✅ **Step 1**: Offline Detection System using Navigator.onLine API
+- ✅ **Step 2**: Navigation Header Integration with responsive design
+- ✅ **Step 3**: Pending Count System with localStorage tracking
+- ✅ **Step 4**: Manual Sync Interface with visual feedback
+- ✅ **Step 5**: Visual Design & Animation with accessibility compliance
+
+**Creative Mode Integration**:
+- ✅ **Offline-First Architecture**: Foundation for PWA features established
+- ✅ **Enhanced UX Flow**: Offline Sync Flow pattern implementation
+- ✅ **Mobile Optimization**: Touch-friendly interface maintained
+- ✅ **Smart Alert Strategy**: Context-appropriate sync notifications
+- ✅ **Responsive Design**: Cross-device compatibility ensured
+
+**Success Criteria Defined**:
+- ✅ Offline indicator appears in header when offline
+- ✅ Shows pending count of unsynced readings
+- ✅ Manual sync button available and functional
+- ✅ Professional appearance consistent with design system
+- ✅ Offline/online transitions tested on target devices
+- ✅ 44px minimum touch targets maintained
+- ✅ Responsive design works on all screen sizes
+- ✅ No impact on existing QR scanner functionality
+
+**Files to Modify Identified**:
+- `pages/qr-meter-reading/index.php` - Navigation header integration
+- `pages/qr-meter-reading/assets/js/app.js` - Offline detection and sync logic
+- `pages/qr-meter-reading/assets/css/qr-scanner.css` - Offline indicator styling
+
+**Challenges & Mitigations Documented**:
+- ✅ Cross-browser offline detection compatibility with fallback mechanisms
+- ✅ Mobile device offline detection reliability with extensive testing
+- ✅ localStorage data persistence with validation and cleanup
+- ✅ Navigation header layout impact with responsive design
+
+**Rollback Procedures Established**:
+- ✅ Clear steps to revert all changes if issues arise
+- ✅ Data cleanup procedures for localStorage
+- ✅ Original navigation header restoration process
+
+**Testing Strategy Defined**:
+- ✅ Pre-phase documentation of current state
+- ✅ During implementation testing on target devices
+- ✅ Post-phase validation and integration testing
+- ✅ Device-specific testing on Samsung A15 and iPhone 14 Pro Max
+
+**Ready for Implementation**: All planning requirements met, technology stack validated, implementation plan detailed, and Creative Mode design decisions integrated.
+
+## 🔧 **SEPARATE ENHANCEMENT SPECIFICATIONS**
+
+### **Meter Replacement Validation Enhancement - SPECIFICATION DEFINED**
+**Status**: **SPECIFICATION DEFINED** - Ready for Implementation  
+**Priority**: **HIGH** - Critical business logic for meter replacements  
+**Date**: 2025-09-25  
+**Complexity**: Level 2 (Business Logic Enhancement)  
+**Risk**: Medium - Database logic and user workflow changes  
+**Time**: 3-4 hours  
+**Dependencies**: None (can be implemented independently)  
+
+#### **Business Requirements**
+- **Trigger Condition**: Current reading < Previous reading
+- **User Prompt**: SweetAlert dialog asking "Is this a new meter?"
+- **User Options**: 
+  - **Yes**: Proceed with meter replacement logic (add remark, set previous reading to 0)
+  - **No**: Block submission, inform user to provide valid reading
+
+#### **Technical Implementation**
+- **Frontend Validation**: JavaScript validation in `app.js` before form submission
+- **SweetAlert Integration**: Context-appropriate dialog for meter replacement confirmation
+- **Database Logic**: Create separate meter replacement stored procedure (based on `save-tenant-reading-procedure.sql`) to handle previous reading = 0
+- **Remarks Integration**: Automatic remark addition for new meter scenarios
+
+#### **Success Criteria**
+- [ ] Validation triggers when current reading < previous reading
+- [ ] SweetAlert dialog appears with "Is this a new meter?" prompt
+- [ ] "No" option blocks submission and shows error message
+- [ ] "Yes" option proceeds with meter replacement logic
+- [ ] Remarks automatically updated with new meter information and current date
+- [ ] Previous reading set to 0 in database for new meters
+- [ ] Meter replacement flag added to audit trail
+- [ ] User experience is clear and intuitive
+- [ ] No impact on normal meter reading workflow
+
+#### **Business Impact**
+- **Critical Issue Resolution**: Addresses Issue 11 (Electric Meter Replacement Scenario)
+- **Data Accuracy**: Prevents incorrect usage calculations for meter replacements
+- **User Guidance**: Provides clear workflow for meter replacement scenarios
+- **Audit Trail**: Maintains proper remarks for meter replacement documentation
+
+#### **Implementation Notes**
+- **SweetAlert Usage**: This is appropriate use of SweetAlert for critical business confirmation
+- **User Education**: Consider adding help text about meter replacement scenarios
+- **Testing**: Must test with various meter replacement scenarios
+- **Documentation**: Update user guides with meter replacement procedures
 
 ### **✅ Phase 1: CSS File Organization - COMPLETED**
 **Status**: **COMPLETED** - Foundation phase completed successfully  
