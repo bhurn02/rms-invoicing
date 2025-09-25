@@ -716,6 +716,300 @@
 
 /* ===== PROFESSIONAL NAVIGATION STYLING ===== */
 
+/* PHASE 8: Offline Status Indicator - UX Design Standards Compliant */
+.offline-indicator {
+    display: flex;
+    align-items: center;
+    margin-right: 0.75rem;
+    transition: all 0.3s ease-in-out;
+    flex-shrink: 0;
+    position: relative;
+    /* Ensure proper spacing from Tools dropdown */
+    margin-left: 0;
+}
+
+.offline-indicator.hidden {
+    display: none;
+}
+
+.offline-status {
+    display: flex;
+    align-items: center;
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: all 0.3s ease-in-out;
+    min-height: 44px; /* Touch target requirement */
+    cursor: pointer;
+    position: relative;
+    /* Professional styling following design standards */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border: 1px solid transparent;
+    /* Match Tools button size */
+    height: 38px;
+    line-height: 1.2;
+}
+
+.offline-status:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.offline-status.offline {
+    background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+    color: #dc2626;
+    border-color: #fca5a5;
+}
+
+.offline-status.pending {
+    background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+    color: #1d4ed8;
+    border-color: #93c5fd;
+}
+
+.offline-status.online {
+    background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+    color: #16a34a;
+    border-color: #86efac;
+}
+
+/* Online status green dot */
+.online-dot {
+    width: 8px;
+    height: 8px;
+    background-color: #22c55e;
+    border-radius: 50%;
+    display: inline-block;
+    animation: pulse-green 2s infinite;
+}
+
+@keyframes pulse-green {
+    0% { opacity: 1; }
+    50% { opacity: 0.5; }
+    100% { opacity: 1; }
+}
+
+/* Tooltip for accessibility and user guidance - Desktop shows below */
+.offline-status::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.9);
+    color: white;
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.375rem;
+    font-size: 0.75rem;
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease-in-out;
+    z-index: 1000;
+    pointer-events: none;
+    margin-top: 0.5rem;
+}
+
+.offline-status:hover::after {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%) translateY(4px);
+}
+
+/* Mobile-specific touch interactions */
+@media (max-width: 768px) {
+    .offline-status {
+        padding: 0.75rem 1rem;
+        font-size: 0.9rem;
+        min-height: 48px; /* Larger touch target for mobile */
+    }
+    
+    .offline-status::after {
+        /* Mobile tooltip positioning */
+        bottom: auto;
+        top: 100%;
+        transform: translateX(-50%);
+        margin-top: 0.5rem;
+    }
+    
+    .offline-status:hover::after {
+        transform: translateX(-50%) translateY(4px);
+    }
+    
+    /* Show text on mobile for better UX */
+    .offline-status .d-none.d-sm-inline {
+        display: inline !important;
+    }
+}
+
+/* Desktop hover states */
+@media (min-width: 769px) {
+    .offline-status:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+    }
+}
+
+/* Badge styling improvements */
+.offline-status .badge {
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.375rem;
+    min-width: 1.5rem;
+    text-align: center;
+}
+
+/* Fix Tools dropdown button border */
+.btn-outline-light.dropdown-toggle {
+    border-color: transparent !important;
+}
+
+.btn-outline-light.dropdown-toggle:hover,
+.btn-outline-light.dropdown-toggle:focus,
+.btn-outline-light.dropdown-toggle:active {
+    border-color: transparent !important;
+    box-shadow: none !important;
+}
+
+/* User Avatar Status Indicator (like messaging apps) */
+.user-avatar {
+    position: relative;
+    display: inline-block;
+}
+
+.user-avatar .status-badge {
+    position: absolute;
+    bottom: -2px;
+    right: -2px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    border: 2px solid white;
+    z-index: 10;
+}
+
+.user-avatar .status-badge.online {
+    background-color: #22c55e;
+    animation: pulse-green 2s infinite;
+}
+
+.user-avatar .status-badge.offline {
+    background-color: #dc2626;
+}
+
+.user-avatar .status-badge.pending {
+    background-color: #f59e0b;
+}
+
+/* Ensure avatar container has proper positioning */
+.navbar .user-dropdown {
+    position: relative;
+}
+
+/* Sync button styling - Make icon visible */
+.sync-btn {
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.375rem;
+    font-size: 0.875rem;
+    transition: all 0.2s ease-in-out;
+    background-color: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #1d4ed8;
+}
+
+.sync-btn:hover {
+    transform: scale(1.05);
+    background-color: rgba(255, 255, 255, 0.2);
+    color: #1e40af;
+}
+
+.sync-btn:active {
+    transform: scale(0.95);
+}
+
+.sync-btn i {
+    color: inherit;
+}
+
+.offline-status i {
+    font-size: 1rem;
+}
+
+.offline-status .badge {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+    min-width: 1.5rem;
+    text-align: center;
+}
+
+.sync-btn {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+    min-height: 32px;
+    min-width: 32px;
+    border-radius: 0.25rem;
+    transition: all 0.2s ease-in-out;
+}
+
+.sync-btn:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+    transform: scale(1.05);
+}
+
+.sync-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* Mobile responsive offline indicator */
+@media (max-width: 768px) {
+    .offline-indicator {
+        margin-right: 0.5rem;
+    }
+    
+    .offline-status {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.8rem;
+        min-height: 40px;
+    }
+    
+    .offline-status span.d-none.d-sm-inline {
+        display: none !important;
+    }
+    
+    .sync-btn {
+        min-height: 28px;
+        min-width: 28px;
+        padding: 0.2rem 0.4rem;
+    }
+}
+
+/* Extra small devices */
+@media (max-width: 576px) {
+    .offline-indicator {
+        margin-right: 0.25rem;
+    }
+    
+    .offline-status {
+        padding: 0.2rem 0.4rem;
+        font-size: 0.75rem;
+        min-height: 36px;
+    }
+    
+    .offline-status i {
+        font-size: 0.875rem;
+    }
+    
+    .offline-status .badge {
+        font-size: 0.7rem;
+        padding: 0.2rem 0.4rem;
+        min-width: 1.25rem;
+    }
+}
+
 /* Critical iOS fixes */
 input[type="text"], input[type="email"], input[type="password"], 
 input[type="number"], input[type="date"], textarea, select {

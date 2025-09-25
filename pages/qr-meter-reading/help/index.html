@@ -92,6 +92,9 @@
                             <a class="nav-link" href="#qr-scanning">
                                 <i class="bi bi-qr-code-scan me-2"></i>QR Scanning
                             </a>
+                            <a class="nav-link" href="#offline-sync">
+                                <i class="bi bi-wifi-off me-2"></i>Offline & Sync
+                            </a>
                             <a class="nav-link" href="#qr-generator">
                                 <i class="bi bi-qr-code me-2"></i>QR Generator
                             </a>
@@ -150,11 +153,19 @@
                                         </li>
                                         <li class="mb-2">
                                             <i class="bi bi-check-circle text-success me-2"></i>
-                                            Offline capability
+                                            Offline-first architecture
                                         </li>
                                         <li class="mb-2">
                                             <i class="bi bi-check-circle text-success me-2"></i>
-                                            Real-time validation
+                                            Smart sync system
+                                        </li>
+                                        <li class="mb-2">
+                                            <i class="bi bi-check-circle text-success me-2"></i>
+                                            Real-time status indicators
+                                        </li>
+                                        <li class="mb-2">
+                                            <i class="bi bi-check-circle text-success me-2"></i>
+                                            Connection notifications
                                         </li>
                                     </ul>
                                 </div>
@@ -342,6 +353,139 @@
                             </div>
                         </section>
                         
+                        <!-- Offline & Sync Features -->
+                        <section id="offline-sync" class="mb-5">
+                            <h2 class="h3 mb-4">
+                                <i class="bi bi-wifi-off me-2 text-primary"></i>Offline Mode & Sync Features
+                            </h2>
+                            
+                            <div class="feature-card">
+                                <h5 class="mb-3">Offline-First Architecture</h5>
+                                <p>The QR Meter Reading System is designed to work seamlessly offline. When you lose internet connection, readings are automatically saved locally and synced when connection is restored. You'll never lose your work!</p>
+                            </div>
+                            
+                            <h5 class="mb-3">Connection Status Indicators</h5>
+                            
+                            <div class="mb-4">
+                                <h6 class="mb-2">
+                                    <span class="step-number">1</span>Online Status (Green Dot)
+                                </h6>
+                                <p>When you're online and all readings are synced, you'll see a green dot on your user avatar in the navigation bar.</p>
+                                <div class="text-center mt-3">
+                                    <img src="assets/images/007 qr-meter-reading - MAIN PAGE - Online Indicator.png" alt="Online Status Indicator" class="img-fluid rounded shadow" style="max-width: 400px;">
+                                    <p class="small text-muted mt-2">Green dot indicates you're online and all readings are synced</p>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <h6 class="mb-2">
+                                    <span class="step-number">2</span>Offline Status (Red Dot)
+                                </h6>
+                                <p>When you're offline, readings are saved locally and you'll see a red dot on your user avatar. The system will show an offline indicator in the navigation.</p>
+                                <div class="text-center mt-3">
+                                    <img src="assets/images/008 qr-meter-reading - MAIN PAGE - Offline Indicator.png" alt="Offline Status Indicator" class="img-fluid rounded shadow" style="max-width: 400px;">
+                                    <p class="small text-muted mt-2">Red dot and offline indicator when connection is lost</p>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <h6 class="mb-2">
+                                    <span class="step-number">3</span>Pending Sync (Orange Dot)
+                                </h6>
+                                <p>When you're online but have readings waiting to sync, you'll see an orange dot and a sync indicator with the count of pending readings.</p>
+                                <div class="text-center mt-3">
+                                    <img src="assets/images/009 qr-meter-reading - MAIN PAGE - Manual Sync Indicator.png" alt="Manual Sync Indicator" class="img-fluid rounded shadow" style="max-width: 400px;">
+                                    <p class="small text-muted mt-2">Orange dot and sync button when readings need to be synced</p>
+                                </div>
+                            </div>
+                            
+                            <h5 class="mb-3">Automatic Sync Process</h5>
+                            
+                            <div class="mb-4">
+                                <h6 class="mb-2">
+                                    <span class="step-number">1</span>Connection Restored
+                                </h6>
+                                <p>When your internet connection is restored, the system automatically detects this and begins syncing your offline readings.</p>
+                                <div class="text-center mt-3">
+                                    <img src="assets/images/010 qr-meter-reading - MAIN PAGE - Auto Sync Indicator.png" alt="Auto Sync Progress" class="img-fluid rounded shadow" style="max-width: 400px;">
+                                    <p class="small text-muted mt-2">Auto sync progress indicator showing readings being processed</p>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <h6 class="mb-2">
+                                    <span class="step-number">2</span>Sync Progress
+                                </h6>
+                                <p>You'll see a progress indicator showing how many readings are being synced. The system processes each reading individually to ensure data integrity.</p>
+                                <div class="text-center mt-3">
+                                    <img src="assets/images/011 qr-meter-reading - MAIN PAGE - Auto Sync - Unstable or Failed Sync Indicator.png" alt="Failed Sync Indicator" class="img-fluid rounded shadow" style="max-width: 400px;">
+                                    <p class="small text-muted mt-2">Failed sync indicator when connection becomes unstable</p>
+                                </div>
+                            </div>
+                            
+                            <h5 class="mb-3">Manual Sync Process</h5>
+                            
+                            <div class="mb-4">
+                                <h6 class="mb-2">
+                                    <span class="step-number">1</span>Manual Sync Button
+                                </h6>
+                                <p>If you have pending readings and want to sync them manually, click the sync button in the navigation bar. This is useful when you want to ensure readings are uploaded immediately.</p>
+                                <div class="text-center mt-3">
+                                    <img src="assets/images/012 qr-meter-reading - MAIN PAGE - Manual Sync Progress Indicator.png" alt="Manual Sync Progress" class="img-fluid rounded shadow" style="max-width: 400px;">
+                                    <p class="small text-muted mt-2">Manual sync progress with detailed status information</p>
+                                </div>
+                            </div>
+                            
+                            <div class="success-box">
+                                <h6 class="mb-2">
+                                    <i class="bi bi-lightbulb me-2"></i>Smart Sync Features
+                                </h6>
+                                <ul class="mb-0">
+                                    <li><strong>Connection Stability Check:</strong> System verifies stable connection before auto-sync</li>
+                                    <li><strong>Duplicate Prevention:</strong> Each reading has unique ID to prevent duplicates</li>
+                                    <li><strong>Error Recovery:</strong> Failed readings stay in queue for retry</li>
+                                    <li><strong>Progress Tracking:</strong> Real-time progress indicators for all sync operations</li>
+                                    <li><strong>Smart Notifications:</strong> Context-aware notifications for connection changes</li>
+                                </ul>
+                            </div>
+                            
+                            <h5 class="mb-3">Connection Notifications</h5>
+                            
+                            <div class="mb-4">
+                                <h6 class="mb-2">
+                                    <span class="step-number">1</span>Connection Lost Notification
+                                </h6>
+                                <p>When you lose internet connection, you'll see a prominent notification at the top of the screen.</p>
+                                <div class="text-center mt-3">
+                                    <img src="assets/images/013 qr-meter-reading - MAIN PAGE - Connection Lost Notification.png" alt="Connection Lost Notification" class="img-fluid rounded shadow" style="max-width: 400px;">
+                                    <p class="small text-muted mt-2">Connection Lost notification with two-line layout</p>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <h6 class="mb-2">
+                                    <span class="step-number">2</span>Connection Restored Notification
+                                </h6>
+                                <p>When your internet connection is restored, you'll see a confirmation notification.</p>
+                                <div class="text-center mt-3">
+                                    <img src="assets/images/014 qr-meter-reading - MAIN PAGE - Connection Restored Notification.png" alt="Connection Restored Notification" class="img-fluid rounded shadow" style="max-width: 400px;">
+                                    <p class="small text-muted mt-2">Connection Restored notification with clean design</p>
+                                </div>
+                            </div>
+                            
+                            <div class="warning-box">
+                                <h6 class="mb-2">
+                                    <i class="bi bi-info-circle me-2"></i>Smart Notification Features
+                                </h6>
+                                <ul class="mb-0">
+                                    <li><strong>"Connection Lost"</strong> - Shows when you go offline</li>
+                                    <li><strong>"Reading will be saved offline"</strong> - Reassures data safety</li>
+                                    <li><strong>"Connection Restored"</strong> - Confirms when connection returns</li>
+                                    <li><strong>Auto-dismiss:</strong> Notifications automatically disappear after a few seconds</li>
+                                </ul>
+                            </div>
+                        </section>
+                        
                         <!-- QR Generator -->
                         <section id="qr-generator" class="mb-5">
                             <h2 class="h3 mb-4">
@@ -495,6 +639,18 @@
                                         <p><strong>Meaning:</strong> Connection to server is lost.</p>
                                         <p><strong>Action:</strong> Check internet connection, data will be saved offline and synced when connection is restored.</p>
                                     </div>
+                                    
+                                    <div class="mb-3">
+                                        <h6 class="text-warning">"Sync Failed"</h6>
+                                        <p><strong>Meaning:</strong> Offline readings couldn't be uploaded to server.</p>
+                                        <p><strong>Action:</strong> Check connection stability, use manual sync button, or wait for automatic retry.</p>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <h6 class="text-warning">"Orange Dot Showing"</h6>
+                                        <p><strong>Meaning:</strong> You have readings waiting to sync.</p>
+                                        <p><strong>Action:</strong> Click the sync button in navigation or wait for automatic sync when connection is stable.</p>
+                                    </div>
                                 </div>
                             </div>
                         </section>
@@ -514,7 +670,7 @@
                                     </h2>
                                     <div id="faq1" class="accordion-collapse collapse show" data-bs-parent="#faqAccordion">
                                         <div class="accordion-body">
-                                            Yes! The system works offline and will automatically sync your readings when the connection is restored. You'll see an offline indicator in the navigation bar when working offline.
+                                            Yes! The system is designed for offline-first operation. When you lose internet connection, readings are automatically saved locally and synced when connection is restored. You'll see status indicators (green/red/orange dots) on your user avatar to show connection status.
                                         </div>
                                     </div>
                                 </div>
@@ -554,6 +710,51 @@
                                     <div id="faq4" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
                                         <div class="accordion-body">
                                             No, readings cannot be edited after submission to maintain data integrity. If you need to correct a reading, contact your administrator who can void the incorrect reading and you can submit a new one.
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header">
+                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq6">
+                                            What do the status dots mean?
+                                        </button>
+                                    </h2>
+                                    <div id="faq6" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                                        <div class="accordion-body">
+                                            The colored dots on your user avatar indicate your connection status:
+                                            <ul>
+                                                <li><strong>Green Dot:</strong> You're online and all readings are synced</li>
+                                                <li><strong>Red Dot:</strong> You're offline, readings are saved locally</li>
+                                                <li><strong>Orange Dot:</strong> You're online but have readings waiting to sync</li>
+                                            </ul>
+                                            You can also see sync progress indicators and manual sync buttons when needed.
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header">
+                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq7">
+                                            How does automatic sync work?
+                                        </button>
+                                    </h2>
+                                    <div id="faq7" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                                        <div class="accordion-body">
+                                            When your internet connection is restored, the system automatically detects this and begins syncing your offline readings. It verifies connection stability before starting sync to prevent data loss. You'll see a progress indicator showing how many readings are being processed.
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header">
+                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq8">
+                                            What if sync fails?
+                                        </button>
+                                    </h2>
+                                    <div id="faq8" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                                        <div class="accordion-body">
+                                            If sync fails due to connection issues, your readings remain safely stored offline. The system will automatically retry when connection is stable, or you can use the manual sync button. Failed readings are never lost and will be retried.
                                         </div>
                                     </div>
                                 </div>

@@ -291,7 +291,8 @@
                     <h6 class="mt-4 mb-3">What Happens Offline:</h6>
                     <ul>
                         <li>Readings are saved to your device</li>
-                        <li>Offline indicator appears in navigation</li>
+                        <li>Red dot appears on your user avatar</li>
+                        <li>Offline indicator shows in navigation</li>
                         <li>Data syncs automatically when online</li>
                         <li>No data loss - everything is preserved</li>
                     </ul>
@@ -308,6 +309,76 @@
                             <i class="bi bi-arrow-clockwise me-2 text-primary"></i>Manual Sync
                         </h6>
                         <p class="mb-0">If you have pending offline readings, look for the sync button in the navigation bar to manually trigger synchronization.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Sync Issues -->
+            <div class="issue-card">
+                <div class="issue-header severity-medium">
+                    <h4 class="mb-0">
+                        <i class="bi bi-arrow-clockwise me-2"></i>Sync Issues
+                    </h4>
+                </div>
+                <div class="issue-content">
+                    <p><strong>Problem:</strong> Offline readings not syncing or sync failing repeatedly.</p>
+                    
+                    <h6 class="mt-4 mb-3">Status Indicators:</h6>
+                    <div class="row">
+                        <div class="col-md-4 text-center">
+                            <div class="badge bg-success fs-6 p-2 mb-2">Green Dot</div>
+                            <p class="small">Online & Synced</p>
+                        </div>
+                        <div class="col-md-4 text-center">
+                            <div class="badge bg-danger fs-6 p-2 mb-2">Red Dot</div>
+                            <p class="small">Offline</p>
+                        </div>
+                        <div class="col-md-4 text-center">
+                            <div class="badge bg-warning fs-6 p-2 mb-2">Orange Dot</div>
+                            <p class="small">Pending Sync</p>
+                        </div>
+                    </div>
+                    
+                    <h6 class="mt-4 mb-3">Solutions:</h6>
+                    
+                    <div class="solution-step">
+                        <h6 class="mb-2">
+                            <i class="bi bi-wifi me-2 text-success"></i>Check Connection Stability
+                        </h6>
+                        <p class="mb-0">Ensure you have a stable internet connection. The system checks connection stability before auto-sync to prevent data loss.</p>
+                    </div>
+                    
+                    <div class="solution-step">
+                        <h6 class="mb-2">
+                            <i class="bi bi-arrow-clockwise me-2 text-primary"></i>Manual Sync
+                        </h6>
+                        <p class="mb-0">Click the sync button in the navigation bar to manually trigger synchronization of pending readings.</p>
+                    </div>
+                    
+                    <div class="solution-step">
+                        <h6 class="mb-2">
+                            <i class="bi bi-hourglass-split me-2 text-warning"></i>Wait for Auto-Sync
+                        </h6>
+                        <p class="mb-0">The system automatically retries sync when connection becomes stable. You'll see progress indicators during sync.</p>
+                    </div>
+                    
+                    <div class="solution-step">
+                        <h6 class="mb-2">
+                            <i class="bi bi-exclamation-triangle me-2 text-danger"></i>Sync Failed
+                        </h6>
+                        <p class="mb-0">If sync fails, your readings remain safely stored offline. The system will retry automatically or you can use manual sync.</p>
+                    </div>
+                    
+                    <div class="warning-note">
+                        <h6 class="mb-2">
+                            <i class="bi bi-info-circle me-2"></i>Smart Sync Features
+                        </h6>
+                        <ul class="mb-0">
+                            <li>Connection stability check prevents data loss</li>
+                            <li>Duplicate prevention with unique IDs</li>
+                            <li>Progress indicators show sync status</li>
+                            <li>Failed readings stay in queue for retry</li>
+                        </ul>
                     </div>
                 </div>
             </div>
@@ -380,6 +451,18 @@
                             <h6 class="text-info mt-3">"Camera Permission Denied"</h6>
                             <p class="small">Browser doesn't have permission to access camera.</p>
                             <p class="small"><strong>Solution:</strong> Allow camera access in browser settings.</p>
+                            
+                            <h6 class="text-warning mt-3">"Sync Failed"</h6>
+                            <p class="small">Offline readings couldn't be uploaded to server.</p>
+                            <p class="small"><strong>Solution:</strong> Check connection stability, use manual sync button.</p>
+                            
+                            <h6 class="text-info mt-3">"Connection Lost Notification"</h6>
+                            <p class="small">Red notification appears when internet connection is lost.</p>
+                            <p class="small"><strong>Solution:</strong> This is normal - continue working, data is saved offline.</p>
+                            
+                            <h6 class="text-success mt-3">"Connection Restored Notification"</h6>
+                            <p class="small">Green notification appears when internet connection returns.</p>
+                            <p class="small"><strong>Solution:</strong> This is normal - sync will start automatically.</p>
                         </div>
                     </div>
                 </div>

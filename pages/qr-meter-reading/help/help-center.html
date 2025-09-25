@@ -156,6 +156,7 @@
                         <li><i class="bi bi-check text-success me-2"></i>System overview and features</li>
                         <li><i class="bi bi-check text-success me-2"></i>Step-by-step instructions</li>
                         <li><i class="bi bi-check text-success me-2"></i>QR scanning workflow</li>
+                        <li><i class="bi bi-check text-success me-2"></i>Offline mode & sync features</li>
                         <li><i class="bi bi-check text-success me-2"></i>QR generator usage</li>
                         <li><i class="bi bi-check text-success me-2"></i>Frequently asked questions</li>
                     </ul>
@@ -189,6 +190,7 @@
                     <ul class="list-unstyled text-start mb-4">
                         <li><i class="bi bi-check text-success me-2"></i>Camera and scanning issues</li>
                         <li><i class="bi bi-check text-success me-2"></i>Network connectivity problems</li>
+                        <li><i class="bi bi-check text-success me-2"></i>Offline sync troubleshooting</li>
                         <li><i class="bi bi-check text-success me-2"></i>Access and permission issues</li>
                         <li><i class="bi bi-check text-success me-2"></i>Error message explanations</li>
                         <li><i class="bi bi-check text-success me-2"></i>Prevention and maintenance tips</li>
@@ -200,14 +202,14 @@
             </div>
             
             <!-- Visual Guide Section -->
-            <div class="help-card">
+            <div class="help-card" style="margin-top: 2rem;">
                 <div class="help-content">
                     <h3 class="mb-4 text-center">
                         <i class="bi bi-images me-2 text-primary"></i>Visual Guide - QR Meter Reading Workflow
                     </h3>
                     <p class="text-center text-muted mb-4">See exactly how the QR Meter Reading System looks and works with these real interface screenshots.</p>
                     
-                    <div class="screenshot-grid">
+                    <div class="screenshot-grid" style="margin-top: 2rem;">
                         <!-- Login Process -->
                         <div class="screenshot-item">
                             <img src="assets/images/001 qr-meter-reading - LOGIN.png" alt="QR Meter Reading Login Screen" class="ui-screenshot">
@@ -248,6 +250,62 @@
                             <h6 class="mb-2">6. Recent Readings</h6>
                             <p class="small text-muted">View and verify your recent meter reading submissions</p>
                         </div>
+                        
+                        <!-- Online Status -->
+                        <div class="screenshot-item">
+                            <img src="assets/images/007 qr-meter-reading - MAIN PAGE - Online Indicator.png" alt="Online Status Indicator" class="ui-screenshot">
+                            <h6 class="mb-2">7. Online Status</h6>
+                            <p class="small text-muted">Green dot indicates you're online and all readings are synced</p>
+                        </div>
+                        
+                        <!-- Offline Status -->
+                        <div class="screenshot-item">
+                            <img src="assets/images/008 qr-meter-reading - MAIN PAGE - Offline Indicator.png" alt="Offline Status Indicator" class="ui-screenshot">
+                            <h6 class="mb-2">8. Offline Status</h6>
+                            <p class="small text-muted">Red dot and offline indicator when connection is lost</p>
+                        </div>
+                        
+                        <!-- Manual Sync -->
+                        <div class="screenshot-item">
+                            <img src="assets/images/009 qr-meter-reading - MAIN PAGE - Manual Sync Indicator.png" alt="Manual Sync Indicator" class="ui-screenshot">
+                            <h6 class="mb-2">9. Manual Sync</h6>
+                            <p class="small text-muted">Orange dot and sync button when readings need to be synced</p>
+                        </div>
+                        
+                        <!-- Auto Sync Progress -->
+                        <div class="screenshot-item">
+                            <img src="assets/images/010 qr-meter-reading - MAIN PAGE - Auto Sync Indicator.png" alt="Auto Sync Progress" class="ui-screenshot">
+                            <h6 class="mb-2">10. Auto Sync Progress</h6>
+                            <p class="small text-muted">Progress indicator showing readings being processed automatically</p>
+                        </div>
+                        
+                        <!-- Failed Sync -->
+                        <div class="screenshot-item">
+                            <img src="assets/images/011 qr-meter-reading - MAIN PAGE - Auto Sync - Unstable or Failed Sync Indicator.png" alt="Failed Sync Indicator" class="ui-screenshot">
+                            <h6 class="mb-2">11. Failed Sync</h6>
+                            <p class="small text-muted">Failed sync indicator when connection becomes unstable</p>
+                        </div>
+                        
+                        <!-- Manual Sync Progress -->
+                        <div class="screenshot-item">
+                            <img src="assets/images/012 qr-meter-reading - MAIN PAGE - Manual Sync Progress Indicator.png" alt="Manual Sync Progress" class="ui-screenshot">
+                            <h6 class="mb-2">12. Manual Sync Progress</h6>
+                            <p class="small text-muted">Detailed progress indicator for manual sync operations</p>
+                        </div>
+                        
+                        <!-- Connection Lost Notification -->
+                        <div class="screenshot-item">
+                            <img src="assets/images/013 qr-meter-reading - MAIN PAGE - Connection Lost Notification.png" alt="Connection Lost Notification" class="ui-screenshot">
+                            <h6 class="mb-2">13. Connection Lost</h6>
+                            <p class="small text-muted">Prominent notification when internet connection is lost</p>
+                        </div>
+                        
+                        <!-- Connection Restored Notification -->
+                        <div class="screenshot-item">
+                            <img src="assets/images/014 qr-meter-reading - MAIN PAGE - Connection Restored Notification.png" alt="Connection Restored Notification" class="ui-screenshot">
+                            <h6 class="mb-2">14. Connection Restored</h6>
+                            <p class="small text-muted">Confirmation notification when internet connection returns</p>
+                        </div>
                     </div>
                     
                     <div class="text-center mt-4">
@@ -281,9 +339,11 @@
                             <h5 class="text-success">Key Features</h5>
                             <ul class="list-unstyled">
                                 <li><i class="bi bi-check-circle text-success me-2"></i>Mobile QR scanning</li>
-                                <li><i class="bi bi-check-circle text-success me-2"></i>Offline functionality</li>
+                                <li><i class="bi bi-check-circle text-success me-2"></i>Offline-first architecture</li>
+                                <li><i class="bi bi-check-circle text-success me-2"></i>Smart sync system</li>
+                                <li><i class="bi bi-check-circle text-success me-2"></i>Real-time status indicators</li>
                                 <li><i class="bi bi-check-circle text-success me-2"></i>Automatic tenant lookup</li>
-                                <li><i class="bi bi-check-circle text-success me-2"></i>Real-time validation</li>
+                                <li><i class="bi bi-check-circle text-success me-2"></i>Connection notifications</li>
                             </ul>
                         </div>
                     </div>
@@ -293,19 +353,14 @@
             <!-- Navigation -->
             <div class="text-center mt-4">
                 <div class="row">
-                    <div class="col-md-4">
+                    <div class="col-md-6">
                         <a href="../index.php" class="btn btn-primary btn-lg w-100">
                             <i class="bi bi-qr-code-scan me-2"></i>Back to Scanner
                         </a>
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-md-6">
                         <a href="../qr-generator.html" class="btn btn-success btn-lg w-100">
                             <i class="bi bi-qr-code me-2"></i>QR Generator
-                        </a>
-                    </div>
-                    <div class="col-md-4">
-                        <a href="../auth/logout.php" class="btn btn-outline-secondary btn-lg w-100">
-                            <i class="bi bi-box-arrow-right me-2"></i>Logout
                         </a>
                     </div>
                 </div>
@@ -313,13 +368,28 @@
             
             <!-- Footer -->
             <footer class="text-center mt-5 pt-4 border-top">
-                <p class="text-muted">
-                    <i class="bi bi-shield-check me-2"></i>
-                    QR Meter Reading System v1.2 - Help Documentation
-                </p>
-                <p class="small text-muted">
-                    For technical support, contact your system administrator.
-                </p>
+                <div class="row">
+                    <div class="col-md-6">
+                        <a href="../index.php" class="btn btn-outline-primary btn-lg w-100 mb-3">
+                            <i class="bi bi-qr-code-scan me-2"></i>Back to Scanner
+                        </a>
+                    </div>
+                    <div class="col-md-6">
+                        <a href="../qr-generator.html" class="btn btn-outline-success btn-lg w-100 mb-3">
+                            <i class="bi bi-qr-code me-2"></i>QR Generator
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="mt-4 pt-3 border-top">
+                    <p class="text-muted mb-2">
+                        <i class="bi bi-shield-check me-2"></i>
+                        QR Meter Reading System v1.2 - Help Documentation
+                    </p>
+                    <p class="small text-muted mb-0">
+                        For technical support, contact your system administrator.
+                    </p>
+                </div>
             </footer>
         </div>
     </div>

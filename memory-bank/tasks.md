@@ -20,34 +20,35 @@
 ### **🎯 WEEK 2: CORE UX IMPROVEMENTS (Medium Risk, High Impact)**
 - [x] **Phase 6**: QR Scanner Page UX Optimization ⭐⭐ **MODERATE** ✅ **COMPLETED AS PART OF PHASE 4**
 - [x] **Phase 7**: Smart Alert Strategy - Success Notifications ⭐ **EASY** ✅ **COMPLETE** (Mobile UX + Messaging + Top Row Animation)
-- [ ] **Phase 8**: Offline Status Indicator ⭐⭐ **MODERATE**
-- [ ] **Phase 9**: Mobile Gesture Support ⭐⭐ **MODERATE**
+- [x] **Phase 8**: Offline Status Indicator ⭐⭐ **MODERATE** ✅ **COMPLETE** (UX Standards Compliant)
+- [ ] **Phase 9**: Offline Data Integrity Fix ⭐⭐⭐ **CRITICAL** - **READY FOR IMPLEMENTATION**
+- [ ] **Phase 10**: Mobile Gesture Support ⭐⭐ **MODERATE**
 
 ### **⚡ WEEK 3: ADVANCED CORE FEATURES (High Risk, High Impact)**
-- [ ] **Phase 10**: Continuous Scanning Workflow ⭐⭐⭐ **COMPLEX**
-- [ ] **Phase 11**: Service Worker Implementation ⭐⭐⭐ **COMPLEX**
-- [ ] **Phase 12**: Cross-Device Testing ⭐⭐ **MODERATE**
-- [ ] **Phase 13**: Performance Optimization ⭐⭐ **MODERATE**
+- [ ] **Phase 11**: Continuous Scanning Workflow ⭐⭐⭐ **COMPLEX**
+- [ ] **Phase 12**: Service Worker Implementation ⭐⭐⭐ **COMPLEX**
+- [ ] **Phase 13**: Cross-Device Testing ⭐⭐ **MODERATE**
+- [ ] **Phase 14**: Performance Optimization ⭐⭐ **MODERATE**
 
 ### **🧪 WEEK 4: TESTING & VALIDATION (Medium Risk, Critical for Quality)**
-- [ ] **Phase 14**: Documentation Updates ⭐ **EASY**
+- [ ] **Phase 15**: Documentation Updates ⭐ **EASY**
 
 ### ** WEEK 5-7: BUSINESS LOGIC (High Risk, High Business Value)**
-- [ ] **Phase 15**: Tenant Readings Management Interface ⭐⭐⭐ **COMPLEX**
-- [ ] **Phase 16**: Export & Reporting Features ⭐⭐⭐ **COMPLEX**
-- [ ] **Phase 17**: Advanced Tenant Management ⭐⭐⭐ **COMPLEX**
+- [ ] **Phase 16**: Tenant Readings Management Interface ⭐⭐⭐ **COMPLEX**
+- [ ] **Phase 17**: Export & Reporting Features ⭐⭐⭐ **COMPLEX**
+- [ ] **Phase 18**: Advanced Tenant Management ⭐⭐⭐ **COMPLEX**
 
 ### **⚙️ WEEK 8: UTILITY RATE MANAGEMENT (Medium Risk, Business Value)**
-- [ ] **Phase 18**: Single-Point Rate Entry System ⭐⭐ **MODERATE**
-- [ ] **Phase 19**: Automatic Unit Classification ⭐ **EASY**
+- [ ] **Phase 19**: Single-Point Rate Entry System ⭐⭐ **MODERATE**
+- [ ] **Phase 20**: Automatic Unit Classification ⭐ **EASY**
 
 ### **🚀 WEEK 9: FINAL DEPLOYMENT (Low Risk, Critical for Go-Live)**
-- [ ] **Phase 20**: Comprehensive Testing ⭐⭐ **MODERATE**
-- [ ] **Phase 21**: Production Deployment ⭐ **EASY**
+- [ ] **Phase 21**: Comprehensive Testing ⭐⭐ **MODERATE**
+- [ ] **Phase 22**: Production Deployment ⭐ **EASY**
 
 ### ** WEEK 10: NICE-TO-HAVE FEATURES (Low Priority, Enhancements)**
-- [ ] **Phase 22**: Background Sync System ⭐⭐⭐ **COMPLEX**
-- [ ] **Phase 23**: Voice Input Features ⭐⭐⭐ **COMPLEX**
+- [ ] **Phase 23**: Background Sync System ⭐⭐⭐ **COMPLEX**
+- [ ] **Phase 24**: Voice Input Features ⭐⭐⭐ **COMPLEX**
 
 ## Creative Mode Completion Status
 **✅ CREATIVE MODE COMPLETE**
@@ -266,8 +267,186 @@ Successfully implemented the exact CodePen template (403-acess-denied.html) for 
 - **Reflection**: [memory-bank/reflection/reflection-phase6-qr-scanner-ux.md](reflection/reflection-phase6-qr-scanner-ux.md)
 - **Status**: ✅ **COMPLETED** - Requirements fulfilled by Phase 4
 
+### **✅ Phase 8: Offline Status Indicator - COMPLETED & ARCHIVED**
+**Date**: 2025-09-25  
+**Status**: COMPLETED & ARCHIVED  
+**QA Validation**: ✅ PASSED - All success criteria met  
+**Reflection**: ✅ COMPLETED - [reflection-phase8-offline-status-indicator.md](reflection/reflection-phase8-offline-status-indicator.md)  
+**Archive**: ✅ COMPLETED - [docs/archive/enhancements/2025-09/phase8-offline-status-indicator-20250925.md](../docs/archive/enhancements/2025-09/phase8-offline-status-indicator-20250925.md)  
+
+#### **Phase 8 Summary**
+Successfully implemented comprehensive offline-first system with smart notifications, environment controls, sync progress indicators, and help system enhancement. Evolved from simple navigation indicator to sophisticated offline architecture with connection stability checks, duplicate prevention, and professional user experience.
+
+#### **Key Achievements**
+- ✅ Offline indicator appears in header when offline
+- ✅ Shows pending count of unsynced readings
+- ✅ Manual sync button available and functional
+- ✅ Professional appearance consistent with design system
+- ✅ Offline/online transitions tested on target devices
+- ✅ 44px minimum touch targets maintained
+- ✅ Responsive design works on all screen sizes
+- ✅ No impact on existing QR scanner functionality
+- ✅ Smart notification system with two-line layout
+- ✅ Environment management (testing vs production)
+- ✅ Sync progress indicators with real-time feedback
+- ✅ Connection stability checks prevent data loss
+- ✅ Comprehensive help system enhancement
+- ✅ Testing panel for screenshot documentation
+
+#### **Technical Implementation**
+- **Offline Detection**: Navigator.onLine API with event listeners for online/offline status changes
+- **Visual Indicator**: Professional offline status display in navigation header with pending count badges
+- **Manual Sync**: Touch-friendly sync button with loading states and visual feedback
+- **Offline Storage**: Enhanced localStorage integration with automatic sync when connection restored
+- **Form Integration**: Seamless offline form submission with appropriate success messaging
+- **Responsive Design**: Mobile-first approach with proper breakpoints and touch targets
+- **Error Handling**: Network error detection with automatic offline storage fallback
+
+#### **Files Modified**
+- `pages/qr-meter-reading/assets/js/app.js` - Added offline detection system, indicator management, and sync functionality
+- `pages/qr-meter-reading/assets/css/qr-scanner.css` - Added offline indicator styling with responsive design
+- `pages/qr-meter-reading/api/ping.php` - Created lightweight endpoint for connection stability testing
+- `pages/qr-meter-reading/api/get-config.php` - Created endpoint to expose APP_ENV to frontend
+- `pages/qr-meter-reading/config/config.local.php` - Set APP_ENV to 'testing' for development
+- `pages/qr-meter-reading/help/index.html` - Updated user manual with offline/sync features and screenshots
+- `pages/qr-meter-reading/help/quick-reference.html` - Updated quick reference with offline mode features
+- `pages/qr-meter-reading/help/troubleshooting.html` - Enhanced troubleshooting with offline sync solutions
+- `pages/qr-meter-reading/help/help-center.html` - Enhanced help center with proper UX design standards
+- `memory-bank/tasks.md` - Updated phase status
+- `memory-bank/sync-functionality-documentation.md` - Created comprehensive sync functionality documentation
+- `memory-bank/phase8-enhancement-summary.md` - Created Phase 8 enhancement summary
+
+#### **Success Criteria Met**
+- ✅ Offline indicator appears in header when offline
+- ✅ Shows pending count of unsynced readings
+- ✅ Manual sync button available and functional
+- ✅ Professional appearance consistent with design system
+- ✅ Offline/online transitions tested on target devices
+- ✅ 44px minimum touch targets maintained
+- ✅ Responsive design works on all screen sizes
+- ✅ No impact on existing QR scanner functionality
+
+#### **Reflection Highlights**
+- **What Went Well**: Scope evolution from simple indicator to comprehensive offline-first system, user-driven development with multiple feedback rounds, smart notification system with context-aware display, environment management with testing/production separation, connection stability checks preventing data loss
+- **Challenges**: Initial UX design violations requiring multiple iterations, navigation sequence complexity, mobile accessibility requirements, intermittent connection handling, testing panel obstruction, sync speed for documentation, environment configuration integration
+- **Lessons Learned**: User feedback integration during implementation produces significantly better outcomes, iterative design achieves professional results, scope flexibility while maintaining quality produces comprehensive solutions, documentation-driven development ensures accuracy, testing-first approach enables better validation
+- **Next Steps**: Implement Phase 9 (Offline Data Integrity Fix) to address critical bug with tenant previous reading retrieval, conduct comprehensive cross-device testing, prepare field technician training materials, implement performance monitoring for offline sync
+
+## Status
+- [x] Initialization complete
+- [x] Planning complete
+- [x] Implementation complete
+- [x] Reflection complete
+- [x] Archiving complete
+
+## Archive
+- **Date**: 2025-09-25
+- **Archive Document**: [docs/archive/enhancements/2025-09/phase8-offline-status-indicator-20250925.md](../docs/archive/enhancements/2025-09/phase8-offline-status-indicator-20250925.md)
+- **Status**: COMPLETED & ARCHIVED
+
 ## Current Task
-**Phase 8: Offline Status Indicator** ⭐⭐ **MODERATE**
+**Phase 9: Offline Data Integrity Fix** ⭐⭐⭐ **CRITICAL** - **READY FOR IMPLEMENTATION**
+
+### **🚨 CRITICAL ISSUE IDENTIFIED**
+**Problem**: Major bug with tenant previous reading retrieval during offline mode that could cause incorrect data to be saved locally and synced.
+
+**Impact**: 
+- Previous reading data may be incorrect when stored offline
+- Sync process could propagate incorrect tenant data
+- Data integrity compromised during offline operations
+- Potential billing calculation errors
+
+**Priority**: **CRITICAL** - Must be addressed before any offline functionality goes to production
+
+### **Phase 9: Offline Data Integrity Fix - DETAILED IMPLEMENTATION PLAN**
+
+#### **Overview**
+Fix critical bug with tenant previous reading retrieval during offline mode to ensure data integrity and prevent incorrect data from being saved locally or synced to the server.
+
+#### **Complexity Assessment**
+- **Level**: 3 (Critical Bug Fix)
+- **Type**: Data Integrity & Sync Accuracy
+- **Risk**: High - Data integrity and sync accuracy
+- **Time**: 4-6 hours
+- **Dependencies**: Offline Status Indicator (Phase 8)
+
+#### **Root Cause Analysis**
+The offline mode implementation may have issues with:
+- **Tenant Resolution**: Incorrect tenant lookup during offline mode
+- **Previous Reading Retrieval**: Wrong previous reading data stored offline
+- **Data Validation**: Insufficient validation of offline data before sync
+- **Sync Process**: Incorrect data propagated during sync operations
+
+#### **Implementation Plan**
+
+**Step 1: Data Integrity Audit**
+- Audit current offline data storage structure
+- Identify where tenant previous reading retrieval fails
+- Document data flow issues in offline mode
+- Test offline data accuracy with various tenant scenarios
+
+**Step 2: Tenant Resolution Fix**
+- Fix tenant lookup logic for offline mode
+- Ensure proper tenant resolution before storing offline data
+- Implement fallback tenant resolution for offline scenarios
+- Add validation for tenant data integrity
+
+**Step 3: Previous Reading Accuracy**
+- Fix previous reading retrieval during offline mode
+- Ensure correct previous reading data is stored offline
+- Implement validation to prevent incorrect previous readings
+- Add data integrity checks before offline storage
+
+**Step 4: Sync Process Validation**
+- Add data validation before sync operations
+- Implement integrity checks during sync process
+- Ensure only valid data is synced to server
+- Add rollback mechanism for failed sync operations
+
+**Step 5: Testing & Validation**
+- Test offline readings with various tenant scenarios
+- Verify data integrity throughout offline/sync cycle
+- Test edge cases and error scenarios
+- Validate sync process with corrected data
+
+#### **Success Criteria**
+- [ ] Previous reading correctly retrieved and stored offline
+- [ ] Offline readings maintain data integrity
+- [ ] Sync process preserves accurate tenant data
+- [ ] No incorrect data saved locally or synced
+- [ ] Proper tenant resolution during offline mode
+- [ ] Data validation prevents corrupt offline data
+- [ ] Sync process handles data integrity errors gracefully
+
+#### **Files to Modify**
+- `pages/qr-meter-reading/assets/js/app.js` - Fix offline data storage and validation
+- `pages/qr-meter-reading/api/save-reading.php` - Add data integrity validation
+- `memory-bank/tasks.md` - Update phase status
+- `memory-bank/progress.md` - Document implementation progress
+
+#### **Dependencies**
+- **Phase 8**: Offline Status Indicator (required for offline functionality)
+
+#### **Challenges & Mitigations**
+- **Challenge**: Complex tenant resolution logic during offline mode
+  - **Mitigation**: Implement comprehensive tenant lookup with fallbacks
+- **Challenge**: Data validation complexity
+  - **Mitigation**: Add multiple validation layers and integrity checks
+- **Challenge**: Sync process data integrity
+  - **Mitigation**: Implement validation before sync and rollback mechanisms
+
+#### **Rollback Procedures**
+- Disable offline mode until fix implemented
+- Restore online-only functionality
+- Clear any corrupted offline data
+- Implement emergency data validation
+
+#### **Testing Strategy**
+- **Pre-Phase**: Document current offline data issues
+- **During Implementation**: Test data integrity at each step
+- **Post-Phase**: Comprehensive offline/sync testing
+- **Integration**: Test with existing QR scanner functionality
+- **Edge Cases**: Test various tenant scenarios and error conditions
 
 ### **Phase 8 Entry Criteria** ✅ **MET**
 - [x] Phase 7 Smart Alert Strategy - Success Notifications complete (with mobile UX enhancement, messaging correction, and top row animation)
@@ -276,6 +455,183 @@ Successfully implemented the exact CodePen template (403-acess-denied.html) for 
 - [x] Touch targets meet 44px minimum
 - [x] Responsive design system established
 - [x] Toast notification system implemented and enhanced
+
+### **✅ Phase 8: Offline Status Indicator - COMPLETED (Testing Code Added)**
+**Date**: 2025-09-25  
+**Status**: ✅ **COMPLETED** - All UX design standards violations fixed, testing code added for screenshots  
+**QA Validation**: ✅ PASSED - Professional appearance and accessibility standards met  
+
+#### **Phase 8 Summary**
+Successfully implemented offline status indicator following UX design standards with professional appearance, clear user guidance, and proper accessibility features. Added comprehensive testing panel for screenshot documentation and complete help system enhancement with offline/sync features.
+
+#### **Key Achievements**
+- ✅ **Professional Desktop Styling**: Gradient backgrounds, proper shadows, hover effects
+- ✅ **Clear User Guidance**: Tooltips explain what offline status and badge numbers mean
+- ✅ **Mobile Accessibility**: Touch events show detailed information on tap
+- ✅ **Badge Clarity**: Badge numbers clearly labeled as "reading(s) saved offline"
+- ✅ **Visual Hierarchy**: Proper alignment and spacing following design standards
+- ✅ **Touch Targets**: 48px minimum touch targets on mobile
+- ✅ **Responsive Design**: Different behaviors for desktop vs mobile
+- ✅ **SweetAlert Integration**: Appropriate use for mobile information display
+- ✅ **Complete Sync Functionality**: Manual and automatic sync with duplicate prevention
+- ✅ **Comprehensive Documentation**: Complete sync functionality documentation created
+- ✅ **Testing Panel Added**: Comprehensive testing controls for screenshot documentation
+- ✅ **Manual Testing Controls**: Individual buttons for Online, Offline, Pending states
+- ✅ **Auto-Cycle Testing**: Automatic cycling through all states for comprehensive screenshots
+- ✅ **Testing Status Display**: Real-time status indicator showing current test state
+- ✅ **Sync Progress Indicator**: Real-time progress bar showing auto-sync status and processing count
+- ✅ **Test Sync Button**: Button to test sync progress indicator functionality
+- ✅ **Environment-Based Controls**: Test panel only available in testing mode (APP_ENV = 'testing')
+- ✅ **Production Speed Sync**: Fast sync in production, slow sync for screenshots
+- ✅ **Real API Integration**: Production sync makes actual server calls to save data
+- ✅ **Smart Offline Notifications**: Context-aware offline notifications with two-line layout
+- ✅ **Smart Online Notifications**: Connection restored notifications (not on page load)
+- ✅ **Form Activity Detection**: Smart detection of user form interaction for relevant notifications
+- ✅ **Config System Integration**: Proper config.php integration for environment management
+- ✅ **Notification Layout Enhancement**: Two-line notification layout with title and subtitle
+- ✅ **Reliable Notification Display**: Offline notifications always appear when connection lost
+- ✅ **Help Documentation Enhancement**: Comprehensive help system updates with offline/sync features
+- ✅ **User Manual Updates**: Complete user manual with new Phase 8 features and screenshots
+- ✅ **Quick Reference Guide**: Updated quick reference with offline mode and sync features
+- ✅ **Troubleshooting Guide**: Enhanced troubleshooting with offline sync solutions
+- ✅ **Help Center Enhancement**: Professional help center with proper UX design standards
+- ✅ **Visual Guide Updates**: New screenshots (007-014) documenting offline/sync features
+- ✅ **Connection Notifications**: Documentation for offline/online notification system  
+
+### **Phase 8 Entry Criteria** ✅ **MET**
+- [x] Phase 7 Smart Alert Strategy - Success Notifications complete (with mobile UX enhancement, messaging correction, and top row animation)
+- [x] CSS file organization complete
+- [x] Mobile-first design implemented
+- [x] Touch targets meet 44px minimum
+- [x] Responsive design system established
+- [x] Toast notification system implemented and enhanced
+
+### **Phase 8: Offline Status Indicator - DETAILED IMPLEMENTATION PLAN**
+
+#### **Overview**
+Implement offline status indicator in navigation header following Creative Mode design decisions for Offline-First Architecture. This phase establishes the foundation for offline functionality and background sync capabilities.
+
+#### **Complexity Assessment**
+- **Level**: 2 (Simple Enhancement)
+- **Type**: UX Enhancement with Technical Implementation
+- **Risk**: Medium - Navigation changes and offline detection
+- **Time**: 2-3 hours
+- **Dependencies**: CSS File Organization (Phase 1), Responsive Layout Fixes (Phase 4)
+
+#### **Technology Stack**
+- **Framework**: Vanilla JavaScript (existing system)
+- **Storage**: localStorage for offline data tracking
+- **Detection**: Navigator.onLine API with event listeners
+- **UI Framework**: Bootstrap 5 (existing)
+- **Styling**: CSS with mobile-first responsive design
+
+#### **Technology Validation Checkpoints**
+- [x] Navigator.onLine API available in target browsers (Samsung A15, iPhone 14 Pro Max)
+- [x] localStorage available for offline data tracking
+- [x] Bootstrap 5 components available for indicator styling
+- [x] CSS responsive design system established
+- [x] JavaScript event handling capabilities confirmed
+
+#### **Creative Mode Design Integration**
+Based on `memory-bank/creative-modern-ux-enhancements.md` and `memory-bank/enhanced-ux-flows.md`:
+
+**Offline-First Architecture Implementation Requirements**:
+- **Offline Detection**: Detect network status changes using Navigator.onLine
+- **Visual Indicator**: Show offline status in navigation header
+- **Pending Count**: Display number of pending offline readings
+- **Manual Sync Button**: Allow users to trigger sync manually
+- **Professional Appearance**: Consistent with existing design system
+
+**Enhanced UX Flow - Offline Sync Flow**:
+- **Offline Detection**: Real-time network status monitoring
+- **Local Storage**: Track pending readings when offline
+- **Status Indicator**: Visual feedback in header navigation
+- **Sync Options**: Manual and automatic sync capabilities
+
+#### **Implementation Plan**
+
+**Step 1: Offline Detection System**
+- Implement Navigator.onLine API monitoring
+- Add event listeners for online/offline status changes
+- Create offline data tracking system using localStorage
+- Test offline detection on target devices
+
+**Step 2: Navigation Header Integration**
+- Add offline status indicator to existing navigation header
+- Implement responsive design for mobile and desktop
+- Create visual states for online/offline/pending sync
+- Ensure 44px minimum touch targets
+
+**Step 3: Pending Count System**
+- Track pending offline readings in localStorage
+- Display count in status indicator
+- Update count when readings are saved offline
+- Clear count when sync is successful
+
+**Step 4: Manual Sync Interface**
+- Add manual sync button to offline indicator
+- Implement sync trigger functionality
+- Create visual feedback during sync process
+- Handle sync success/failure states
+
+**Step 5: Visual Design & Animation**
+- Create professional offline indicator design
+- Implement smooth transitions for status changes
+- Add loading animations for sync process
+- Ensure accessibility compliance
+
+#### **Success Criteria**
+- [ ] Offline indicator appears in header when offline
+- [ ] Shows pending count of unsynced readings
+- [ ] Manual sync button available and functional
+- [ ] Professional appearance consistent with design system
+- [ ] Offline/online transitions tested on target devices
+- [ ] 44px minimum touch targets maintained
+- [ ] Responsive design works on all screen sizes
+- [ ] No impact on existing QR scanner functionality
+
+#### **Files to Modify**
+- `pages/qr-meter-reading/index.php` - Add offline status indicator to navigation header
+- `pages/qr-meter-reading/assets/js/app.js` - Implement offline detection and sync logic
+- `pages/qr-meter-reading/assets/css/qr-scanner.css` - Add offline indicator styling
+- `memory-bank/tasks.md` - Update phase status
+- `memory-bank/progress.md` - Document implementation progress
+
+#### **Dependencies**
+- **Phase 1**: CSS File Organization (required for proper styling)
+- **Phase 4**: Responsive Layout Fixes (required for mobile optimization)
+- **Phase 7**: Success Notifications (required for sync feedback)
+
+#### **Challenges & Mitigations**
+- **Challenge**: Cross-browser offline detection compatibility
+  - **Mitigation**: Use Navigator.onLine with fallback polling mechanism
+- **Challenge**: Mobile device offline detection reliability
+  - **Mitigation**: Test extensively on Samsung A15 and iPhone 14 Pro Max
+- **Challenge**: localStorage data persistence
+  - **Mitigation**: Implement data validation and cleanup mechanisms
+- **Challenge**: Navigation header layout impact
+  - **Mitigation**: Use responsive design to prevent layout breaks
+
+#### **Rollback Procedures**
+- Remove offline indicator from navigation header
+- Remove offline detection JavaScript code
+- Remove offline indicator CSS styling
+- Restore original navigation header layout
+- Clear localStorage offline data
+
+#### **Testing Strategy**
+- **Pre-Phase**: Document current navigation header layout
+- **During Implementation**: Test offline detection on target devices
+- **Post-Phase**: Verify offline indicator functionality and responsive design
+- **Integration**: Test with existing QR scanner functionality
+- **Device Testing**: Samsung A15, iPhone 14 Pro Max, desktop browsers
+
+#### **Creative Mode Integration Success**
+- [ ] **Offline-First Architecture**: Foundation established for PWA features
+- [ ] **Enhanced UX Flow**: Offline Sync Flow pattern implemented
+- [ ] **Mobile Optimization**: Touch-friendly interface maintained
+- [ ] **Smart Alert Strategy**: Context-appropriate sync notifications
+- [ ] **Responsive Design**: Works across all target devices
 
 ### **✅ Phase 7: Smart Alert Strategy - Success Notifications - COMPLETED & ARCHIVED**
 **Date**: 2025-09-10  
@@ -359,9 +715,78 @@ All Phase 6 success criteria were met during Phase 4 implementation.
 - **Database Operations**: All database operations must remain functional
 - **User Authentication**: Login/logout must work correctly
 
+## 🔧 **SEPARATE ENHANCEMENTS (Independent of Phase Structure)**
+
+### **Meter Replacement Validation Enhancement** ⭐⭐ **MODERATE**
+**Status**: **SPECIFICATION DEFINED** - Ready for Implementation  
+**Priority**: **HIGH** - Critical business logic for meter replacements  
+**Date**: 2025-09-25  
+**Complexity**: Level 2 (Business Logic Enhancement)  
+**Risk**: Medium - Database logic and user workflow changes  
+**Time**: 3-4 hours  
+**Dependencies**: None (can be implemented independently)  
+
+#### **Overview**
+Implement validation for meter replacement scenarios when current reading is less than previous reading. This addresses the critical business case where electric meters are replaced and start at 0.
+
+#### **Business Requirements**
+- **Trigger Condition**: Current reading < Previous reading
+- **User Prompt**: SweetAlert dialog asking "Is this a new meter?"
+- **User Options**: 
+  - **Yes**: Proceed with meter replacement logic
+  - **No**: Block submission, inform user to provide valid reading
+- **Meter Replacement Logic**: 
+  - Add remark about new meter installation with current date
+  - Set previous reading to 0 in database
+  - Allow submission to proceed
+  - Flag reading as meter replacement for audit trail
+
+#### **Implementation Requirements**
+- **Frontend Validation**: JavaScript validation before form submission
+- **SweetAlert Integration**: Context-appropriate dialog for meter replacement confirmation
+- **Database Logic**: Modify stored procedure to handle previous reading = 0 for new meters
+- **Remarks Integration**: Automatic remark addition for new meter scenarios
+- **User Experience**: Clear messaging about meter replacement process
+
+#### **Technical Implementation**
+- **Validation Location**: `pages/qr-meter-reading/assets/js/app.js`
+- **Database Changes**: Create separate meter replacement stored procedure (based on `save-tenant-reading-procedure.sql`)
+- **UI Integration**: SweetAlert dialog with Yes/No options
+- **Data Flow**: Current reading validation → User confirmation → Database save with adjusted previous reading
+
+#### **Success Criteria**
+- [ ] Validation triggers when current reading < previous reading
+- [ ] SweetAlert dialog appears with "Is this a new meter?" prompt
+- [ ] "No" option blocks submission and shows error message
+- [ ] "Yes" option proceeds with meter replacement logic
+- [ ] Remarks automatically updated with new meter information and current date
+- [ ] Previous reading set to 0 in database for new meters
+- [ ] Meter replacement flag added to audit trail
+- [ ] User experience is clear and intuitive
+- [ ] No impact on normal meter reading workflow
+
+#### **Files to Modify**
+- `pages/qr-meter-reading/assets/js/app.js` - Add validation logic
+- `database/save-tenant-reading-procedure.sql` - Update stored procedure (create separate meter replacement procedure during implementation)
+- `pages/qr-meter-reading/api/save-reading.php` - Handle meter replacement flag
+- `memory-bank/tasks.md` - Update specification status
+- `memory-bank/progress.md` - Document implementation progress
+
+#### **Business Impact**
+- **Critical Issue Resolution**: Addresses Issue 11 (Electric Meter Replacement Scenario)
+- **Data Accuracy**: Prevents incorrect usage calculations for meter replacements
+- **User Guidance**: Provides clear workflow for meter replacement scenarios
+- **Audit Trail**: Maintains proper remarks for meter replacement documentation
+
+#### **Implementation Notes**
+- **SweetAlert Usage**: This is appropriate use of SweetAlert for critical business confirmation
+- **User Education**: Consider adding help text about meter replacement scenarios
+- **Testing**: Must test with various meter replacement scenarios
+- **Documentation**: Update user guides with meter replacement procedures
+
 ## Total Project Estimate
-- **Total Phases**: 23
-- **Total Development Time**: 123-162 hours
+- **Total Phases**: 24
+- **Total Development Time**: 127-170 hours
 - **Total Timeline**: 10 weeks
 - **Success Rate Target**: 98%
 - **Risk Level**: Medium (phased approach with rollback capability)
