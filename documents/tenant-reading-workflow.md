@@ -87,7 +87,7 @@ sequenceDiagram
 
 ---
 
-## 7) Complete QR Scanning Flow with Meter Replacement Validation
+## 6) Complete QR Scanning Flow with Meter Replacement Validation
 
 ### **Comprehensive QR Meter Reading Flow**
 ```mermaid
@@ -193,6 +193,62 @@ sequenceDiagram
 
 ---
 
+## 7) Offline-First Architecture & Sync System
+
+### **Offline Reading Workflow**
+```mermaid
+flowchart TD
+    A[User Takes Reading] --> B{Online?}
+    B -->|Yes| C[Submit to Server]
+    B -->|No| D[Store in localStorage]
+    D --> E[Show Offline Notification]
+    E --> F[Update Status Indicators]
+    F --> G[Continue Working]
+    
+    H[Connection Restored] --> I[Browser Online Event]
+    I --> J[Show Online Notification]
+    J --> K[Connection Stability Check]
+    K --> L{Stable?}
+    L -->|Yes| M[Auto Sync Triggered]
+    L -->|No| N[Skip Auto Sync]
+    M --> O[Process Offline Queue]
+    O --> P[Submit Each Reading]
+    P --> Q{Success?}
+    Q -->|Yes| R[Remove from Queue]
+    Q -->|No| S[Keep in Queue]
+    R --> T[Update UI]
+    S --> T
+    N --> T
+```
+
+### **Offline Storage Structure**
+```javascript
+// localStorage key: 'qr_meter_readings_offline'
+[
+    {
+        propertyCode: "GCA",
+        unitNo: "101",
+        currentReading: 10510,
+        remarks: "Monthly reading",
+        locationData: {...},
+        timestamp: "2025-09-25T14:30:00Z",
+        syncId: "unique-id-1" // Prevents duplicates
+    }
+]
+```
+
+### **Smart Notifications**
+- **Offline Notification**: "Connection Lost" + "Reading will be saved offline"
+- **Online Notification**: "Connection Restored" (only when previously offline)
+- **Sync Progress**: "Auto sync in progress" / "Manual sync in progress"
+- **Status Indicators**: Avatar badges (green/red/orange dots)
+
+### **Environment Management**
+- **Testing Mode**: Test panel visible, slow sync for screenshots
+- **Production Mode**: Clean interface, fast sync for real users
+- **Config System**: Proper config.php integration for environment detection
+
+
 ## 8) Meter Replacement Validation Specification
 
 ### **Business Requirements**
@@ -232,7 +288,7 @@ sequenceDiagram
 
 ---
 
-## 6) Reporting Linkage
+## 9) Reporting Linkage
 - Report endpoint queries `t_tenant_reading` (+ join `t_tenant_reading_ext`) by date range/property/technician
 - Usage = `current_reading - prev_reading`
 - Exports: PDF, Excel, CSV

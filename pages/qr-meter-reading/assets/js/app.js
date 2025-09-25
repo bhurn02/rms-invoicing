@@ -13,17 +13,45 @@ class QRMeterReadingApp {
         this.isAuthenticated = true; // Will be checked on initialization
         this.isSubmitting = false; // Prevent double form submission
         this.activeCameraStream = null; // Track active camera stream
+        this.isOnline = navigator.onLine; // Track online status
+        this.offlineIndicator = null; // Reference to offline indicator element
+        this.appConfig = null; // Application configuration
+        this.wasOffline = false; // Track if we were previously offline
+        this.lastFormInteraction = 0; // Track last form interaction time
         
         this.init();
     }
 
-    init() {
+    async init() {
+        await this.loadAppConfig();
         this.checkAuthentication();
         this.setupEventListeners();
         this.loadRecentReadings();
         this.setupOfflineSync();
+        this.setupOfflineDetection();
         this.setCurrentDate();
         this.updateUserInfo();
+        
+        // Add testing functionality for screenshots (only in testing mode)
+        if (this.appConfig && this.appConfig.isTesting) {
+            this.addTestingControls();
+        }
+    }
+
+    async loadAppConfig() {
+        try {
+            const response = await fetch('api/get-config.php');
+            if (response.ok) {
+                this.appConfig = await response.json();
+                console.log('App configuration loaded:', this.appConfig);
+            } else {
+                console.warn('Failed to load app configuration, defaulting to production mode');
+                this.appConfig = { isTesting: false, isProduction: true };
+            }
+        } catch (error) {
+            console.warn('Error loading app configuration:', error);
+            this.appConfig = { isTesting: false, isProduction: true };
+        }
     }
 
     async checkAuthentication() {
@@ -66,6 +94,20 @@ class QRMeterReadingApp {
         document.getElementById('reading-form').addEventListener('submit', (e) => {
             e.preventDefault();
             this.submitReadingForm(e);
+        });
+
+        // Track form interactions for offline notification
+        const formInputs = ['currentReading', 'remarks'];
+        formInputs.forEach(inputId => {
+            const input = document.getElementById(inputId);
+            if (input) {
+                input.addEventListener('focus', () => {
+                    this.lastFormInteraction = Date.now();
+                });
+                input.addEventListener('input', () => {
+                    this.lastFormInteraction = Date.now();
+                });
+            }
         });
 
         // Keyboard shortcuts
@@ -646,6 +688,30 @@ class QRMeterReadingApp {
             submitBtn.innerHTML = '<i class="bi bi-hourglass-split me-2"></i>Saving...';
             submitBtn.disabled = true;
             
+            // Check if online
+            if (!this.isOnline) {
+                // Store offline and show success
+                this.storeOfflineReading(readingData);
+                
+                this.showSuccessToast(
+                    'Reading Saved Offline!',
+                    'Will sync when connection is restored'
+                );
+                
+                // Reset form and hide
+                event.target.reset();
+                const formCard = document.getElementById('reading-form-card');
+                formCard.classList.add('scanner-hidden');
+                formCard.classList.remove('scanner-visible');
+                
+                // Auto-advance: Focus scanner for next reading after brief delay
+                setTimeout(() => {
+                    this.focusScannerForNext();
+                }, 800);
+                
+                return;
+            }
+            
             // Submit reading to API
             const response = await fetch('api/save-reading.php', {
                 method: 'POST',
@@ -688,7 +754,29 @@ class QRMeterReadingApp {
         } catch (error) {
             console.error('Error saving reading:', error);
             
-            // Show error message with SweetAlert
+            // Check if it's a network error and we're offline
+            if (!this.isOnline || error.name === 'TypeError' || error.message.includes('fetch')) {
+                // Store offline and show success
+                this.storeOfflineReading(readingData);
+                
+                this.showSuccessToast(
+                    'Reading Saved Offline!',
+                    'Will sync when connection is restored'
+                );
+                
+                // Reset form and hide
+                event.target.reset();
+                const formCard = document.getElementById('reading-form-card');
+                formCard.classList.add('scanner-hidden');
+                formCard.classList.remove('scanner-visible');
+                
+                // Auto-advance: Focus scanner for next reading after brief delay
+                setTimeout(() => {
+                    this.focusScannerForNext();
+                }, 800);
+                
+            } else {
+                // Show error message with SweetAlert for other errors
             Swal.fire({
                 icon: 'error',
                 title: 'Error Saving Reading',
@@ -696,6 +784,7 @@ class QRMeterReadingApp {
                 confirmButtonText: 'OK',
                 confirmButtonColor: '#dc3545'
             });
+            }
             
         } finally {
             // Reset submitting state
@@ -839,6 +928,7 @@ class QRMeterReadingApp {
         
         // Update UI to show offline status
         this.updateOfflineStatus();
+        this.updateOfflineIndicator();
     }
 
     async setupOfflineSync() {
@@ -855,28 +945,669 @@ class QRMeterReadingApp {
         }
     }
 
-    async syncOfflineReadings() {
-        const readingsToSync = [...this.offlineQueue];
+    async syncOfflineReadings(isManual = false) {
+        if (this.offlineQueue.length === 0) {
+            console.log('No offline readings to sync');
+            return;
+        }
         
-        for (const reading of readingsToSync) {
+        console.log(`Starting ${isManual ? 'manual' : 'auto'} sync of ${this.offlineQueue.length} offline readings`);
+        const readingsToSync = [...this.offlineQueue];
+        const totalReadings = readingsToSync.length;
+        let syncedCount = 0;
+        let failedCount = 0;
+        
+        // Show sync progress indicator
+        this.showSyncProgress(totalReadings, 0, 0, isManual);
+        
+        for (let i = 0; i < readingsToSync.length; i++) {
+            const reading = readingsToSync[i];
+            
             try {
-                const success = await this.submitReadingOnline(reading);
-                if (success) {
-                    // Remove from offline queue
-                    this.offlineQueue = this.offlineQueue.filter(r => r !== reading);
-                    localStorage.setItem('qr_meter_readings_offline', JSON.stringify(this.offlineQueue));
+                // Check connection before each sync attempt
+                if (!this.isOnline) {
+                    console.log('Connection lost during sync, stopping sync process');
+                    this.hideSyncProgress();
+                    break;
                 }
+                
+                // Update progress indicator
+                this.updateSyncProgress(totalReadings, i + 1, syncedCount, failedCount);
+                
+                console.log(`Syncing reading: ${reading.propertyCode}-${reading.unitNo}`);
+                const success = await this.submitReadingOnline(reading);
+                
+                if (success) {
+                    // Remove from offline queue only after confirmed success
+                    this.offlineQueue = this.offlineQueue.filter(r => r.syncId !== reading.syncId);
+                    localStorage.setItem('qr_meter_readings_offline', JSON.stringify(this.offlineQueue));
+                    syncedCount++;
+                    console.log(`Successfully synced reading: ${reading.propertyCode}-${reading.unitNo}`);
+                } else {
+                    failedCount++;
+                    console.log(`Failed to sync reading: ${reading.propertyCode}-${reading.unitNo}`);
+                }
+                
+                // Update progress after each reading
+                this.updateSyncProgress(totalReadings, i + 1, syncedCount, failedCount);
+                
             } catch (error) {
-                console.error('Error syncing offline reading:', error);
+                console.error(`Error syncing reading ${reading.propertyCode}-${reading.unitNo}:`, error);
+                failedCount++;
+                
+                // If it's a network error, stop syncing to prevent data loss
+                if (error.name === 'TypeError' || error.message.includes('fetch')) {
+                    console.log('Network error detected, stopping sync to prevent data loss');
+                    this.hideSyncProgress();
+                    break;
+                }
+                
+                // Update progress even on error
+                this.updateSyncProgress(totalReadings, i + 1, syncedCount, failedCount);
             }
         }
         
+        // Hide progress indicator
+        this.hideSyncProgress();
+        
+        // Update UI with sync results
         this.updateOfflineStatus();
+        this.updateOfflineIndicator();
+        
+        if (syncedCount > 0) {
+            this.showStatus(`${syncedCount} reading(s) synced successfully`, 'success');
+        }
+        
+        if (failedCount > 0) {
+            this.showStatus(`${failedCount} reading(s) failed to sync, will retry later`, 'warning');
+        }
+        
+        console.log(`Sync completed: ${syncedCount} synced, ${failedCount} failed, ${this.offlineQueue.length} remaining`);
+    }
+
+    async syncOfflineReadingsWithDelay(isManual = false) {
+        if (this.offlineQueue.length === 0) {
+            console.log('No offline readings to sync');
+            return;
+        }
+        
+        console.log(`Starting ${isManual ? 'manual' : 'auto'} sync with delay of ${this.offlineQueue.length} offline readings`);
+        const readingsToSync = [...this.offlineQueue];
+        const totalReadings = readingsToSync.length;
+        let syncedCount = 0;
+        let failedCount = 0;
+        
+        // Show sync progress indicator
+        this.showSyncProgress(totalReadings, 0, 0, isManual);
+        
+        for (let i = 0; i < readingsToSync.length; i++) {
+            const reading = readingsToSync[i];
+            
+            try {
+                // Check connection before each sync attempt
+                if (!this.isOnline) {
+                    console.log('Connection lost during sync, stopping sync process');
+                    this.hideSyncProgress();
+                    break;
+                }
+                
+                // Update progress indicator
+                this.updateSyncProgress(totalReadings, i + 1, syncedCount, failedCount);
+                
+                console.log(`Syncing reading: ${reading.propertyCode}-${reading.unitNo}`);
+                
+                // Add delay for screenshot purposes (2 seconds per reading)
+                await new Promise(resolve => setTimeout(resolve, 2000));
+                
+                const success = await this.submitReadingOnline(reading);
+                
+                if (success) {
+                    // Remove from offline queue only after confirmed success
+                    this.offlineQueue = this.offlineQueue.filter(r => r.syncId !== reading.syncId);
+                    localStorage.setItem('qr_meter_readings_offline', JSON.stringify(this.offlineQueue));
+                    syncedCount++;
+                    console.log(`Successfully synced reading: ${reading.propertyCode}-${reading.unitNo}`);
+                } else {
+                    failedCount++;
+                    console.log(`Failed to sync reading: ${reading.propertyCode}-${reading.unitNo}`);
+                }
+                
+                // Update progress after each reading
+                this.updateSyncProgress(totalReadings, i + 1, syncedCount, failedCount);
+                
+            } catch (error) {
+                console.error(`Error syncing reading ${reading.propertyCode}-${reading.unitNo}:`, error);
+                failedCount++;
+                
+                // If it's a network error, stop syncing to prevent data loss
+                if (error.name === 'TypeError' || error.message.includes('fetch')) {
+                    console.log('Network error detected, stopping sync to prevent data loss');
+                    this.hideSyncProgress();
+                    break;
+                }
+                
+                // Update progress even on error
+                this.updateSyncProgress(totalReadings, i + 1, syncedCount, failedCount);
+            }
+        }
+        
+        // Hide progress indicator
+        this.hideSyncProgress();
+        
+        // Update UI with sync results
+        this.updateOfflineStatus();
+        this.updateOfflineIndicator();
+        
+        if (syncedCount > 0) {
+            this.showStatus(`${syncedCount} reading(s) synced successfully`, 'success');
+        }
+        
+        if (failedCount > 0) {
+            this.showStatus(`${failedCount} reading(s) failed to sync, will retry later`, 'warning');
+        }
+        
+        console.log(`Sync with delay completed: ${syncedCount} synced, ${failedCount} failed, ${this.offlineQueue.length} remaining`);
+    }
+
+    // Sync progress indicator methods
+    showSyncProgress(totalReadings, currentReading, syncedCount, isManual = false) {
+        // Remove existing progress indicator if any
+        this.hideSyncProgress();
+        
+        const syncType = isManual ? "Manual sync in progress" : "Auto sync in progress";
+        
+        const progressIndicator = document.createElement('div');
+        progressIndicator.id = 'sync-progress-indicator';
+        progressIndicator.style.cssText = `
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.9);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            z-index: 10000;
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+            min-width: 300px;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        `;
+        
+        progressIndicator.innerHTML = `
+            <div style="display: flex; align-items: center; justify-content: center; margin-bottom: 10px;">
+                <div class="spinner" style="width: 20px; height: 20px; border: 2px solid #333; border-top: 2px solid #4caf50; border-radius: 50%; animation: spin 1s linear infinite; margin-right: 10px;"></div>
+                <span style="font-weight: bold;">${syncType}</span>
+            </div>
+            <div style="margin-bottom: 8px;">
+                <span id="sync-progress-text">Processing reading 1 of ${totalReadings} offline readings</span>
+            </div>
+            <div style="background: #333; border-radius: 4px; height: 8px; margin-bottom: 8px;">
+                <div id="sync-progress-bar" style="background: linear-gradient(90deg, #4caf50, #8bc34a); height: 100%; border-radius: 4px; width: 0%; transition: width 0.3s ease;"></div>
+            </div>
+            <div style="font-size: 12px; color: #ccc;">
+                <span id="sync-results">Synced: 0 | Failed: 0</span>
+            </div>
+            <style>
+                @keyframes spin {
+                    0% { transform: rotate(0deg); }
+                    100% { transform: rotate(360deg); }
+                }
+            </style>
+        `;
+        
+        document.body.appendChild(progressIndicator);
+    }
+    
+    updateSyncProgress(totalReadings, currentReading, syncedCount, failedCount) {
+        const progressText = document.getElementById('sync-progress-text');
+        const progressBar = document.getElementById('sync-progress-bar');
+        const results = document.getElementById('sync-results');
+        
+        if (progressText) {
+            progressText.textContent = `Processing reading ${currentReading} of ${totalReadings} offline readings`;
+        }
+        
+        if (progressBar) {
+            const percentage = (currentReading / totalReadings) * 100;
+            progressBar.style.width = `${percentage}%`;
+        }
+        
+        if (results) {
+            results.textContent = `Synced: ${syncedCount} | Failed: ${failedCount}`;
+        }
+    }
+    
+    hideSyncProgress() {
+        const progressIndicator = document.getElementById('sync-progress-indicator');
+        if (progressIndicator) {
+            progressIndicator.remove();
+        }
+    }
+
+    // Offline notification methods
+    isFormActive() {
+        // Check if user is actively entering data (form has focus or recent activity)
+        const currentReadingInput = document.getElementById('currentReading');
+        const remarksInput = document.getElementById('remarks');
+        
+        // Check if any form field has focus
+        const activeElement = document.activeElement;
+        if (activeElement && (activeElement === currentReadingInput || activeElement === remarksInput)) {
+            return true;
+        }
+        
+        // Check if form has been recently interacted with (within last 30 seconds)
+        const lastInteraction = this.lastFormInteraction || 0;
+        const now = Date.now();
+        return (now - lastInteraction) < 30000; // 30 seconds
+    }
+
+    showOfflineNotification() {
+        // Remove existing notification if any
+        this.hideOfflineNotification();
+        
+        const notification = document.createElement('div');
+        notification.id = 'offline-notification';
+        notification.style.cssText = `
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, #ff6b6b, #ee5a52);
+            color: white;
+            padding: 16px 24px;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(255, 107, 107, 0.3);
+            z-index: 10000;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-size: 14px;
+            font-weight: 500;
+            text-align: center;
+            max-width: 400px;
+            animation: slideDown 0.3s ease-out;
+        `;
+        
+        notification.innerHTML = `
+            <div style="display: flex; flex-direction: column; align-items: center; gap: 4px;">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <i class="bi bi-wifi-off" style="font-size: 16px;"></i>
+                    <span style="font-weight: 600;">Connection Lost</span>
+                </div>
+                <div style="font-size: 13px; opacity: 0.9;">
+                    Reading will be saved offline
+                </div>
+            </div>
+            <style>
+                @keyframes slideDown {
+                    from { transform: translateX(-50%) translateY(-20px); opacity: 0; }
+                    to { transform: translateX(-50%) translateY(0); opacity: 1; }
+                }
+            </style>
+        `;
+        
+        document.body.appendChild(notification);
+        
+        // Auto-hide after 5 seconds
+        setTimeout(() => {
+            this.hideOfflineNotification();
+        }, 5000);
+    }
+
+    hideOfflineNotification() {
+        const notification = document.getElementById('offline-notification');
+        if (notification) {
+            notification.remove();
+        }
+    }
+
+    showOnlineNotification() {
+        // Remove existing notifications if any
+        this.hideOfflineNotification();
+        this.hideOnlineNotification();
+        
+        const notification = document.createElement('div');
+        notification.id = 'online-notification';
+        notification.style.cssText = `
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, #4caf50, #45a049);
+            color: white;
+            padding: 16px 24px;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(76, 175, 80, 0.3);
+            z-index: 10000;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-size: 14px;
+            font-weight: 500;
+            text-align: center;
+            max-width: 400px;
+            animation: slideDown 0.3s ease-out;
+        `;
+        
+        notification.innerHTML = `
+            <div style="display: flex; align-items: center; justify-content: center; gap: 8px;">
+                <i class="bi bi-wifi" style="font-size: 16px;"></i>
+                <span>Connection Restored</span>
+            </div>
+            <style>
+                @keyframes slideDown {
+                    from { transform: translateX(-50%) translateY(-20px); opacity: 0; }
+                    to { transform: translateX(-50%) translateY(0); opacity: 1; }
+                }
+            </style>
+        `;
+        
+        document.body.appendChild(notification);
+        
+        // Auto-hide after 3 seconds
+        setTimeout(() => {
+            this.hideOnlineNotification();
+        }, 3000);
+    }
+
+    hideOnlineNotification() {
+        const notification = document.getElementById('online-notification');
+        if (notification) {
+            notification.remove();
+        }
     }
 
     updateOfflineStatus() {
         if (this.offlineQueue.length > 0) {
             this.showStatus(`${this.offlineQueue.length} reading(s) saved offline`, 'info');
+        }
+    }
+
+    // PHASE 8: Offline Detection System with Intermittent Connection Handling
+    setupOfflineDetection() {
+        // Create offline indicator element
+        this.createOfflineIndicator();
+        
+        // Enhanced online/offline event handling with connection stability check
+        window.addEventListener('online', () => {
+            console.log('Browser online event detected');
+            this.isOnline = true;
+            this.updateOfflineIndicator();
+            
+            // Hide offline notification if showing
+            this.hideOfflineNotification();
+            
+            // Show online notification if we were previously offline
+            if (this.wasOffline) {
+                this.showOnlineNotification();
+                this.wasOffline = false;
+            }
+            
+            // Wait for connection stability before auto-sync
+            this.waitForStableConnection().then(() => {
+                console.log('Connection stable, starting auto-sync');
+                this.syncOfflineReadings();
+            }).catch(() => {
+                console.log('Connection unstable, skipping auto-sync');
+            });
+        });
+        
+        window.addEventListener('offline', () => {
+            console.log('Browser offline event detected');
+            this.isOnline = false;
+            this.wasOffline = true; // Track that we went offline
+            this.updateOfflineIndicator();
+            
+            // Show offline notification when connection is lost
+            this.showOfflineNotification();
+        });
+        
+        // Initial update
+        this.updateOfflineIndicator();
+        
+        // Add mobile touch event handling for accessibility
+        this.setupMobileTouchEvents();
+        
+        // Initial update to show current status
+        this.updateOfflineIndicator();
+    }
+
+    // Wait for stable connection before auto-sync
+    async waitForStableConnection() {
+        const STABILITY_CHECK_DURATION = 3000; // 3 seconds
+        const PING_INTERVAL = 500; // Check every 500ms
+        const REQUIRED_SUCCESS_COUNT = 3; // Need 3 successful pings
+        
+        return new Promise((resolve, reject) => {
+            let successCount = 0;
+            let checkCount = 0;
+            const maxChecks = STABILITY_CHECK_DURATION / PING_INTERVAL;
+            
+            const checkConnection = async () => {
+                checkCount++;
+                
+                try {
+                    // Test connection with a lightweight request
+                    const response = await fetch('api/ping.php', {
+                        method: 'HEAD',
+                        cache: 'no-cache',
+                        timeout: 2000
+                    });
+                    
+                    if (response.ok) {
+                        successCount++;
+                        console.log(`Connection check ${checkCount}: Success (${successCount}/${REQUIRED_SUCCESS_COUNT})`);
+                        
+                        if (successCount >= REQUIRED_SUCCESS_COUNT) {
+                            console.log('Connection stable - proceeding with sync');
+                            resolve();
+                            return;
+                        }
+                    } else {
+                        console.log(`Connection check ${checkCount}: Failed (${response.status})`);
+                        successCount = 0; // Reset on failure
+                    }
+                } catch (error) {
+                    console.log(`Connection check ${checkCount}: Error (${error.message})`);
+                    successCount = 0; // Reset on error
+                }
+                
+                if (checkCount >= maxChecks) {
+                    console.log('Connection stability check timeout');
+                    reject(new Error('Connection not stable enough for auto-sync'));
+                    return;
+                }
+                
+                // Continue checking
+                setTimeout(checkConnection, PING_INTERVAL);
+            };
+            
+            // Start checking after a brief delay
+            setTimeout(checkConnection, 1000);
+        });
+    }
+
+    createOfflineIndicator() {
+        // Find the navigation container
+        const navContainer = document.querySelector('.navbar .container-fluid');
+        if (!navContainer) {
+            console.error('Navigation container not found');
+            return;
+        }
+        
+        // Find the navigation items container (where user dropdown is located)
+        const navItems = navContainer.querySelector('.d-flex.align-items-center.ms-auto');
+        if (!navItems) {
+            console.error('Navigation items container not found');
+            console.log('Available elements in navContainer:', navContainer.children);
+            return;
+        }
+        
+        console.log('Found nav items container:', navItems);
+        
+        // Create offline indicator element
+        const offlineIndicator = document.createElement('div');
+        offlineIndicator.className = 'offline-indicator';
+        offlineIndicator.id = 'offline-indicator';
+        
+        // Insert at the beginning of nav items (before Tools dropdown)
+        navItems.insertBefore(offlineIndicator, navItems.firstChild);
+        console.log('Offline indicator created and inserted at beginning (before Tools)');
+        
+        this.offlineIndicator = offlineIndicator;
+    }
+
+    updateOfflineIndicator() {
+        if (!this.offlineIndicator) {
+            console.log('Offline indicator not found');
+            return;
+        }
+        
+        const pendingCount = this.offlineQueue.length;
+        console.log('Updating offline indicator:', { isOnline: this.isOnline, pendingCount });
+        
+        // Update user avatar status badge
+        this.updateUserAvatarStatus();
+        
+        if (!this.isOnline) {
+            // Show offline status with clear tooltip
+            this.offlineIndicator.innerHTML = `
+                <div class="offline-status offline" data-tooltip="You are offline. Readings will be saved locally and synced when connection is restored.">
+                    <i class="bi bi-wifi-off me-1"></i>
+                    <span class="d-none d-sm-inline">Offline</span>
+                </div>
+            `;
+            this.offlineIndicator.classList.remove('hidden');
+            console.log('Showing offline status');
+        } else if (pendingCount > 0) {
+            // Show pending sync status with clear tooltip
+            this.offlineIndicator.innerHTML = `
+                <div class="offline-status pending" data-tooltip="${pendingCount} reading(s) saved offline. Click sync to upload to server.">
+                    <i class="bi bi-cloud-upload me-1"></i>
+                    <span class="d-none d-sm-inline">Sync</span>
+                    <span class="badge bg-info ms-1" title="${pendingCount} reading(s) pending sync">${pendingCount}</span>
+                    <button class="btn btn-sm ms-2 sync-btn" onclick="qrMeterApp.manualSync()" title="Sync offline readings">
+                        <i class="bi bi-arrow-clockwise"></i>
+                    </button>
+                </div>
+            `;
+            this.offlineIndicator.classList.remove('hidden');
+            console.log('Showing pending sync status');
+        } else {
+            // Hide offline indicator when online (status shown in avatar)
+            this.offlineIndicator.classList.add('hidden');
+            console.log('Hiding offline indicator - status shown in avatar');
+        }
+    }
+
+    updateUserAvatarStatus() {
+        const userAvatar = document.querySelector('.user-avatar');
+        if (!userAvatar) {
+            console.log('User avatar not found');
+            return;
+        }
+        
+        // Remove existing status badge
+        const existingBadge = userAvatar.querySelector('.status-badge');
+        if (existingBadge) {
+            existingBadge.remove();
+        }
+        
+        const pendingCount = this.offlineQueue.length;
+        let statusClass = '';
+        let statusTitle = '';
+        
+        if (!this.isOnline) {
+            statusClass = 'offline';
+            statusTitle = 'You are offline - Readings saved locally';
+        } else if (pendingCount > 0) {
+            statusClass = 'pending';
+            statusTitle = `${pendingCount} reading(s) pending sync - Orange dot indicates sync needed`;
+        } else {
+            statusClass = 'online';
+            statusTitle = 'You are online - All readings saved to server';
+        }
+        
+        // Create status badge
+        const statusBadge = document.createElement('div');
+        statusBadge.className = `status-badge ${statusClass}`;
+        statusBadge.title = statusTitle;
+        
+        userAvatar.appendChild(statusBadge);
+        console.log('Updated user avatar status:', statusClass);
+    }
+
+    async manualSync() {
+        if (this.offlineQueue.length === 0) return;
+        
+        // Show sync in progress
+        const syncBtn = this.offlineIndicator.querySelector('.sync-btn');
+        if (syncBtn) {
+            syncBtn.innerHTML = '<i class="bi bi-hourglass-split"></i>';
+            syncBtn.disabled = true;
+        }
+        
+        try {
+            // Use slow sync only in testing mode, fast sync in production
+            if (this.appConfig && this.appConfig.isTesting) {
+                await this.syncOfflineReadingsWithDelay(true); // Slow sync for screenshots
+            } else {
+                await this.syncOfflineReadings(true); // Fast sync for production
+            }
+            this.showStatus('Offline readings synced successfully', 'success');
+        } catch (error) {
+            console.error('Manual sync failed:', error);
+            this.showStatus('Sync failed. Will retry automatically.', 'warning');
+        } finally {
+            // Restore sync button
+            if (syncBtn) {
+                syncBtn.innerHTML = '<i class="bi bi-arrow-clockwise"></i>';
+                syncBtn.disabled = false;
+            }
+        }
+    }
+
+    setupMobileTouchEvents() {
+        // Add touch event listeners for mobile accessibility
+        document.addEventListener('touchstart', (e) => {
+            const offlineStatus = e.target.closest('.offline-status');
+            if (offlineStatus) {
+                // Add visual feedback for touch
+                offlineStatus.style.transform = 'scale(0.98)';
+            }
+        });
+        
+        document.addEventListener('touchend', (e) => {
+            const offlineStatus = e.target.closest('.offline-status');
+            if (offlineStatus) {
+                // Remove visual feedback
+                offlineStatus.style.transform = '';
+                
+                // Show detailed information on mobile tap
+                this.showOfflineInfo(offlineStatus);
+            }
+        });
+    }
+
+    showOfflineInfo(offlineStatus) {
+        const pendingCount = this.offlineQueue.length;
+        let message = '';
+        
+        if (!this.isOnline) {
+            message = `You are currently offline. ${pendingCount > 0 ? `${pendingCount} reading(s) have been saved locally and will be synced when your connection is restored.` : 'Your readings will be saved locally until you are back online.'}`;
+        } else if (pendingCount > 0) {
+            message = `You have ${pendingCount} reading(s) saved offline. Tap the sync button to upload them to the server.`;
+        }
+        
+        if (message) {
+            // Use SweetAlert for mobile information display (appropriate use case)
+            Swal.fire({
+                icon: 'info',
+                title: 'Offline Status',
+                text: message,
+                confirmButtonText: 'OK',
+                confirmButtonColor: '#1d4ed8',
+                showCloseButton: true
+            });
         }
     }
 
@@ -1185,6 +1916,377 @@ class QRMeterReadingApp {
                 startBtn.classList.add('scanner-visible');
             }
         }
+    }
+
+    // Testing functionality for screenshots
+    addTestingControls() {
+        // Create testing panel
+        const testingPanel = document.createElement('div');
+        testingPanel.id = 'testing-panel';
+        testingPanel.style.cssText = `
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            z-index: 9999;
+            font-family: Arial, sans-serif;
+            font-size: 12px;
+            min-width: 200px;
+            max-width: 250px;
+        `;
+
+        testingPanel.innerHTML = `
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                <h4 style="margin: 0; color: #ffeb3b;">📸 Testing Panel</h4>
+                <button id="test-toggle" style="padding: 2px 6px; font-size: 10px; background: #666; color: white; border: none; border-radius: 3px;">Hide</button>
+            </div>
+            <div id="test-controls" style="margin-bottom: 10px;">
+                <div style="margin-bottom: 10px;">
+                    <button id="test-online" style="margin: 2px; padding: 5px 8px; font-size: 11px;">Online</button>
+                    <button id="test-offline" style="margin: 2px; padding: 5px 8px; font-size: 11px;">Offline</button>
+                </div>
+                <div style="margin-bottom: 10px;">
+                    <button id="test-pending-1" style="margin: 2px; padding: 5px 8px; font-size: 11px;">1 Pending</button>
+                    <button id="test-pending-3" style="margin: 2px; padding: 5px 8px; font-size: 11px;">3 Pending</button>
+                    <button id="test-pending-5" style="margin: 2px; padding: 5px 8px; font-size: 11px;">5 Pending</button>
+                </div>
+                <div style="margin-bottom: 10px;">
+                    <button id="test-cycle" style="margin: 2px; padding: 5px 8px; font-size: 11px; background: #4caf50;">Auto Cycle</button>
+                    <button id="test-sync" style="margin: 2px; padding: 5px 8px; font-size: 11px; background: #2196f3;">Test Sync</button>
+                    <button id="test-clear" style="margin: 2px; padding: 5px 8px; font-size: 11px; background: #f44336;">Clear</button>
+                </div>
+                <div style="margin-bottom: 10px;">
+                    <button id="test-offline-notification" style="margin: 2px; padding: 5px 8px; font-size: 11px; background: #ff6b6b;">Test Offline</button>
+                    <button id="test-online-notification" style="margin: 2px; padding: 5px 8px; font-size: 11px; background: #4caf50;">Test Online</button>
+                </div>
+                <div style="font-size: 10px; color: #ccc;">
+                    Status: <span id="test-status">Online</span>
+                </div>
+            </div>
+        `;
+
+        document.body.appendChild(testingPanel);
+
+        // Add event listeners for testing buttons
+        document.getElementById('test-online').addEventListener('click', () => {
+            this.testSetOnline();
+        });
+
+        document.getElementById('test-offline').addEventListener('click', () => {
+            this.testSetOffline();
+        });
+
+        document.getElementById('test-pending-1').addEventListener('click', () => {
+            this.testSetPending(1);
+        });
+
+        document.getElementById('test-pending-3').addEventListener('click', () => {
+            this.testSetPending(3);
+        });
+
+        document.getElementById('test-pending-5').addEventListener('click', () => {
+            this.testSetPending(5);
+        });
+
+        document.getElementById('test-cycle').addEventListener('click', () => {
+            this.testAutoCycle();
+        });
+
+        document.getElementById('test-clear').addEventListener('click', () => {
+            this.testClear();
+        });
+
+        document.getElementById('test-sync').addEventListener('click', () => {
+            this.testSyncProgress();
+        });
+
+        document.getElementById('test-offline-notification').addEventListener('click', () => {
+            this.testOfflineNotification();
+        });
+
+        document.getElementById('test-online-notification').addEventListener('click', () => {
+            this.testOnlineNotification();
+        });
+
+        // Add toggle functionality
+        document.getElementById('test-toggle').addEventListener('click', () => {
+            this.toggleTestingPanel();
+        });
+    }
+
+    // Testing methods
+    testSetOnline() {
+        // Only allow test functions in testing mode
+        if (!this.appConfig || !this.appConfig.isTesting) {
+            console.warn('Test functions are only available in testing mode');
+            return;
+        }
+        
+        this.isOnline = true;
+        this.offlineQueue = []; // Clear any pending readings for true online state
+        localStorage.removeItem('qr_meter_readings_offline'); // Clear localStorage
+        this.updateOfflineStatus();
+        this.updateOfflineIndicator();
+        this.updateUserAvatarStatus();
+        this.updateTestStatus('Online');
+    }
+
+    testSetOffline() {
+        // Only allow test functions in testing mode
+        if (!this.appConfig || !this.appConfig.isTesting) {
+            console.warn('Test functions are only available in testing mode');
+            return;
+        }
+        
+        this.isOnline = false;
+        this.updateOfflineStatus();
+        this.updateOfflineIndicator();
+        this.updateUserAvatarStatus();
+        this.updateTestStatus('Offline');
+    }
+
+    testSetPending(count) {
+        // Only allow test functions in testing mode
+        if (!this.appConfig || !this.appConfig.isTesting) {
+            console.warn('Test functions are only available in testing mode');
+            return;
+        }
+        
+        this.isOnline = true;
+        
+        // Clear existing test data
+        this.offlineQueue = [];
+        
+        // Add test readings
+        for (let i = 1; i <= count; i++) {
+            this.offlineQueue.push({
+                propertyCode: `GCA`,
+                unitNo: `10${i}`,
+                currentReading: 10000 + i,
+                remarks: `Test reading ${i}`,
+                syncId: `test_${i}_${Date.now()}`,
+                timestamp: new Date().toISOString()
+            });
+        }
+        
+        // Save to localStorage
+        localStorage.setItem('qr_meter_readings_offline', JSON.stringify(this.offlineQueue));
+        
+        this.updateOfflineStatus();
+        this.updateOfflineIndicator();
+        this.updateUserAvatarStatus();
+        this.updateTestStatus(`Online - ${count} Pending`);
+    }
+
+    testAutoCycle() {
+        // Only allow test functions in testing mode
+        if (!this.appConfig || !this.appConfig.isTesting) {
+            console.warn('Test functions are only available in testing mode');
+            return;
+        }
+        
+        const states = [
+            { name: 'Online', action: () => this.testSetOnline() },
+            { name: 'Online - 1 Pending', action: () => this.testSetPending(1) },
+            { name: 'Online - 3 Pending', action: () => this.testSetPending(3) },
+            { name: 'Offline', action: () => this.testSetOffline() },
+            { name: 'Offline - 2 Saved', action: () => {
+                this.isOnline = false;
+                this.testSetPending(2);
+                this.updateTestStatus('Offline - 2 Saved');
+            }}
+        ];
+
+        let currentIndex = 0;
+        
+        const cycle = () => {
+            const state = states[currentIndex];
+            state.action();
+            
+            currentIndex = (currentIndex + 1) % states.length;
+            
+            // Continue cycling every 4 seconds
+            setTimeout(cycle, 4000);
+        };
+        
+        // Start cycling
+        cycle();
+        
+        // Show cycling indicator
+        const cycleBtn = document.getElementById('test-cycle');
+        cycleBtn.textContent = 'Cycling...';
+        cycleBtn.style.background = '#ff9800';
+        
+        // Stop cycling after 20 seconds
+        setTimeout(() => {
+            cycleBtn.textContent = 'Auto Cycle';
+            cycleBtn.style.background = '#4caf50';
+        }, 20000);
+    }
+
+    testClear() {
+        // Only allow test functions in testing mode
+        if (!this.appConfig || !this.appConfig.isTesting) {
+            console.warn('Test functions are only available in testing mode');
+            return;
+        }
+        
+        this.isOnline = navigator.onLine;
+        this.offlineQueue = [];
+        
+        // Clear localStorage
+        localStorage.removeItem('qr_meter_readings_offline');
+        
+        this.updateOfflineStatus();
+        this.updateOfflineIndicator();
+        this.updateUserAvatarStatus();
+        this.updateTestStatus('Cleared');
+        
+        // Hide testing panel
+        const testingPanel = document.getElementById('testing-panel');
+        if (testingPanel) {
+            testingPanel.style.display = 'none';
+        }
+    }
+
+    // Test notification methods
+    testOfflineNotification() {
+        // Only allow test functions in testing mode
+        if (!this.appConfig || !this.appConfig.isTesting) {
+            console.warn('Test functions are only available in testing mode');
+            return;
+        }
+        
+        this.showOfflineNotification();
+        this.updateTestStatus('Offline Notification Shown');
+    }
+
+    testOnlineNotification() {
+        // Only allow test functions in testing mode
+        if (!this.appConfig || !this.appConfig.isTesting) {
+            console.warn('Test functions are only available in testing mode');
+            return;
+        }
+        
+        this.showOnlineNotification();
+        this.updateTestStatus('Online Notification Shown');
+    }
+
+    updateTestStatus(status) {
+        const statusElement = document.getElementById('test-status');
+        if (statusElement) {
+            statusElement.textContent = status;
+        }
+    }
+
+    toggleTestingPanel() {
+        const controls = document.getElementById('test-controls');
+        const toggleBtn = document.getElementById('test-toggle');
+        
+        if (controls.style.display === 'none') {
+            controls.style.display = 'block';
+            toggleBtn.textContent = 'Hide';
+        } else {
+            controls.style.display = 'none';
+            toggleBtn.textContent = 'Show';
+        }
+    }
+
+    testSyncProgress() {
+        // Only allow test sync in testing mode
+        if (!this.appConfig || !this.appConfig.isTesting) {
+            console.warn('Test sync is only available in testing mode');
+            return;
+        }
+        
+        // Create test offline readings if none exist
+        if (this.offlineQueue.length === 0) {
+            this.testSetPending(5);
+        }
+        
+        // Trigger auto sync simulation with delay for screenshots
+        this.testAutoSyncWithDelay();
+    }
+
+    async testAutoSyncWithDelay() {
+        if (this.offlineQueue.length === 0) {
+            console.log('No offline readings to sync');
+            return;
+        }
+        
+        console.log(`Starting TEST auto sync of ${this.offlineQueue.length} offline readings`);
+        const readingsToSync = [...this.offlineQueue];
+        const totalReadings = readingsToSync.length;
+        let syncedCount = 0;
+        let failedCount = 0;
+        
+        // Show sync progress indicator (test sync - auto sync simulation)
+        this.showSyncProgress(totalReadings, 0, 0, false);
+        
+        for (let i = 0; i < readingsToSync.length; i++) {
+            const reading = readingsToSync[i];
+            
+            try {
+                // Check connection before each sync attempt
+                if (!this.isOnline) {
+                    console.log('Connection lost during sync, stopping sync process');
+                    this.hideSyncProgress();
+                    break;
+                }
+                
+                // Update progress indicator
+                this.updateSyncProgress(totalReadings, i + 1, syncedCount, failedCount);
+                
+                console.log(`TEST Auto syncing reading: ${reading.propertyCode}-${reading.unitNo}`);
+                
+                // Add delay for screenshot purposes (2 seconds per reading)
+                await new Promise(resolve => setTimeout(resolve, 2000));
+                
+                // Simulate sync attempt (don't actually call server)
+                const success = Math.random() > 0.2; // 80% success rate for testing
+                
+                if (success) {
+                    // Remove from offline queue only after confirmed success
+                    this.offlineQueue = this.offlineQueue.filter(r => r.syncId !== reading.syncId);
+                    localStorage.setItem('qr_meter_readings_offline', JSON.stringify(this.offlineQueue));
+                    syncedCount++;
+                    console.log(`TEST Auto sync successfully synced reading: ${reading.propertyCode}-${reading.unitNo}`);
+                } else {
+                    failedCount++;
+                    console.log(`TEST Auto sync failed to sync reading: ${reading.propertyCode}-${reading.unitNo}`);
+                }
+                
+                // Update progress after each reading
+                this.updateSyncProgress(totalReadings, i + 1, syncedCount, failedCount);
+                
+            } catch (error) {
+                console.error(`TEST Auto sync error syncing reading ${reading.propertyCode}-${reading.unitNo}:`, error);
+                failedCount++;
+                
+                // Update progress even on error
+                this.updateSyncProgress(totalReadings, i + 1, syncedCount, failedCount);
+            }
+        }
+        
+        // Hide progress indicator
+        this.hideSyncProgress();
+        
+        // Update UI with sync results
+        this.updateOfflineStatus();
+        this.updateOfflineIndicator();
+        
+        if (syncedCount > 0) {
+            this.showStatus(`TEST Auto sync: ${syncedCount} reading(s) synced successfully`, 'success');
+        }
+        
+        if (failedCount > 0) {
+            this.showStatus(`TEST Auto sync: ${failedCount} reading(s) failed to sync`, 'warning');
+        }
+        
+        console.log(`TEST Auto sync completed: ${syncedCount} synced, ${failedCount} failed, ${this.offlineQueue.length} remaining`);
     }
 }
 
