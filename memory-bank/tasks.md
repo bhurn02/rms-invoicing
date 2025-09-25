@@ -21,33 +21,34 @@
 - [x] **Phase 6**: QR Scanner Page UX Optimization ⭐⭐ **MODERATE** ✅ **COMPLETED AS PART OF PHASE 4**
 - [x] **Phase 7**: Smart Alert Strategy - Success Notifications ⭐ **EASY** ✅ **COMPLETE** (Mobile UX + Messaging + Top Row Animation)
 - [x] **Phase 8**: Offline Status Indicator ⭐⭐ **MODERATE** ✅ **COMPLETE** (UX Standards Compliant)
-- [ ] **Phase 9**: Mobile Gesture Support ⭐⭐ **MODERATE**
+- [ ] **Phase 9**: Offline Data Integrity Fix ⭐⭐⭐ **CRITICAL** - **READY FOR IMPLEMENTATION**
+- [ ] **Phase 10**: Mobile Gesture Support ⭐⭐ **MODERATE**
 
 ### **⚡ WEEK 3: ADVANCED CORE FEATURES (High Risk, High Impact)**
-- [ ] **Phase 10**: Continuous Scanning Workflow ⭐⭐⭐ **COMPLEX**
-- [ ] **Phase 11**: Service Worker Implementation ⭐⭐⭐ **COMPLEX**
-- [ ] **Phase 12**: Cross-Device Testing ⭐⭐ **MODERATE**
-- [ ] **Phase 13**: Performance Optimization ⭐⭐ **MODERATE**
+- [ ] **Phase 11**: Continuous Scanning Workflow ⭐⭐⭐ **COMPLEX**
+- [ ] **Phase 12**: Service Worker Implementation ⭐⭐⭐ **COMPLEX**
+- [ ] **Phase 13**: Cross-Device Testing ⭐⭐ **MODERATE**
+- [ ] **Phase 14**: Performance Optimization ⭐⭐ **MODERATE**
 
 ### **🧪 WEEK 4: TESTING & VALIDATION (Medium Risk, Critical for Quality)**
-- [ ] **Phase 14**: Documentation Updates ⭐ **EASY**
+- [ ] **Phase 15**: Documentation Updates ⭐ **EASY**
 
 ### ** WEEK 5-7: BUSINESS LOGIC (High Risk, High Business Value)**
-- [ ] **Phase 15**: Tenant Readings Management Interface ⭐⭐⭐ **COMPLEX**
-- [ ] **Phase 16**: Export & Reporting Features ⭐⭐⭐ **COMPLEX**
-- [ ] **Phase 17**: Advanced Tenant Management ⭐⭐⭐ **COMPLEX**
+- [ ] **Phase 16**: Tenant Readings Management Interface ⭐⭐⭐ **COMPLEX**
+- [ ] **Phase 17**: Export & Reporting Features ⭐⭐⭐ **COMPLEX**
+- [ ] **Phase 18**: Advanced Tenant Management ⭐⭐⭐ **COMPLEX**
 
 ### **⚙️ WEEK 8: UTILITY RATE MANAGEMENT (Medium Risk, Business Value)**
-- [ ] **Phase 18**: Single-Point Rate Entry System ⭐⭐ **MODERATE**
-- [ ] **Phase 19**: Automatic Unit Classification ⭐ **EASY**
+- [ ] **Phase 19**: Single-Point Rate Entry System ⭐⭐ **MODERATE**
+- [ ] **Phase 20**: Automatic Unit Classification ⭐ **EASY**
 
 ### **🚀 WEEK 9: FINAL DEPLOYMENT (Low Risk, Critical for Go-Live)**
-- [ ] **Phase 20**: Comprehensive Testing ⭐⭐ **MODERATE**
-- [ ] **Phase 21**: Production Deployment ⭐ **EASY**
+- [ ] **Phase 21**: Comprehensive Testing ⭐⭐ **MODERATE**
+- [ ] **Phase 22**: Production Deployment ⭐ **EASY**
 
 ### ** WEEK 10: NICE-TO-HAVE FEATURES (Low Priority, Enhancements)**
-- [ ] **Phase 22**: Background Sync System ⭐⭐⭐ **COMPLEX**
-- [ ] **Phase 23**: Voice Input Features ⭐⭐⭐ **COMPLEX**
+- [ ] **Phase 23**: Background Sync System ⭐⭐⭐ **COMPLEX**
+- [ ] **Phase 24**: Voice Input Features ⭐⭐⭐ **COMPLEX**
 
 ## Creative Mode Completion Status
 **✅ CREATIVE MODE COMPLETE**
@@ -318,7 +319,116 @@ Successfully implemented offline status indicator in navigation header with comp
 - ✅ No impact on existing QR scanner functionality
 
 ## Current Task
-**Phase 9: Mobile Gesture Support** ⭐⭐ **MODERATE** - **READY FOR IMPLEMENTATION**
+**Phase 9: Offline Data Integrity Fix** ⭐⭐⭐ **CRITICAL** - **READY FOR IMPLEMENTATION**
+
+### **🚨 CRITICAL ISSUE IDENTIFIED**
+**Problem**: Major bug with tenant previous reading retrieval during offline mode that could cause incorrect data to be saved locally and synced.
+
+**Impact**: 
+- Previous reading data may be incorrect when stored offline
+- Sync process could propagate incorrect tenant data
+- Data integrity compromised during offline operations
+- Potential billing calculation errors
+
+**Priority**: **CRITICAL** - Must be addressed before any offline functionality goes to production
+
+### **Phase 9: Offline Data Integrity Fix - DETAILED IMPLEMENTATION PLAN**
+
+#### **Overview**
+Fix critical bug with tenant previous reading retrieval during offline mode to ensure data integrity and prevent incorrect data from being saved locally or synced to the server.
+
+#### **Complexity Assessment**
+- **Level**: 3 (Critical Bug Fix)
+- **Type**: Data Integrity & Sync Accuracy
+- **Risk**: High - Data integrity and sync accuracy
+- **Time**: 4-6 hours
+- **Dependencies**: Offline Status Indicator (Phase 8)
+
+#### **Root Cause Analysis**
+The offline mode implementation may have issues with:
+- **Tenant Resolution**: Incorrect tenant lookup during offline mode
+- **Previous Reading Retrieval**: Wrong previous reading data stored offline
+- **Data Validation**: Insufficient validation of offline data before sync
+- **Sync Process**: Incorrect data propagated during sync operations
+
+#### **Implementation Plan**
+
+**Step 1: Data Integrity Audit**
+- Audit current offline data storage structure
+- Identify where tenant previous reading retrieval fails
+- Document data flow issues in offline mode
+- Test offline data accuracy with various tenant scenarios
+
+**Step 2: Tenant Resolution Fix**
+- Fix tenant lookup logic for offline mode
+- Ensure proper tenant resolution before storing offline data
+- Implement fallback tenant resolution for offline scenarios
+- Add validation for tenant data integrity
+
+**Step 3: Previous Reading Accuracy**
+- Fix previous reading retrieval during offline mode
+- Ensure correct previous reading data is stored offline
+- Implement validation to prevent incorrect previous readings
+- Add data integrity checks before offline storage
+
+**Step 4: Sync Process Validation**
+- Add data validation before sync operations
+- Implement integrity checks during sync process
+- Ensure only valid data is synced to server
+- Add rollback mechanism for failed sync operations
+
+**Step 5: Testing & Validation**
+- Test offline readings with various tenant scenarios
+- Verify data integrity throughout offline/sync cycle
+- Test edge cases and error scenarios
+- Validate sync process with corrected data
+
+#### **Success Criteria**
+- [ ] Previous reading correctly retrieved and stored offline
+- [ ] Offline readings maintain data integrity
+- [ ] Sync process preserves accurate tenant data
+- [ ] No incorrect data saved locally or synced
+- [ ] Proper tenant resolution during offline mode
+- [ ] Data validation prevents corrupt offline data
+- [ ] Sync process handles data integrity errors gracefully
+
+#### **Files to Modify**
+- `pages/qr-meter-reading/assets/js/app.js` - Fix offline data storage and validation
+- `pages/qr-meter-reading/api/save-reading.php` - Add data integrity validation
+- `memory-bank/tasks.md` - Update phase status
+- `memory-bank/progress.md` - Document implementation progress
+
+#### **Dependencies**
+- **Phase 8**: Offline Status Indicator (required for offline functionality)
+
+#### **Challenges & Mitigations**
+- **Challenge**: Complex tenant resolution logic during offline mode
+  - **Mitigation**: Implement comprehensive tenant lookup with fallbacks
+- **Challenge**: Data validation complexity
+  - **Mitigation**: Add multiple validation layers and integrity checks
+- **Challenge**: Sync process data integrity
+  - **Mitigation**: Implement validation before sync and rollback mechanisms
+
+#### **Rollback Procedures**
+- Disable offline mode until fix implemented
+- Restore online-only functionality
+- Clear any corrupted offline data
+- Implement emergency data validation
+
+#### **Testing Strategy**
+- **Pre-Phase**: Document current offline data issues
+- **During Implementation**: Test data integrity at each step
+- **Post-Phase**: Comprehensive offline/sync testing
+- **Integration**: Test with existing QR scanner functionality
+- **Edge Cases**: Test various tenant scenarios and error conditions
+
+### **Phase 8 Entry Criteria** ✅ **MET**
+- [x] Phase 7 Smart Alert Strategy - Success Notifications complete (with mobile UX enhancement, messaging correction, and top row animation)
+- [x] CSS file organization complete
+- [x] Mobile-first design implemented
+- [x] Touch targets meet 44px minimum
+- [x] Responsive design system established
+- [x] Toast notification system implemented and enhanced
 
 ### **✅ Phase 8: Offline Status Indicator - COMPLETED (Testing Code Added)**
 **Date**: 2025-09-25  
@@ -649,8 +759,8 @@ Implement validation for meter replacement scenarios when current reading is les
 - **Documentation**: Update user guides with meter replacement procedures
 
 ## Total Project Estimate
-- **Total Phases**: 23
-- **Total Development Time**: 123-162 hours
+- **Total Phases**: 24
+- **Total Development Time**: 127-170 hours
 - **Total Timeline**: 10 weeks
 - **Success Rate Target**: 98%
 - **Risk Level**: Medium (phased approach with rollback capability)

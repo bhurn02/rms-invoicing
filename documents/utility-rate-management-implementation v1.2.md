@@ -405,12 +405,27 @@ graph TD
 - **FAQ Updates**: New questions about status dots, automatic sync, and sync failures
 - **Error Message Reference**: Updated with sync-related error messages and solutions
 
-#### **Phase 9: Mobile Gesture Support** ⭐⭐ **MODERATE**
+#### **Phase 9: Offline Data Integrity Fix** ⭐⭐⭐ **CRITICAL**
+- **Task**: Fix critical bug with tenant previous reading retrieval during offline mode
+- **Risk**: High - Data integrity and sync accuracy
+- **Time**: 4-6 hours
+- **Dependencies**: Offline Status Indicator (Phase 8)
+- **Entry Criteria**: Offline status indicator working
+- **Success Criteria**:
+  - Previous reading correctly retrieved and stored offline
+  - Offline readings maintain data integrity
+  - Sync process preserves accurate tenant data
+  - No incorrect data saved locally or synced
+  - Proper tenant resolution during offline mode
+- **Rollback**: Disable offline mode until fix implemented
+- **Validation**: Test offline readings with various tenant scenarios
+
+#### **Phase 10: Mobile Gesture Support** ⭐⭐ **MODERATE**
 - **Task**: Add swipe navigation and touch optimization
 - **Risk**: Medium - Touch interaction changes
 - **Time**: 3-4 hours
-- **Dependencies**: Responsive Layout Fixes (Phase 4)
-- **Entry Criteria**: Responsive layout system working
+- **Dependencies**: Offline Data Integrity Fix (Phase 9)
+- **Entry Criteria**: Offline data integrity issues resolved
 - **Success Criteria**:
   - Swipe gestures work smoothly
   - Touch targets minimum 44px
@@ -421,12 +436,12 @@ graph TD
 
 ### **⚡ WEEK 3: ADVANCED CORE FEATURES (High Risk, High Impact)**
 
-#### **Phase 10: Continuous Scanning Workflow** ⭐⭐⭐ **COMPLEX**
+#### **Phase 11: Continuous Scanning Workflow** ⭐⭐⭐ **COMPLEX**
 - **Task**: Implement auto-advance to next scan after successful reading
 - **Risk**: High - Core workflow changes
 - **Time**: 6-8 hours
-- **Dependencies**: Smart Alert Strategy - Success Notifications (Phase 7)
-- **Entry Criteria**: Success notifications working properly
+- **Dependencies**: Offline Data Integrity Fix (Phase 9)
+- **Entry Criteria**: Offline data integrity issues resolved
 - **Success Criteria**:
   - Seamless transition between meter readings
   - Auto-advance after successful submission
@@ -436,12 +451,12 @@ graph TD
 - **Rollback**: Restore manual progression workflow
 - **Validation**: Test multiple meter readings, verify seamless flow
 
-#### **Phase 11: Service Worker Implementation** ⭐⭐⭐ **COMPLEX**
+#### **Phase 12: Service Worker Implementation** ⭐⭐⭐ **COMPLEX**
 - **Task**: Implement PWA Service Worker for offline functionality
 - **Risk**: High - New technology integration
 - **Time**: 8-10 hours
-- **Dependencies**: Offline Status Indicator (Phase 8)
-- **Entry Criteria**: Offline status indicator working
+- **Dependencies**: Offline Data Integrity Fix (Phase 9)
+- **Entry Criteria**: Offline data integrity issues resolved
 - **Success Criteria**:
   - Service Worker registered successfully
   - Basic offline functionality working
@@ -450,7 +465,7 @@ graph TD
 - **Rollback**: Remove Service Worker registration
 - **Validation**: Test offline functionality, verify Service Worker registration
 
-#### **Phase 12: Cross-Device Testing** ⭐⭐ **MODERATE**
+#### **Phase 13: Cross-Device Testing** ⭐⭐ **MODERATE**
 - **Task**: Test on Samsung A15, iPhone 14 Pro Max, laptops
 - **Risk**: Medium - Device-specific issues
 - **Time**: 4-6 hours
@@ -464,7 +479,7 @@ graph TD
 - **Rollback**: Address device-specific issues
 - **Validation**: Comprehensive testing on all target devices
 
-#### **Phase 13: Performance Optimization** ⭐⭐ **MODERATE**
+#### **Phase 14: Performance Optimization** ⭐⭐ **MODERATE**
 - **Task**: Optimize load times, animations, battery usage
 - **Risk**: Medium - Performance tuning
 - **Time**: 4-6 hours
@@ -480,7 +495,7 @@ graph TD
 
 ### **🧪 WEEK 4: TESTING & VALIDATION (Medium Risk, Critical for Quality)**
 
-#### **Phase 14: Documentation Updates** ⭐ **EASY**
+#### **Phase 15: Documentation Updates** ⭐ **EASY**
 - **Task**: Update user guides and technical documentation
 - **Risk**: Low - Documentation only
 - **Time**: 2-3 hours
@@ -496,7 +511,7 @@ graph TD
 
 ### ** WEEK 5-7: BUSINESS LOGIC (High Risk, High Business Value)**
 
-#### **Phase 15: Tenant Readings Management Interface** ⭐⭐⭐ **COMPLEX**
+#### **Phase 16: Tenant Readings Management Interface** ⭐⭐⭐ **COMPLEX**
 - **Task**: Create comprehensive reading management system
 - **Risk**: High - Complex business logic
 - **Time**: 20-25 hours
@@ -510,11 +525,11 @@ graph TD
 - **Rollback**: Remove management interface
 - **Validation**: Test all CRUD operations, verify business logic
 
-#### **Phase 16: Export & Reporting Features** ⭐⭐⭐ **COMPLEX**
+#### **Phase 17: Export & Reporting Features** ⭐⭐⭐ **COMPLEX**
 - **Task**: Implement Excel, PDF, CSV export functionality
 - **Risk**: High - File generation complexity
 - **Time**: 15-20 hours
-- **Dependencies**: Tenant Readings Management (Phase 15)
+- **Dependencies**: Tenant Readings Management (Phase 16)
 - **Entry Criteria**: Management interface working
 - **Success Criteria**:
   - Excel export with multiple sheets
@@ -524,11 +539,11 @@ graph TD
 - **Rollback**: Remove export functionality
 - **Validation**: Test all export formats, verify file generation
 
-#### **Phase 17: Advanced Tenant Management** ⭐⭐⭐ **COMPLEX**
+#### **Phase 18: Advanced Tenant Management** ⭐⭐⭐ **COMPLEX**
 - **Task**: Implement advanced tenant assignment scenarios
 - **Risk**: High - Complex business rules
 - **Time**: 12-15 hours
-- **Dependencies**: Tenant Readings Management (Phase 15)
+- **Dependencies**: Tenant Readings Management (Phase 16)
 - **Entry Criteria**: Basic management interface working
 - **Success Criteria**:
   - Handle terminated tenant assignments
@@ -540,7 +555,7 @@ graph TD
 
 ### **⚙️ WEEK 8: UTILITY RATE MANAGEMENT (Medium Risk, Business Value)**
 
-#### **Phase 18: Single-Point Rate Entry System** ⭐⭐ **MODERATE**
+#### **Phase 19: Single-Point Rate Entry System** ⭐⭐ **MODERATE**
 - **Task**: Interface for entering Electric and LEAC rates
 - **Risk**: Medium - Database integration
 - **Time**: 8-10 hours
@@ -554,11 +569,11 @@ graph TD
 - **Rollback**: Remove rate entry system
 - **Validation**: Test rate updates, verify database integration
 
-#### **Phase 19: Automatic Unit Classification** ⭐ **EASY**
+#### **Phase 20: Automatic Unit Classification** ⭐ **EASY**
 - **Task**: Use existing space_type for residential/commercial classification
 - **Risk**: Low - Database field usage
 - **Time**: 2-3 hours
-- **Dependencies**: Single-Point Rate Entry System (Phase 18)
+- **Dependencies**: Single-Point Rate Entry System (Phase 19)
 - **Entry Criteria**: Rate entry system working
 - **Success Criteria**:
   - Automatic classification working
@@ -570,7 +585,7 @@ graph TD
 
 ### **🚀 WEEK 9: FINAL DEPLOYMENT (Low Risk, Critical for Go-Live)**
 
-#### **Phase 20: Comprehensive Testing** ⭐⭐ **MODERATE**
+#### **Phase 21: Comprehensive Testing** ⭐⭐ **MODERATE**
 - **Task**: End-to-end testing of complete system
 - **Risk**: Medium - Integration testing
 - **Time**: 8-10 hours
@@ -585,11 +600,11 @@ graph TD
 - **Rollback**: Address integration issues
 - **Validation**: Comprehensive system testing
 
-#### **Phase 21: Production Deployment** ⭐ **EASY**
+#### **Phase 22: Production Deployment** ⭐ **EASY**
 - **Task**: Deploy to production environment
 - **Risk**: Low - Deployment process
 - **Time**: 2-4 hours
-- **Dependencies**: Comprehensive Testing (Phase 20)
+- **Dependencies**: Comprehensive Testing (Phase 21)
 - **Entry Criteria**: All testing passed
 - **Success Criteria**:
   - System deployed to production
@@ -601,11 +616,11 @@ graph TD
 
 ### ** WEEK 10: NICE-TO-HAVE FEATURES (Low Priority, Enhancements)**
 
-#### **Phase 22: Background Sync System** ⭐⭐⭐ **COMPLEX**
+#### **Phase 23: Background Sync System** ⭐⭐⭐ **COMPLEX**
 - **Task**: Implement background synchronization of offline readings
 - **Risk**: High - Complex sync logic
 - **Time**: 10-12 hours
-- **Dependencies**: Service Worker Implementation (Phase 11)
+- **Dependencies**: Service Worker Implementation (Phase 12)
 - **Entry Criteria**: Service Worker working
 - **Success Criteria**:
   - Offline readings sync when connection restored
@@ -615,11 +630,11 @@ graph TD
 - **Rollback**: Remove background sync
 - **Validation**: Test offline/online transitions, verify sync
 
-#### **Phase 23: Voice Input Features** ⭐⭐⭐ **COMPLEX**
+#### **Phase 24: Voice Input Features** ⭐⭐⭐ **COMPLEX**
 - **Task**: Add speech-to-text for meter reading entry
 - **Risk**: High - Browser compatibility issues
 - **Time**: 6-8 hours
-- **Dependencies**: Mobile Gesture Support (Phase 9)
+- **Dependencies**: Mobile Gesture Support (Phase 10)
 - **Entry Criteria**: Mobile gestures working
 - **Success Criteria**:
   - Voice input works on target devices
@@ -653,21 +668,21 @@ graph TD
 ## 📊 IMPLEMENTATION TIMELINE
 
 ### **Total Project Estimate**
-- **Total Phases**: 23
-- **Total Development Time**: 123-162 hours
+- **Total Phases**: 24
+- **Total Development Time**: 127-170 hours
 - **Total Timeline**: 10 weeks
 - **Success Rate Target**: 98%
 - **Risk Level**: Medium (phased approach with rollback capability)
 
 ### **Weekly Breakdown**
 - **Week 1**: Phases 1-5 (Foundation & Quick Wins)
-- **Week 2**: Phases 6-9 (Core UX Improvements)
-- **Week 3**: Phases 10-13 (Advanced Core Features)
-- **Week 4**: Phase 14 (Testing & Validation)
-- **Week 5-7**: Phases 15-17 (Business Logic)
-- **Week 8**: Phases 18-19 (Utility Rate Management)
-- **Week 9**: Phases 20-21 (Final Deployment)
-- **Week 10**: Phases 22-23 (Nice-to-Have Features)
+- **Week 2**: Phases 6-9 (Core UX Improvements + Critical Offline Data Integrity Fix)
+- **Week 3**: Phases 10-14 (Advanced Core Features)
+- **Week 4**: Phase 15 (Testing & Validation)
+- **Week 5-7**: Phases 16-18 (Business Logic)
+- **Week 8**: Phases 19-20 (Utility Rate Management)
+- **Week 9**: Phases 21-22 (Final Deployment)
+- **Week 10**: Phases 23-24 (Nice-to-Have Features)
 
 ## 🎯 CONCLUSION
 
