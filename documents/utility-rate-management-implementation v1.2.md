@@ -405,20 +405,23 @@ graph TD
 - **FAQ Updates**: New questions about status dots, automatic sync, and sync failures
 - **Error Message Reference**: Updated with sync-related error messages and solutions
 
-#### **Phase 9: Offline Data Integrity Fix** ⭐⭐⭐ **CRITICAL**
-- **Task**: Fix critical bug with tenant previous reading retrieval during offline mode
+#### **Phase 9: Offline Data Integrity Fix** ⭐⭐⭐ **CRITICAL** ✅ **CREATIVE PHASES COMPLETE**
+- **Task**: Implement cache-first tenant resolution system with comprehensive offline data integrity
 - **Risk**: High - Data integrity and sync accuracy
 - **Time**: 4-6 hours
 - **Dependencies**: Offline Status Indicator (Phase 8)
 - **Entry Criteria**: Offline status indicator working
 - **Success Criteria**:
-  - Previous reading correctly retrieved and stored offline
-  - Offline readings maintain data integrity
-  - Sync process preserves accurate tenant data
-  - No incorrect data saved locally or synced
-  - Proper tenant resolution during offline mode
+  - **Cache-First Strategy**: 95%+ cache hit rate with <10ms response times
+  - **Page Reload Cache Initialization**: Fresh cache on every page load using vw_LatestTenantReadings
+  - **Smart Validation**: Cache validity checking with network fallback
+  - **Complete Offline Capability**: Works for all 100-120 rentable units
+  - **Data Accuracy**: Smart validation ensures data integrity
+  - **Performance**: Sub-10ms QR scan responses with 95%+ cache hits
 - **Rollback**: Disable offline mode until fix implemented
 - **Validation**: Test offline readings with various tenant scenarios
+- **Creative Phases**: ✅ Architecture & Algorithm design complete
+- **Implementation Strategy**: Cache-first with smart validation and fallback mechanisms
 
 #### **Phase 10: Mobile Gesture Support** ⭐⭐ **MODERATE**
 - **Task**: Add swipe navigation and touch optimization

@@ -2,7 +2,7 @@
 
 **Document Type**: Mode Integration Bridge  
 **Purpose**: Ensure seamless transition from Creative Mode to Implementation Mode for Phase 9  
-**Date**: September 25, 2025  
+**Date**: September 26, 2025  
 **Status**: Complete - Ready for Implementation Mode  
 **Phase**: Phase 9 - Offline Data Integrity Fix  
 
@@ -13,11 +13,12 @@ This document ensures that all design decisions made in Creative Mode for Phase 
 ## 📋 CREATIVE MODE OUTPUTS
 
 ### **Design Decisions Made**
-- ✅ **Architecture Design**: Hybrid online/offline tenant resolution system
-- ✅ **Algorithm Design**: Sequential fallback algorithm with validation pipeline
-- ✅ **Caching Strategy**: 24-hour cache with LRU eviction and fallback mechanisms
-- ✅ **Data Validation Pipeline**: Multi-stage validation before offline storage and during sync
+- ✅ **Architecture Design**: Cache-first tenant resolution system with smart validation
+- ✅ **Algorithm Design**: Cache-first with network fallback and expired cache handling
+- ✅ **Caching Strategy**: Page reload cache initialization using vw_LatestTenantReadings (90-day duration)
+- ✅ **Data Validation Pipeline**: Multi-stage validation with cache validity checking
 - ✅ **Error Handling Strategy**: Graceful degradation with clear error messages and retry logic
+- ✅ **Performance Strategy**: 95%+ cache hit rate with <10ms response times
 
 ### **Creative Phase Documents Created**
 - ✅ **`memory-bank/creative-offline-data-integrity.md`** - Complete design analysis and decisions
@@ -34,25 +35,29 @@ When switching to Implementation Mode, the system must load:
 4. **`memory-bank/sync-functionality-documentation.md`** - Existing sync functionality reference
 
 ### **Design Decision Implementation Checklist**
-- [ ] **Architecture Implementation**: Hybrid online/offline tenant resolution system
-- [ ] **Algorithm Implementation**: Sequential fallback algorithm with validation pipeline
-- [ ] **Caching Implementation**: 24-hour cache with LRU eviction
-- [ ] **Validation Pipeline**: Multi-stage validation before offline storage
+- [ ] **Architecture Implementation**: Cache-first tenant resolution system with smart validation
+- [ ] **Algorithm Implementation**: Cache-first with network fallback and expired cache handling
+- [ ] **Caching Implementation**: Page reload cache initialization using vw_LatestTenantReadings (90-day duration)
+- [ ] **Connection Restore Cache Refresh**: Automatic cache update when connection is restored
+- [ ] **Validation Pipeline**: Multi-stage validation with cache validity checking
 - [ ] **Error Handling**: Graceful degradation and retry logic
+- [ ] **Performance Implementation**: 95%+ cache hit rate with <10ms response times
 - [ ] **Enhanced Offline Storage**: Validation metadata and sync preparation
 
 ## 🎨 DESIGN DECISION MAPPING
 
 ### **Architecture Design Implementation**
-**Creative Decision**: Hybrid online/offline tenant resolution approach
+**Creative Decision**: Cache-first tenant resolution system with smart validation
 **Implementation Requirements**:
-- Create `TenantResolutionService` class with online/offline methods
-- Implement caching mechanism with 24-hour expiration
+- Create `TenantResolutionService` class with cache-first methods
+- Implement page reload cache initialization using vw_LatestTenantReadings
+- Implement connection restore cache refresh for data freshness
+- Cache-first strategy with 95%+ hit rate and <10ms response times
 - Add fallback resolution strategies (cache, offline history, defaults, server)
 - Implement graceful degradation for offline scenarios
 
 ### **Algorithm Design Implementation**
-**Creative Decision**: Sequential fallback algorithm with validation pipeline
+**Creative Decision**: Cache-first with network fallback and expired cache handling
 **Implementation Requirements**:
 - Implement tenant resolution fallback algorithm with 4 strategies
 - Create data validation pipeline with multiple validation stages

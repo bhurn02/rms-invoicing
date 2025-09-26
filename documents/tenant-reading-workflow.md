@@ -193,32 +193,106 @@ sequenceDiagram
 
 ---
 
-## 7) Offline-First Architecture & Sync System
+## 7) Cache-First Offline Architecture & Sync System
 
-### **Offline Reading Workflow**
+### **Cache-First QR Scanning Workflow**
 ```mermaid
 flowchart TD
-    A[User Takes Reading] --> B{Online?}
-    B -->|Yes| C[Submit to Server]
-    B -->|No| D[Store in localStorage]
-    D --> E[Show Offline Notification]
-    E --> F[Update Status Indicators]
-    F --> G[Continue Working]
+    A[QR Code Scanned] --> B[Extract Property/Unit]
+    B --> C[Check Cache First]
+    C --> D{Cache Hit & Valid?}
+    D -->|Yes| E[Return Cached Data<br/>< 10ms Response]
+    D -->|No| F{Online?}
+    F -->|Yes| G[Fetch from Network<br/>200-500ms Response]
+    F -->|No| H{Expired Cache Available?}
+    H -->|Yes| I[Use Expired Cache<br/>< 10ms Response<br/>Warning: May be outdated]
+    H -->|No| J[Block - No Data Available]
+    G --> K[Update Cache]
+    K --> L[Return Network Data]
+    E --> M[Populate Form]
+    I --> M
+    L --> M
+    M --> N[User Enters Reading]
+    N --> O[Submit Reading]
+    O --> P{Online?}
+    P -->|Yes| Q[Submit to Server]
+    P -->|No| R[Store in Offline Queue]
+    Q --> S[Success Notification]
+    R --> T[Offline Notification]
+    T --> U[Update Status Indicators]
+    U --> V[Continue Working]
     
-    H[Connection Restored] --> I[Browser Online Event]
-    I --> J[Show Online Notification]
-    J --> K[Connection Stability Check]
-    K --> L{Stable?}
-    L -->|Yes| M[Auto Sync Triggered]
-    L -->|No| N[Skip Auto Sync]
-    M --> O[Process Offline Queue]
-    O --> P[Submit Each Reading]
-    P --> Q{Success?}
-    Q -->|Yes| R[Remove from Queue]
-    Q -->|No| S[Keep in Queue]
-    R --> T[Update UI]
-    S --> T
-    N --> T
+    W[Connection Restored] --> X[Browser Online Event]
+    X --> Y[Show Online Notification]
+    Y --> Z[Connection Stability Check]
+    Z --> AA{Stable?}
+    AA -->|Yes| BB[Refresh Cache First]
+    AA -->|No| CC[Skip Auto Sync]
+    BB --> DD[Load Fresh Data from vw_LatestTenantReadings]
+    DD --> EE[Update Comprehensive Cache]
+    EE --> FF[Auto Sync Offline Queue]
+    FF --> GG[Process Each Reading]
+    GG --> HH{Success?}
+    HH -->|Yes| II[Remove from Queue]
+    HH -->|No| JJ[Keep in Queue]
+    II --> KK[Update UI & Cache Status]
+    JJ --> KK
+    CC --> KK
+```
+
+### **Cache-First Performance Benefits**
+- **95%+ Cache Hit Rate**: Sub-10ms response times for QR scans
+- **Reduced Server Load**: Minimal database queries
+- **Better User Experience**: Instant QR scan responses
+- **Complete Offline Capability**: Works for all 100-120 rentable units
+- **Battery Efficient**: Minimal network usage
+- **Page Reload Refresh**: Fresh cache on every page load using vw_LatestTenantReadings
+- **Connection Restore Refresh**: Automatic cache update when connection is restored
+
+### **Cache Refresh on Connection Restore**
+```javascript
+// Enhanced connection restore with cache refresh
+window.addEventListener('online', async () => {
+    console.log('Connection restored - refreshing cache');
+    
+    // Step 1: Wait for connection stability
+    await waitForStableConnection();
+    
+    // Step 2: Refresh comprehensive cache first
+    try {
+        await refreshComprehensiveCache();
+        console.log('Cache refreshed with latest data');
+    } catch (error) {
+        console.error('Cache refresh failed:', error);
+        // Continue with existing cache
+    }
+    
+    // Step 3: Sync offline queue
+    if (offlineQueue.length > 0) {
+        await syncOfflineReadings();
+    }
+});
+
+// Refresh comprehensive cache using vw_LatestTenantReadings
+async function refreshComprehensiveCache() {
+    const freshData = await Promise.all([
+        loadLatestTenantReadings(), // vw_LatestTenantReadings view
+        loadActiveTenants(),        // Current active tenants
+        loadPropertyDefaults()      // Property/unit defaults
+    ]);
+    
+    const updatedCache = {
+        latestReadings: freshData[0],
+        activeTenants: freshData[1],
+        propertyDefaults: freshData[2],
+        cachedAt: new Date().toISOString(),
+        expiresAt: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString(),
+        source: 'connection_restore_refresh'
+    };
+    
+    localStorage.setItem('qr_comprehensive_cache', JSON.stringify(updatedCache));
+    return updatedCache;
+}
 ```
 
 ### **Offline Storage Structure**
