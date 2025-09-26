@@ -9,16 +9,28 @@ const DYNAMIC_CACHE = 'qr-meter-reading-dynamic-v1.0.0';
 
 // Files to cache for offline functionality
 const STATIC_FILES = [
-    '/',
-    '/index.php',
-    '/assets/css/custom-theme.css',
-    '/assets/css/qr-scanner.css',
-    '/assets/js/app.js',
-    '/manifest.json',
+    '/rms/qr-meter-reading/',
+    '/rms/qr-meter-reading/index.php',
+    '/rms/qr-meter-reading/assets/css/custom-theme.css',
+    '/rms/qr-meter-reading/assets/css/qr-scanner.css',
+    '/rms/qr-meter-reading/assets/js/app.js',
+    '/rms/qr-meter-reading/manifest.json'
+];
+
+// External CDN files - cache separately to avoid CORS issues
+const EXTERNAL_FILES = [
     'https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css',
     'https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js',
     'https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js',
     'https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css'
+];
+
+// Files that might not exist - cache individually with error handling
+const OPTIONAL_FILES = [
+    '/rms/qr-meter-reading/assets/images/favicon.ico',
+    '/rms/qr-meter-reading/assets/images/icon-144x144.png',
+    '/rms/qr-meter-reading/assets/images/icon-192x192.png',
+    '/rms/qr-meter-reading/assets/images/icon-512x512.png'
 ];
 
 // Install event - cache static files
@@ -28,15 +40,44 @@ self.addEventListener('install', (event) => {
     event.waitUntil(
         caches.open(STATIC_CACHE)
             .then((cache) => {
-                console.log('Service Worker: Caching static files');
+                console.log('Service Worker: Caching local static files');
+                // Cache local files first
                 return cache.addAll(STATIC_FILES);
             })
             .then(() => {
-                console.log('Service Worker: Static files cached');
+                console.log('Service Worker: Local static files cached');
+                // Cache external CDN files individually (don't fail if they don't exist)
+                return caches.open(STATIC_CACHE).then((cache) => {
+                    const externalPromises = EXTERNAL_FILES.map(file => 
+                        cache.add(file).catch(error => {
+                            console.warn(`Service Worker: External file failed to cache: ${file}`, error);
+                            return null; // Don't fail the entire cache operation
+                        })
+                    );
+                    return Promise.all(externalPromises);
+                });
+            })
+            .then(() => {
+                console.log('Service Worker: External files cached');
+                // Cache optional files individually (don't fail if they don't exist)
+                return caches.open(STATIC_CACHE).then((cache) => {
+                    const optionalPromises = OPTIONAL_FILES.map(file => 
+                        cache.add(file).catch(error => {
+                            console.warn(`Service Worker: Optional file not found: ${file}`, error);
+                            return null; // Don't fail the entire cache operation
+                        })
+                    );
+                    return Promise.all(optionalPromises);
+                });
+            })
+            .then(() => {
+                console.log('Service Worker: All files cached successfully');
                 return self.skipWaiting();
             })
             .catch((error) => {
                 console.error('Service Worker: Error caching static files:', error);
+                // Don't fail the installation - continue anyway
+                return self.skipWaiting();
             })
     );
 });

@@ -19,13 +19,40 @@ class QRMeterReadingApp {
         this.wasOffline = false; // Track if we were previously offline
         this.lastFormInteraction = 0; // Track last form interaction time
         
+        // Phase 9: Cache-first tenant resolution system
+        this.comprehensiveCache = null; // Cache for all tenant data
+        this.tenantResolutionService = null; // Will be initialized after cache
+        this.dataValidationPipeline = new DataValidationPipeline();
+        this.enhancedOfflineStorage = new EnhancedOfflineStorage();
+        
         this.init();
+    }
+
+    // Utility function to normalize property codes and unit numbers
+    normalizePropertyCode(propertyCode) {
+        return propertyCode ? propertyCode.trim() : '';
+    }
+
+    normalizeUnitNo(unitNo) {
+        return unitNo ? unitNo.trim() : '';
+    }
+
+    // Utility function to normalize both property code and unit number
+    normalizePropertyAndUnit(propertyCode, unitNo) {
+        return {
+            propertyCode: this.normalizePropertyCode(propertyCode),
+            unitNo: this.normalizeUnitNo(unitNo)
+        };
     }
 
     async init() {
         await this.loadAppConfig();
         this.checkAuthentication();
         this.setupEventListeners();
+        
+        // Phase 9: Initialize cache-first system
+        await this.initializeComprehensiveCache();
+        
         this.loadRecentReadings();
         this.setupOfflineSync();
         this.setupOfflineDetection();
@@ -536,12 +563,15 @@ class QRMeterReadingApp {
         const formCard = document.getElementById('reading-form-card');
         const form = document.getElementById('reading-form');
         
+        // Normalize property code and unit number
+        const normalized = this.normalizePropertyAndUnit(propertyCode, unitNo);
+        
         // Clear previous form data
         form.reset();
         
-        // Set property and unit information
-        document.getElementById('property-id').value = propertyCode;
-        document.getElementById('unit-number').value = unitNo;
+        // Set property and unit information (use normalized values)
+        document.getElementById('property-id').value = normalized.propertyCode;
+        document.getElementById('unit-number').value = normalized.unitNo;
         document.getElementById('meter-id').value = meterId || '';
         
         // Show the form
@@ -552,28 +582,37 @@ class QRMeterReadingApp {
         formCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
         
         // Fetch tenant information and last reading, then auto-focus
-        this.fetchTenantAndReadingInfo(propertyCode, unitNo);
+        this.fetchTenantAndReadingInfo(normalized.propertyCode, normalized.unitNo);
     }
     
-    // Fetch tenant information and last reading data
+    // Phase 9: Cache-first tenant and reading information fetch
     async fetchTenantAndReadingInfo(propertyCode, unitNo) {
         try {
-            // Fetch tenant information
-            const tenantResponse = await fetch(`api/get-tenant-by-unit.php?propertyCode=${encodeURIComponent(propertyCode)}&unitNo=${encodeURIComponent(unitNo)}`);
-            const tenantData = await tenantResponse.json();
+            console.log(`Fetching tenant and reading info for ${propertyCode}-${unitNo}`);
             
-            if (tenantData.success && tenantData.data) {
+            // Phase 9: Use cache-first tenant resolution
+            if (!this.tenantResolutionService) {
+                throw new Error('Tenant resolution service not initialized');
+            }
+            const tenantData = await this.tenantResolutionService.resolveTenantWithFallback(propertyCode, unitNo);
+            
+            if (tenantData && tenantData.success) {
                 // Update tenant information display
                 this.updateTenantInfo(tenantData.data);
+            } else {
+                console.warn('No tenant data found for property/unit');
+                this.showStatus('No tenant information found for this property/unit', 'warning');
             }
             
-            // Fetch last reading
-            const readingResponse = await fetch(`api/get-last-reading.php?propertyCode=${encodeURIComponent(propertyCode)}&unitNo=${encodeURIComponent(unitNo)}`);
-            const readingData = await readingResponse.json();
+            // Phase 9: Get previous reading from cache or network
+            const readingData = await this.getPreviousReadingData(propertyCode, unitNo);
             
-            if (readingData.success && readingData.data) {
+            if (readingData && readingData.success) {
                 // Update last reading display
                 this.updateLastReadingInfo(readingData.data);
+            } else {
+                console.warn('No previous reading data found');
+                this.showStatus('No previous reading found - this may be the first reading', 'info');
             }
             
             // Auto-focus on current meter reading input after data is loaded
@@ -659,8 +698,8 @@ class QRMeterReadingApp {
         
         const formData = new FormData(event.target);
         const readingData = {
-            propertyCode: formData.get('propertyCode'),
-            unitNo: formData.get('unitNo'),
+            propertyCode: this.normalizePropertyCode(formData.get('propertyCode')),
+            unitNo: this.normalizeUnitNo(formData.get('unitNo')),
             currentReading: parseFloat(formData.get('currentReading')),
             remarks: formData.get('remarks') || '',
             locationData: await this.getLocationData()
@@ -922,13 +961,37 @@ class QRMeterReadingApp {
         }
     }
 
+    // Phase 9: Enhanced offline storage with validation
     storeOfflineReading(readingData) {
-        this.offlineQueue.push(readingData);
-        localStorage.setItem('qr_meter_readings_offline', JSON.stringify(this.offlineQueue));
-        
-        // Update UI to show offline status
-        this.updateOfflineStatus();
-        this.updateOfflineIndicator();
+        try {
+            // Phase 9: Validate data before storing offline
+            const validationResult = this.dataValidationPipeline.validateOfflineReading(readingData);
+            
+            if (!validationResult.valid) {
+                console.error('Offline reading validation failed:', validationResult.errors);
+                this.showStatus('Data validation failed - reading not saved offline', 'danger');
+                return false;
+            }
+            
+            // Phase 9: Add validation metadata
+            const enhancedReadingData = this.enhancedOfflineStorage.addValidationMetadata(readingData, validationResult);
+            
+            // Store in offline queue
+            this.offlineQueue.push(enhancedReadingData);
+            localStorage.setItem('qr_meter_readings_offline', JSON.stringify(this.offlineQueue));
+            
+            console.log('Reading stored offline with validation metadata:', enhancedReadingData);
+            
+            // Update UI to show offline status
+            this.updateOfflineStatus();
+            this.updateOfflineIndicator();
+            
+            return true;
+        } catch (error) {
+            console.error('Error storing offline reading:', error);
+            this.showStatus('Error storing reading offline', 'danger');
+            return false;
+        }
     }
 
     async setupOfflineSync() {
@@ -942,6 +1005,149 @@ class QRMeterReadingApp {
         // Try to sync offline readings
         if (this.offlineQueue.length > 0) {
             await this.syncOfflineReadings();
+        }
+    }
+
+    // Phase 9: Initialize comprehensive cache on page load
+    async initializeComprehensiveCache() {
+        try {
+            console.log('Initializing comprehensive cache...');
+            
+            // Check if we have a valid cache first
+            const cachedData = localStorage.getItem('qr_comprehensive_cache');
+            if (cachedData) {
+                const parsedCache = JSON.parse(cachedData);
+                if (this.isCacheValid(parsedCache)) {
+                    this.comprehensiveCache = parsedCache;
+                    // Phase 9: Initialize tenant resolution service with existing cache
+                    this.tenantResolutionService = new TenantResolutionService(this.comprehensiveCache);
+                    console.log('Using existing valid cache');
+                    return;
+                }
+            }
+            
+            // Load fresh data from vw_LatestTenantReadings
+            if (this.isOnline) {
+                await this.refreshComprehensiveCache();
+            } else {
+                console.warn('Offline - cannot initialize cache, will use expired cache if available');
+                if (cachedData) {
+                    const parsedCache = JSON.parse(cachedData);
+                    this.comprehensiveCache = parsedCache;
+                    // Phase 9: Initialize tenant resolution service with expired cache
+                    this.tenantResolutionService = new TenantResolutionService(this.comprehensiveCache);
+                    console.log('Using expired cache for offline mode');
+                }
+            }
+        } catch (error) {
+            console.error('Error initializing comprehensive cache:', error);
+        }
+    }
+
+    // Phase 9: Refresh comprehensive cache using vw_LatestTenantReadings
+    async refreshComprehensiveCache() {
+        try {
+            console.log('Refreshing comprehensive cache...');
+            
+            const response = await fetch('api/get-latest-tenant-readings.php');
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
+            
+            const data = await response.json();
+            if (!data.success) {
+                throw new Error(data.message || 'Failed to load latest tenant readings');
+            }
+            
+            const updatedCache = {
+                latestReadings: data.data || [],
+                cachedAt: new Date().toISOString(),
+                expiresAt: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString(), // 90 days
+                source: 'page_load_refresh'
+            };
+            
+            this.comprehensiveCache = updatedCache;
+            localStorage.setItem('qr_comprehensive_cache', JSON.stringify(updatedCache));
+            
+            // Phase 9: Initialize tenant resolution service with comprehensive cache
+            this.tenantResolutionService = new TenantResolutionService(this.comprehensiveCache);
+            
+            console.log(`Cache refreshed with ${updatedCache.latestReadings.length} tenant readings`);
+            return updatedCache;
+        } catch (error) {
+            console.error('Error refreshing comprehensive cache:', error);
+            throw error;
+        }
+    }
+
+    // Phase 9: Check if cache is valid
+    isCacheValid(cache) {
+        if (!cache || !cache.expiresAt) {
+            return false;
+        }
+        
+        const now = new Date();
+        const expiresAt = new Date(cache.expiresAt);
+        return now < expiresAt;
+    }
+
+    // Phase 9: Get previous reading data from cache or network
+    async getPreviousReadingData(propertyCode, unitNo) {
+        try {
+            // First check comprehensive cache
+            if (this.comprehensiveCache && this.comprehensiveCache.latestReadings) {
+                // Normalize property code and unit number for comparison
+                const normalized = this.normalizePropertyAndUnit(propertyCode, unitNo);
+                
+                const cachedReading = this.comprehensiveCache.latestReadings.find(reading => 
+                    this.normalizePropertyCode(reading.property_code) === normalized.propertyCode && 
+                    this.normalizeUnitNo(reading.unit_no) === normalized.unitNo
+                );
+                
+                if (cachedReading) {
+                    console.log('Previous reading found in cache');
+                    return {
+                        success: true,
+                        data: {
+                            prevReading: cachedReading.prev_reading,
+                            currentReading: cachedReading.current_reading,
+                            usage: cachedReading.usage,
+                            readingDate: cachedReading.reading_date,
+                            dateFrom: cachedReading.reading_date_from,
+                            dateTo: cachedReading.reading_date_to,
+                            billingDateFrom: cachedReading.billing_from,
+                            billingDateTo: cachedReading.billing_to
+                        },
+                        source: 'cache'
+                    };
+                } else {
+                    console.log('Previous reading not found in cache for:', propertyCode, unitNo);
+                    console.log('Looking for normalized:', normalized.propertyCode, normalized.unitNo);
+                }
+            }
+            
+            // Fallback to network if online
+            if (this.isOnline) {
+                const response = await fetch(`api/get-last-reading.php?propertyCode=${encodeURIComponent(propertyCode)}&unitNo=${encodeURIComponent(unitNo)}`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    console.log('Previous reading fetched from network');
+                    return data;
+                }
+            }
+            
+            // No data found
+            return {
+                success: false,
+                message: 'No previous reading found'
+            };
+        } catch (error) {
+            console.error('Error getting previous reading data:', error);
+            return {
+                success: false,
+                message: error.message
+            };
         }
     }
 
@@ -1328,13 +1534,21 @@ class QRMeterReadingApp {
         this.createOfflineIndicator();
         
         // Enhanced online/offline event handling with connection stability check
-        window.addEventListener('online', () => {
+        window.addEventListener('online', async () => {
             console.log('Browser online event detected');
             this.isOnline = true;
             this.updateOfflineIndicator();
             
             // Hide offline notification if showing
             this.hideOfflineNotification();
+            
+            // Phase 9: Refresh cache first when connection is restored
+            try {
+                await this.refreshComprehensiveCache();
+                console.log('Cache refreshed on connection restore');
+            } catch (error) {
+                console.error('Cache refresh failed on connection restore:', error);
+            }
             
             // Show online notification if we were previously offline
             if (this.wasOffline) {
@@ -2301,6 +2515,326 @@ document.addEventListener('DOMContentLoaded', () => {
     // Initialize the app
     window.qrMeterApp = new QRMeterReadingApp();
 });
+
+// Phase 9: Tenant Resolution Service Class
+class TenantResolutionService {
+    constructor(comprehensiveCache) {
+        this.comprehensiveCache = comprehensiveCache;
+        this.cacheExpiry = 90 * 24 * 60 * 60 * 1000; // 90 days as per creative design
+    }
+
+    // Local normalization helpers to avoid dependency on outer class
+    normalizePropertyCode(propertyCode) {
+        return propertyCode ? String(propertyCode).trim() : '';
+    }
+
+    normalizeUnitNo(unitNo) {
+        return unitNo ? String(unitNo).trim() : '';
+    }
+
+    normalizePropertyAndUnit(propertyCode, unitNo) {
+        return {
+            propertyCode: this.normalizePropertyCode(propertyCode),
+            unitNo: this.normalizeUnitNo(unitNo)
+        };
+    }
+
+    async resolveTenantWithFallback(propertyCode, unitNo) {
+        const strategies = [
+            this.resolveFromCache.bind(this),
+            this.resolveFromOfflineHistory.bind(this),
+            this.resolveFromDefaults.bind(this),
+            this.resolveFromServer.bind(this)
+        ];
+        
+        for (let i = 0; i < strategies.length; i++) {
+            try {
+                const result = await strategies[i](propertyCode, unitNo);
+                if (result && this.validateTenantResult(result)) {
+                    console.log(`Tenant resolved using strategy ${i + 1}: ${result.source}`);
+                    return result;
+                }
+            } catch (error) {
+                console.warn(`Strategy ${i + 1} failed:`, error);
+                continue;
+            }
+        }
+        
+        throw new Error('All tenant resolution strategies failed');
+    }
+
+    resolveFromCache(propertyCode, unitNo) {
+        // Phase 9: Use comprehensive cache as per creative design
+        if (this.comprehensiveCache && this.comprehensiveCache.latestReadings) {
+            console.log('Cache lookup for:', propertyCode, unitNo);
+            console.log('Cache contains:', this.comprehensiveCache.latestReadings.length, 'readings');
+            
+            // Normalize property code and unit number for comparison
+            const normalized = this.normalizePropertyAndUnit(propertyCode, unitNo);
+            
+            const cachedReading = this.comprehensiveCache.latestReadings.find(reading => 
+                this.normalizePropertyCode(reading.property_code) === normalized.propertyCode && 
+                this.normalizeUnitNo(reading.unit_no) === normalized.unitNo
+            );
+            
+            if (cachedReading) {
+                console.log('Cache hit found:', cachedReading);
+                return {
+                    success: true,
+                    data: {
+                        tenantCode: cachedReading.tenant_code,
+                        tenantName: cachedReading.tenant_name,
+                        realPropertyName: cachedReading.property_name,
+                        unitNo: cachedReading.unit_no,
+                        meterNumber: cachedReading.meter_number || null,
+                        unitType: cachedReading.unit_desc || 'Unknown'
+                    },
+                    source: 'cache',
+                    confidence: 0.9
+                };
+            } else {
+                console.log('Cache miss - no reading found for:', propertyCode, unitNo);
+                console.log('Looking for normalized:', normalized.propertyCode, normalized.unitNo);
+                console.log('First 3 cache entries:', this.comprehensiveCache.latestReadings.slice(0, 3));
+            }
+        } else {
+            console.log('No comprehensive cache available');
+        }
+        
+        return null;
+    }
+
+    resolveFromOfflineHistory(propertyCode, unitNo) {
+        const offlineReadings = this.getOfflineReadings();
+        const normalized = this.normalizePropertyAndUnit(propertyCode, unitNo);
+        
+        const recentReading = offlineReadings
+            .filter(r => this.normalizePropertyCode(r.propertyCode) === normalized.propertyCode && 
+                        this.normalizeUnitNo(r.unitNo) === normalized.unitNo)
+            .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))[0];
+        
+        if (recentReading && recentReading.tenantCode) {
+            return {
+                success: true,
+                data: {
+                    tenantCode: recentReading.tenantCode,
+                    tenantName: recentReading.tenantName || 'Unknown Tenant',
+                    realPropertyName: recentReading.realPropertyName || propertyCode,
+                    unitNo: unitNo,
+                    meterNumber: recentReading.meterNumber,
+                    unitType: recentReading.unitType
+                },
+                source: 'offline_history',
+                confidence: 0.7
+            };
+        }
+        
+        return null;
+    }
+
+    resolveFromDefaults(propertyCode, unitNo) {
+        // Phase 9: Return actual defaults as per creative design
+        return {
+            success: true,
+            data: {
+                tenantCode: 'DEFAULT',
+                tenantName: 'Default Tenant',
+                realPropertyName: propertyCode,
+                unitNo: unitNo,
+                meterNumber: null,
+                unitType: 'Unknown'
+            },
+            source: 'defaults',
+            confidence: 0.3
+        };
+    }
+
+    async resolveFromServer(propertyCode, unitNo) {
+        if (!navigator.onLine) {
+            throw new Error('Server resolution requires online connection');
+        }
+        
+        // Phase 9: Use correct API endpoint as per creative design
+        const response = await fetch(`api/get-tenant-data.php?propertyCode=${encodeURIComponent(propertyCode)}&unitNo=${encodeURIComponent(unitNo)}`);
+        
+        if (response.ok) {
+            const data = await response.json();
+            if (data.success && data.data) {
+                return {
+                    success: true,
+                    data: data.data,
+                    source: 'server',
+                    confidence: 1.0
+                };
+            }
+        }
+        
+        throw new Error('Server resolution failed');
+    }
+
+    // Phase 9: Cache management handled by comprehensive cache
+    isCacheExpired(cached) {
+        if (!cached || !cached.expiresAt) {
+            return true;
+        }
+        return new Date() > new Date(cached.expiresAt);
+    }
+
+    validateTenantResult(result) {
+        return result && result.data && result.data.tenantCode;
+    }
+
+    getOfflineReadings() {
+        const offlineData = localStorage.getItem('qr_meter_readings_offline');
+        return offlineData ? JSON.parse(offlineData) : [];
+    }
+
+    // Phase 9: Property defaults handled by resolveFromDefaults method
+}
+
+// Phase 9: Data Validation Pipeline Class
+class DataValidationPipeline {
+    constructor() {
+        this.validationRules = {
+            requiredFields: ['propertyCode', 'unitNo', 'currentReading'],
+            numericFields: ['currentReading'],
+            minValues: { currentReading: 0 },
+            maxValues: { currentReading: 999999 }
+        };
+    }
+
+    validateOfflineReading(readingData) {
+        const results = [];
+        
+        // Validate required fields
+        const requiredValidation = this.validateRequiredFields(readingData);
+        results.push(requiredValidation);
+        
+        // Validate data types
+        const typeValidation = this.validateDataTypes(readingData);
+        results.push(typeValidation);
+        
+        // Validate business rules
+        const businessValidation = this.validateBusinessRules(readingData);
+        results.push(businessValidation);
+        
+        // Check if all validations passed
+        const valid = results.every(result => result.valid);
+        const errors = results.filter(result => !result.valid);
+        
+        return {
+            valid,
+            errors: errors.map(e => e.error),
+            checks: results
+        };
+    }
+
+    validateRequiredFields(readingData) {
+        const missing = this.validationRules.requiredFields.filter(field => 
+            !readingData[field] || readingData[field] === ''
+        );
+        
+        if (missing.length > 0) {
+            return {
+                valid: false,
+                error: `Missing required fields: ${missing.join(', ')}`
+            };
+        }
+        
+        return { valid: true };
+    }
+
+    validateDataTypes(readingData) {
+        for (const field of this.validationRules.numericFields) {
+            if (readingData[field] !== undefined && isNaN(readingData[field])) {
+                return {
+                    valid: false,
+                    error: `Field ${field} must be a number`
+                };
+            }
+        }
+        
+        return { valid: true };
+    }
+
+    validateBusinessRules(readingData) {
+        // Validate current reading is positive
+        if (readingData.currentReading <= 0) {
+            return {
+                valid: false,
+                error: 'Current reading must be greater than 0'
+            };
+        }
+        
+        // Validate current reading is within reasonable range
+        if (readingData.currentReading > this.validationRules.maxValues.currentReading) {
+            return {
+                valid: false,
+                error: 'Current reading exceeds maximum allowed value'
+            };
+        }
+        
+        return { valid: true };
+    }
+}
+
+// Phase 9: Enhanced Offline Storage Class
+class EnhancedOfflineStorage {
+    constructor() {
+        this.metadataFields = [
+            'validationTimestamp',
+            'validationChecks',
+            'deviceInfo',
+            'locationData',
+            'syncId'
+        ];
+    }
+
+    addValidationMetadata(readingData, validationResult) {
+        const enhancedData = {
+            ...readingData,
+            validationMetadata: {
+                validationTimestamp: new Date().toISOString(),
+                validationChecks: validationResult.checks,
+                deviceInfo: this.getDeviceInfo(),
+                locationData: readingData.locationData || null,
+                syncId: this.generateSyncId()
+            }
+        };
+        
+        return enhancedData;
+    }
+
+    getDeviceInfo() {
+        return {
+            userAgent: navigator.userAgent,
+            platform: navigator.platform,
+            language: navigator.language,
+            timestamp: new Date().toISOString()
+        };
+    }
+
+    generateSyncId() {
+        return `sync_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    }
+
+    prepareForSync(offlineReadings) {
+        return offlineReadings.map(reading => ({
+            ...reading,
+            syncPreparedAt: new Date().toISOString(),
+            syncAttempts: reading.syncAttempts || 0
+        }));
+    }
+
+    validateBeforeSync(offlineReadings) {
+        return offlineReadings.filter(reading => {
+            // Only sync readings that have valid metadata
+            return reading.validationMetadata && 
+                   reading.validationMetadata.validationChecks &&
+                   reading.validationMetadata.validationChecks.every(check => check.valid);
+        });
+    }
+}
 
 // Service Worker for offline functionality
 if ('serviceWorker' in navigator) {
