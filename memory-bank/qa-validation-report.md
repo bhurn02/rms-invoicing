@@ -1,3 +1,48 @@
+# QA Validation Report - Phase 9 (Offline Data Integrity)
+
+Date: September 26, 2025
+Project: RMS QR Meter Reading System
+Phase: 9 - Offline Data Integrity Fix
+Environment: Windows Server 2019, PHP 7.2, MSSQL 2019, Chrome (Desktop/Mobile)
+Validation Status: ✅ PASSED (with minor non-blocking warnings)
+
+Scope
+- Verify cache-first TenantResolution behavior (strategy 1: cache)
+- Verify previous reading retrieval from cache, with network fallback
+- Verify normalization of propertyCode and unitNo across the app
+- Verify Service Worker installation and correct URL base paths
+- Verify offline/online indicators and recent readings UI
+
+Summary of Results
+- Tenant Resolution: Strategy 1 (cache) is used consistently after normalization.
+- Previous Reading: Resolved from cache when available; logs show “Previous reading found in cache”. Network fallback also works when needed.
+- Normalization: Global trimming of propertyCode/unitNo applied in form input, cache lookups, offline history, and previous reading retrieval. Also added internal normalization helpers to TenantResolutionService.
+- Service Worker: Installs and activates successfully. Local files cached via addAll; CDN/optional files cached individually with error handling. All local URLs use /rms/qr-meter-reading/ base path.
+- Offline/Online UX: Indicators update correctly; recent readings load; scanner flow unaffected.
+
+Checks
+- Cache-first tenant resolution
+  - Cache lookup logs show: “Cache lookup for: GC A 103”, “Cache hit found …”, “Tenant resolved using strategy 1: cache”  ✅
+- Previous reading retrieval
+  - Logs show: “Previous reading found in cache”  ✅
+- Normalization coverage
+  - showReadingForm, submitReadingForm, getPreviousReadingData, resolveFromCache, resolveFromOfflineHistory all use normalization  ✅
+- Service Worker caching
+  - No “addAll failed” errors; separate caching of CDN/optional files; correct base paths  ✅
+- API integration
+  - get-tenant-data.php used for server fallback; endpoints use shared config.php  ✅
+
+Non-Blocking Warnings
+- Manifest icons: Placeholder images still used; browser may warn: “icon-144x144.png (Download error or resource isn't a valid image)”. Replace with real PNG assets to clear warnings. ⚠️
+
+Regression/Side Effects
+- None observed. Scanner workflow, recent readings, and offline queue unaffected.
+
+Recommendation
+- Proceed to Phase 10 (Mobile Gesture Support) after replacing manifest icons when convenient. Continue monitoring cache hit rates and offline sync in field tests.
+
+---
+
 # QA Validation Report - RMS QR Meter Reading System
 
 **Date**: September 9, 2025  
