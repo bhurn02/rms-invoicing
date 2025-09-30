@@ -208,7 +208,8 @@ $currentCompany = getCurrentCompanyCode();
                 </div>
 
                 <!-- Reading Form Card - Bootstrap responsive -->
-                <div id="reading-form-card" class="card card-professional shadow-sm border-0 scanner-hidden">
+                <div id="reading-form-card" class="card card-professional shadow-sm border-0 scanner-hidden touch-target"
+                     data-gesture-enabled="true">
                     <div class="card-header bg-success text-white border-0 py-3">
                         <h5 class="card-title mb-0 d-flex align-items-center">
                             <i class="bi bi-check-circle me-2 fs-5"></i>
@@ -259,21 +260,28 @@ $currentCompany = getCurrentCompanyCode();
                             <!-- Reading Information - Bootstrap responsive grid -->
                             <div class="row g-3 mb-4">
                                 <div class="col-12 col-md-6">
-                                    <label for="current-meter-reading" class="form-label field-label">
+                                    <label for="current-meter-reading" class="form-label field-label touch-target">
                                         <i class="bi bi-speedometer2 me-2"></i>Current Meter Reading
                                     </label>
-                                    <input type="number" class="form-control form-field" 
+                                    <input type="number" class="form-control form-field touch-target" 
                                            id="current-meter-reading" name="currentReading" 
-                                           step="0.01" min="0.01" required>
+                                           step="0.01" min="0.01" required
+                                           data-gesture-input="true"
+                                           autocomplete="off"
+                                           inputmode="numeric"
+                                           enterkeyhint="done">
                                     <small class="text-muted">Enter the current meter reading value</small>
                                 </div>
                                 <div class="col-12 col-md-6">
-                                    <label for="remarks" class="form-label field-label">
+                                    <label for="remarks" class="form-label field-label touch-target">
                                         <i class="bi bi-chat-text me-2"></i>Remarks
                                     </label>
-                                    <textarea class="form-control form-field" 
+                                    <textarea class="form-control form-field touch-target" 
                                               id="remarks" name="remarks" 
-                                              rows="3" placeholder="Optional notes about the reading..."></textarea>
+                                              rows="3" placeholder="Optional notes about the reading..."
+                                              data-gesture-input="true"
+                                              autocomplete="off"
+                                              enterkeyhint="done"></textarea>
                                     <small class="text-muted">Add any relevant notes or observations</small>
                                 </div>
                             </div>

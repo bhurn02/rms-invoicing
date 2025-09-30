@@ -2836,6 +2836,290 @@ class EnhancedOfflineStorage {
     }
 }
 
+// ========================
+// PHASE 10: MOBILE GESTURE SUPPORT
+// ========================
+
+/**
+ * Mobile Gesture Detection System
+ * Supports swipe navigation and enhanced touch interactions
+ * Compatible with Samsung A15, iPhone 14 Pro Max, and tablets
+ */
+class MobileGestureHandler {
+    constructor() {
+        this.touchStartX = null;
+        this.touchStartY = null;
+        this.touchCurrentX = null;
+        this.touchCurrentY = null;
+        this.gestureStartTime = null;
+        this.minSwipeDistance = 50; // Minimum distance for swipe recognition
+        this.maxSwipeTime = 500; // Maximum time for swipe gesture
+        this.isGestureActive = false;
+        this.swipeThreshold = 100; // Distance threshold for triggering swipe
+        
+        this.init();
+    }
+
+    init() {
+        this.setupTouchEventListeners();
+        this.addGestureCSS();
+        this.log('MobileGestureHandler initialized');
+    }
+
+    setupTouchEventListeners() {
+        // Add touch event listeners to document for global gesture support
+        document.addEventListener('touchstart', this.handleTouchStart.bind(this), { passive: false });
+        document.addEventListener('touchmove', this.handleTouchMove.bind(this), { passive: false });
+        document.addEventListener('touchend', this.handleTouchEnd.bind(this), { passive: false });
+        
+        this.log('Touch event listeners setup complete');
+    }
+
+    handleTouchStart(event) {
+        const touch = event.touches[0];
+        this.touchStartX = touch.clientX;
+        this.touchStartY = touch.clientY;
+        this.touchCurrentX = touch.clientX;
+        this.touchCurrentY = touch.clientY;
+        this.gestureStartTime = Date.now();
+        this.isGestureActive = true;
+        
+        this.log(`Touch start: (${this.touchStartX}, ${this.touchStartY})`);
+    }
+
+    handleTouchMove(event) {
+        if (!this.isGestureActive) return;
+        
+        const touch = event.touches[0];
+        this.touchCurrentX = touch.clientX;
+        this.touchCurrentY = touch.clientY;
+        
+        // Provide visual feedback during gesture
+        this.showGestureFeedback();
+    }
+
+    handleTouchEnd(event) {
+        if (!this.isGestureActive) return;
+
+        const deltaX = this.touchCurrentX - this.touchStartX;
+        const deltaY = this.touchCurrentY - this.touchStartY;
+        const deltaTime = Date.now() - this.gestureStartTime;
+        const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+        
+        this.log(`Touch end: delta(${deltaX}, ${deltaY}), distance: ${distance}, time: ${deltaTime}ms`);
+        
+        // Detect swipe gestures
+        if (distance > this.minSwipeDistance && deltaTime < this.maxSwipeTime) {
+            this.processSwipeGesture(deltaX, deltaY, distance);
+        }
+        
+        this.clearGestureFeedback();
+        this.resetGestureData();
+    }
+
+    processSwipeGesture(deltaX, deltaY, distance) {
+        const threshold = this.swipeThreshold;
+        
+        // Determine primary swipe direction
+        if (Math.abs(deltaX) > Math.abs(deltaY)) {
+            // Horizontal swipe
+            if (deltaX > threshold) {
+                this.handleSwipeRight(distance);
+            } else if (deltaX < -threshold) {
+                this.handleSwipeLeft(distance);
+            }
+        } else {
+            // Vertical swipe
+            if (deltaY > threshold) {
+                this.handleSwipeDown(distance);
+            } else if (deltaY < -threshold) {
+                this.handleSwipeUp(distance);
+            }
+        }
+    }
+
+    handleSwipeLeft(distance) {
+        this.log('Swipe Left detected');
+        this.executeSwipeAction('left', distance);
+    }
+
+    handleSwipeRight(distance) {
+        this.log('Swipe Right detected');
+        this.executeSwipeAction('right', distance);
+    }
+
+    handleSwipeUp(distance) {
+        this.log('Swipe Up detected');
+        this.executeSwipeAction('up', distance);
+    }
+
+    handleSwipeDown(distance) {
+        this.log('Swipe Down detected');
+        this.executeSwipeAction('down', distance);
+    }
+
+    executeSwipeAction(direction, distance) {
+        // Provide haptic feedback if supported
+        this.provideHapticFeedback();
+        
+        // Execute appropriate action based on direction
+        switch (direction) {
+            case 'left':
+                this.navigateToPreviousSection();
+                break;
+            case 'right':
+                this.navigateToNextSection();
+                break;
+            case 'up':
+                this.scrollUp();
+                break;
+            case 'down':
+                this.scrollDown();
+                break;
+        }
+        
+        // Show swipe confirmation feedback
+        this.showSwipeConfirmation(direction);
+    }
+
+    navigateToPreviousSection() {
+        // Example: Navigate to previous section (could be previous form, previous page, etc.)
+        this.log('Navigating to previous section');
+        // Implementation depends on specific navigation requirements
+    }
+
+    navigateToNextSection() {
+        // Example: Navigate to next section (could be next form, next page, etc.)
+        this.log('Navigating to next section');
+        // Implementation depends on specific navigation requirements
+    }
+
+    scrollUp() {
+        // Smooth scroll up
+        window.scrollBy({
+            top: -200,
+            behavior: 'smooth'
+        });
+        this.log('Scrolling up');
+    }
+
+    scrollDown() {
+        // Smooth scroll down
+        window.scrollBy({
+            top: 200,
+            behavior: 'smooth'
+        });
+        this.log('Scrolling down');
+    }
+
+    provideHapticFeedback() {
+        // Provide haptic feedback if supported by device
+        if (navigator.vibrate) {
+            navigator.vibrate(50); // Short vibration for feedback
+        }
+    }
+
+    showSwipeConfirmation(direction) {
+        // Show brief visual confirmation of swipe action
+        const confirmation = document.createElement('div');
+        confirmation.className = 'swipe-confirmation';
+        confirmation.textContent = `Swipe ${direction.toUpperCase()} detected`;
+        
+        confirmation.style.cssText = `
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(30, 64, 175, 0.9);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-weight: 500;
+            z-index: 9999;
+            font-size: 14px;
+            transition: all 0.3s ease-in-out;
+        `;
+        
+        document.body.appendChild(confirmation);
+        
+        // Remove confirmation after 2 seconds
+        setTimeout(() => {
+            confirmation.style.opacity = '0';
+            setTimeout(() => {
+                if (confirmation.parentNode) {
+                    confirmation.parentNode.removeChild(confirmation);
+                }
+            }, 300);
+        }, 2000);
+    }
+
+    showGestureFeedback() {
+        // Subtle visual feedback during gesture
+        document.body.classList.add('gesture-active');
+    }
+
+    clearGestureFeedback() {
+        // Remove visual feedback
+        document.body.classList.remove('gesture-active');
+    }
+
+    resetGestureData() {
+        this.touchStartX = null;
+        this.touchStartY = null;
+        this.touchCurrentX = null;
+        this.touchCurrentY = null;
+        this.gestureStartTime = null;
+        this.isGestureActive = false;
+    }
+
+    addGestureCSS() {
+        // Add CSS for gesture feedback
+        const style = document.createElement('style');
+        style.textContent = `
+            .gesture-active {
+                overflow: hidden;
+                touch-action: none;
+            }
+            
+            .swipe-confirmation {
+                pointer-events: none;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            }
+            
+            /* Enhanced touch targets */
+            .touch-target {
+                min-height: 44px;
+                min-width: 44px;
+                touch-action: manipulation;
+            }
+            
+            /* Improve form interaction */
+            input, select, textarea {
+                touch-action: manipulation;
+                -webkit-appearance: none;
+                border-radius: 8px;
+            }
+            
+            /* QR Scanner touch area enhancement */
+            #qr-reader {
+                touch-action: manipulation;
+            }
+        `;
+        document.head.appendChild(style);
+    }
+
+    log(message) {
+        console.log(`[MobileGesture] ${message}`);
+    }
+}
+
+// Initialize mobile gesture handler when the app starts
+document.addEventListener('DOMContentLoaded', () => {
+    if (typeof MobileGestureHandler !== 'undefined') {
+        window.mobileGestureHandler = new MobileGestureHandler();
+    }
+});
+
 // Service Worker for offline functionality
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {

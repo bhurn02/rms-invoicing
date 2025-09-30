@@ -8,6 +8,8 @@ also provide a git add commands for the affected files
 
 I will git commit our changes so far. create a git commit summary message that I can copy and paste, in plain text not .md,  of what we've accomplished since start of this conversation
 
+I will git commit our changes so far. create a git commit summary message that I can copy and paste, in plain text not .md,  of what we've accomplished since start of this conversation, refer to @git-summary-format.md for the template.
+
 I will git commit our changes so far. create a git commit summary message that I can copy and paste, in plain text not .md,  of what we've accomplished so far. here's my last git commit:
 
 
