@@ -89,6 +89,9 @@
                             <a class="nav-link" href="#getting-started">
                                 <i class="bi bi-play-circle me-2"></i>Getting Started
                             </a>
+                            <a class="nav-link" href="#reading-schedule">
+                                <i class="bi bi-calendar-check me-2"></i>Reading Schedule
+                            </a>
                             <a class="nav-link" href="#qr-scanning">
                                 <i class="bi bi-qr-code-scan me-2"></i>QR Scanning
                             </a>
@@ -245,6 +248,98 @@
                             </div>
                         </section>
                         
+                        <!-- Reading Schedule & Billing Impact -->
+                        <section id="reading-schedule" class="mb-5">
+                            <h2 class="h3 mb-4">
+                                <i class="bi bi-calendar-check me-2 text-primary"></i>Reading Schedule & Billing Impact
+                            </h2>
+                            
+                            <div class="alert alert-warning">
+                                <h5 class="alert-heading">
+                                    <i class="bi bi-exclamation-triangle me-2"></i>Critical: Timing Matters for Billing Accuracy
+                                </h5>
+                                <p class="mb-3">The date you perform QR meter readings directly affects the billing periods saved in the system. Understanding this timing is crucial for accurate tenant billing.</p>
+                                
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <h6 class="text-primary">Reading Period Calculation</h6>
+                                        <ul class="mb-0">
+                                            <li><strong>Date From:</strong> 1st day of the reading month</li>
+                                            <li><strong>Date To:</strong> Last day of the reading month</li>
+                                            <li><strong>Example:</strong> Reading on Sep 25 → Period: Sep 1-30</li>
+                                        </ul>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <h6 class="text-success">Billing Period Calculation</h6>
+                                        <ul class="mb-0">
+                                            <li><strong>Billing From:</strong> 1st day of next month</li>
+                                            <li><strong>Billing To:</strong> Last day of next month</li>
+                                            <li><strong>Example:</strong> Reading on Sep 25 → Billing: Oct 1-31</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="alert alert-info">
+                                <h6 class="alert-heading">
+                                    <i class="bi bi-clock me-2"></i>Impact of Delayed Readings
+                                </h6>
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <h6 class="text-warning">Late Reading (Oct 5)</h6>
+                                        <p class="small mb-2">If you read meters on October 5th instead of September 25th:</p>
+                                        <ul class="small mb-0">
+                                            <li>Reading Period: Oct 1-31</li>
+                                            <li>Billing Period: Nov 1-30</li>
+                                            <li><strong>Result:</strong> September usage billed in November</li>
+                                        </ul>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <h6 class="text-danger">Very Late Reading (Oct 15)</h6>
+                                        <p class="small mb-2">If you read meters on October 15th:</p>
+                                        <ul class="small mb-0">
+                                            <li>Reading Period: Oct 1-31</li>
+                                            <li>Billing Period: Nov 1-30</li>
+                                            <li><strong>Result:</strong> September + October usage billed together</li>
+                                        </ul>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <h6 class="text-success">On-Time Reading (Sep 25-29)</h6>
+                                        <p class="small mb-2">Recommended reading window:</p>
+                                        <ul class="small mb-0">
+                                            <li>Reading Period: Sep 1-30</li>
+                                            <li>Billing Period: Oct 1-31</li>
+                                            <li><strong>Result:</strong> Accurate monthly billing</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="alert alert-success">
+                                <h6 class="alert-heading">
+                                    <i class="bi bi-check-circle me-2"></i>Best Practices for Reading Schedule
+                                </h6>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <h6 class="text-primary">Recommended Schedule</h6>
+                                        <ul class="mb-0">
+                                            <li><strong>Monthly:</strong> 25th-29th of each month</li>
+                                            <li><strong>Consistency:</strong> Same date range every month</li>
+                                            <li><strong>Planning:</strong> Schedule readings in advance</li>
+                                        </ul>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <h6 class="text-warning">Avoid These Scenarios</h6>
+                                        <ul class="mb-0">
+                                            <li><strong>Early Reading:</strong> Before 25th (affects previous month)</li>
+                                            <li><strong>Late Reading:</strong> After 5th of next month</li>
+                                            <li><strong>Irregular Schedule:</strong> Inconsistent dates</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+                        
                         <!-- QR Scanning -->
                         <section id="qr-scanning" class="mb-5">
                             <h2 class="h3 mb-4">
@@ -350,6 +445,24 @@
                                     <li>Clean the QR code if it's dirty or damaged</li>
                                     <li>Use the "Recent QR Readings" section to verify your submissions</li>
                                 </ul>
+                            </div>
+                            
+                            <!-- Video Demo Section -->
+                            <div class="mt-5">
+                                <h4 class="text-center mb-4">
+                                    <i class="bi bi-play-circle me-2 text-primary"></i>Live Scanning Demo
+                                </h4>
+                                <div class="text-center">
+                                    <div class="ratio ratio-9x16" style="max-width: 350px; margin: 0 auto;">
+                                        <video controls class="rounded shadow">
+                                            <source src="assets/videos/001 qr-meter-reading - Actual Scanning Demo.mp4" type="video/mp4">
+                                            Your browser does not support the video tag.
+                                        </video>
+                                    </div>
+                                    <p class="mt-3 text-muted">
+                                        <strong>Watch the complete scanning process</strong> - From QR code detection to successful reading submission
+                                    </p>
+                                </div>
                             </div>
                         </section>
                         
