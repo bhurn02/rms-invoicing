@@ -13,6 +13,9 @@ header("Pragma: no-cache");
 require_once 'auth/auth.php';
 requireQRMeterReadingAccess();
 
+// Include configuration for environment detection
+require_once 'config/config.local.php';
+
 // Get current user information
 $currentUser = getCurrentUsername();
 $currentCompany = getCurrentCompanyCode();
@@ -81,6 +84,7 @@ $currentCompany = getCurrentCompanyCode();
                         <span class="d-none d-md-inline">Tools</span>
                     </button>
                     <ul class="dropdown-menu dropdown-menu-end">
+                        <?php if (APP_ENV !== 'production'): ?>
                         <li><h6 class="dropdown-header">Development Tools</h6></li>
                         <li>
                             <a class="dropdown-item" href="camera-test.html" target="_blank">
@@ -89,24 +93,30 @@ $currentCompany = getCurrentCompanyCode();
                             </a>
                         </li>
                         <li>
+                            <a class="dropdown-item" href="qr-test.html" target="_blank">
+                                <i class="bi bi-bug"></i>
+                                QR Test Utility
+                            </a>
+                        </li>
+                        <li><hr class="dropdown-divider"></li>
+                        <?php endif; ?>
+                        
+                        <li><h6 class="dropdown-header">QR Tools</h6></li>
+                        <li>
                             <a class="dropdown-item" href="qr-generator.html" target="_blank">
                                 <i class="bi bi-qr-code"></i>
                                 QR Generator
                             </a>
                         </li>
+                        <?php if (APP_ENV !== 'production'): ?>
                         <li>
                             <a class="dropdown-item" href="qr-generator-simple.html" target="_blank">
                                 <i class="bi bi-qr-code-scan"></i>
                                 Simple QR Generator
                             </a>
                         </li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li>
-                            <a class="dropdown-item" href="qr-test.html" target="_blank">
-                                <i class="bi bi-bug"></i>
-                                QR Test Utility
-                            </a>
-                        </li>
+                        <?php endif; ?>
+                        
                         <li><hr class="dropdown-divider"></li>
                         <li><h6 class="dropdown-header">Help & Support</h6></li>
                         <li>

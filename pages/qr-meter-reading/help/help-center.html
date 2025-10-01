@@ -53,6 +53,12 @@
             text-align: center;
             border: 2px solid transparent;
             transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .help-item .btn {
+            margin-top: auto;
         }
         .help-item:hover {
             border-color: #1e40af;
@@ -117,6 +123,61 @@
             color: #6b7280;
             font-size: 0.875rem;
             line-height: 1.4;
+        }
+        
+        /* Search Functionality Styles */
+        .search-container {
+            position: relative;
+        }
+
+        .search-results {
+            background: white;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            max-height: 400px;
+            overflow-y: auto;
+            z-index: 1000;
+        }
+
+        .search-result-item {
+            padding: 12px 16px;
+            border-bottom: 1px solid #f8f9fa;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .search-result-item:hover {
+            background-color: #f8f9fa;
+        }
+
+        .search-result-item:last-child {
+            border-bottom: none;
+        }
+
+        .search-result-title {
+            font-weight: 600;
+            color: #1e40af;
+            margin-bottom: 4px;
+        }
+
+        .search-result-snippet {
+            font-size: 0.9rem;
+            color: #6b7280;
+            line-height: 1.4;
+        }
+
+        .search-highlight {
+            background-color: #fef3c7;
+            padding: 1px 2px;
+            border-radius: 2px;
+            font-weight: 500;
+        }
+
+        .no-results {
+            padding: 20px;
+            text-align: center;
+            color: #6b7280;
         }
         
         /* Modern Full-Screen Gallery */
@@ -258,12 +319,59 @@
                     <i class="bi bi-question-circle feature-icon"></i>
                     <h1 class="display-4 fw-bold mb-3">Help Center</h1>
                     <p class="lead mb-0">Complete documentation and support for the QR Meter Reading System</p>
+                    
+                    <!-- Search Bar -->
+                    <div class="mt-4">
+                        <div class="input-group input-group-lg">
+                            <span class="input-group-text bg-white border-end-0">
+                                <i class="bi bi-search text-primary"></i>
+                            </span>
+                            <input type="text" 
+                                   id="helpSearch" 
+                                   class="form-control border-start-0 ps-0" 
+                                   placeholder="Search help documentation..."
+                                   aria-label="Search help documentation">
+                            <button class="btn btn-outline-secondary" 
+                                    type="button" 
+                                    id="clearSearch"
+                                    style="display: none;">
+                                <i class="bi bi-x"></i>
+                            </button>
+                        </div>
+                        <div id="searchResults" class="search-results mt-2" style="display: none;">
+                            <!-- Search results will be populated here -->
+                        </div>
+                    </div>
                 </div>
+                
                 <div class="help-content">
+                    
                     <div class="row">
                         <div class="col-md-8">
                             <h3 class="mb-3">Welcome to the Help Center</h3>
                             <p class="lead">Find everything you need to use the QR Meter Reading System effectively. Our documentation follows global standards for help systems and provides comprehensive support for all users.</p>
+                            
+                            <!-- About This Project -->
+                            <div class="alert alert-primary mt-4">
+                                <h5 class="alert-heading mb-3">
+                                    <i class="bi bi-info-circle me-2"></i>About This Project
+                                </h5>
+                                <p><strong>Utility Rate & QR Meter Reading System</strong> is a comprehensive solution for automating utility meter reading processes using QR code technology. This system is part of the Realty Management Services (RMS) platform, designed to streamline property management operations for residential, commercial, and warehouse properties.</p>
+                                
+                                <h6 class="mt-3 mb-2">What This System Does</h6>
+                                <ul class="mb-3">
+                                    <li><strong>Automated Meter Reading</strong>: Scan QR codes to quickly record utility meter readings</li>
+                                    <li><strong>Offline-First Operation</strong>: Work seamlessly without internet connection, automatic sync when online</li>
+                                    <li><strong>Data Accuracy</strong>: Prevent duplicate readings and validate data automatically</li>
+                                    <li><strong>Mobile Optimized</strong>: Designed for field technicians using Samsung A15 and iPhone 14 Pro Max devices</li>
+                                    <li><strong>Real-Time Sync</strong>: Background synchronization ensures all data is up-to-date</li>
+                                    <li><strong>Comprehensive Reporting</strong>: Generate detailed reports for billing and analysis</li>
+                                </ul>
+                                
+                                <a href="#features" class="btn btn-light btn-sm">
+                                    <i class="bi bi-list-check me-1"></i>View Complete Feature List
+                                </a>
+                            </div>
                             
                             <div class="row">
                                 <div class="col-md-6">
@@ -355,8 +463,150 @@
                 </div>
             </div>
             
+            <!-- Complete Features Section -->
+            <div class="help-card mt-4" id="features">
+                <div class="help-content">
+                    <h3 class="mb-4 text-center">
+                        <i class="bi bi-list-check me-2 text-primary"></i>Complete Feature List
+                    </h3>
+                    
+                    <p class="text-center mb-4">This section provides a comprehensive overview of all implemented and upcoming features in the Utility Rate & QR Meter Reading System.</p>
+                    
+                    <!-- Implemented Features -->
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="alert alert-success">
+                                <h5 class="alert-heading">
+                                    <i class="bi bi-check-circle me-2"></i>Implemented Features
+                                </h5>
+                                <p class="small text-muted mb-3">Currently available in the system</p>
+                                
+                                <h6 class="mb-2">Core QR Scanning</h6>
+                                <ul class="small mb-3">
+                                    <li>QR code scanning for property and unit identification</li>
+                                    <li>Auto-populated meter reading forms</li>
+                                    <li>Last reading information display</li>
+                                    <li>Recent QR readings table</li>
+                                </ul>
+                                
+                                <h6 class="mb-2">Modern UX & Design</h6>
+                                <ul class="small mb-3">
+                                    <li>Responsive design for all devices</li>
+                                    <li>Touch-friendly interface (44px minimum targets)</li>
+                                    <li>Smart alert strategy (context-appropriate notifications)</li>
+                                    <li>Streamlined authentication (no logout confirmations)</li>
+                                    <li>Mobile gesture support</li>
+                                </ul>
+                                
+                                <h6 class="mb-2">Offline & Sync Features</h6>
+                                <ul class="small mb-3">
+                                    <li>Complete offline operation capability</li>
+                                    <li>Offline status indicators (green/red/orange dots)</li>
+                                    <li>Offline reading display in table</li>
+                                    <li>Auto-sync when connection restored</li>
+                                    <li>Manual sync option</li>
+                                    <li>Real-time sync status updates</li>
+                                    <li>Connection notifications</li>
+                                </ul>
+                                
+                                <h6 class="mb-2">Data Validation & Accuracy</h6>
+                                <ul class="small mb-3">
+                                    <li>Duplicate reading prevention</li>
+                                    <li>Same-period validation</li>
+                                    <li>Offline-first validation</li>
+                                    <li>Last reading prominence for validation</li>
+                                    <li>Comprehensive audit trail</li>
+                                </ul>
+                                
+                                <h6 class="mb-2">User Experience</h6>
+                                <ul class="small mb-3">
+                                    <li>Inline form validation</li>
+                                    <li>Success notifications (non-blocking)</li>
+                                    <li>Progress indicators</li>
+                                    <li>Responsive grid layout</li>
+                                    <li>Access denied page with responsive design</li>
+                                </ul>
+                                
+                                <h6 class="mb-2">Help & Documentation</h6>
+                                <ul class="small mb-3">
+                                    <li>Comprehensive user manual</li>
+                                    <li>Quick reference guide</li>
+                                    <li>Troubleshooting guide</li>
+                                    <li>Visual guide with 16 screenshots</li>
+                                    <li>Help center hub</li>
+                                    <li>Global search functionality</li>
+                                    <li>Smart navigation with active section highlighting</li>
+                                    <li>Page-specific search</li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="alert alert-info">
+                                <h5 class="alert-heading">
+                                    <i class="bi bi-clock-history me-2"></i>Upcoming Features
+                                </h5>
+                                <p class="small text-muted mb-3">Planned for future releases</p>
+                                
+                                <h6 class="mb-2">Advanced Workflow</h6>
+                                <ul class="small mb-3">
+                                    <li>Continuous scanning workflow (auto-advance)</li>
+                                    <li>Service Worker implementation (PWA)</li>
+                                    <li>Enhanced performance optimization</li>
+                                </ul>
+                                
+                                <h6 class="mb-2">Management & Reporting</h6>
+                                <ul class="small mb-3">
+                                    <li>Tenant readings management interface</li>
+                                    <li>Full CRUD operations for readings</li>
+                                    <li>Reading review workflow</li>
+                                    <li>Search and filter functionality</li>
+                                    <li>Export features (Excel, PDF, CSV)</li>
+                                    <li>Advanced reporting</li>
+                                    <li>Print functionality</li>
+                                </ul>
+                                
+                                <h6 class="mb-2">Advanced Tenant Management</h6>
+                                <ul class="small mb-3">
+                                    <li>Terminated tenant assignment handling</li>
+                                    <li>Tenant transition readings</li>
+                                    <li>Historical corrections</li>
+                                    <li>Enhanced audit trail</li>
+                                </ul>
+                                
+                                <h6 class="mb-2">Utility Rate Management</h6>
+                                <ul class="small mb-3">
+                                    <li>Single-point rate entry system</li>
+                                    <li>Electric and LEAC rate management</li>
+                                    <li>Bulk update capability</li>
+                                    <li>Real-time rate application</li>
+                                    <li>Automatic unit classification</li>
+                                    <li>Integration with charge management</li>
+                                </ul>
+                                
+                                <h6 class="mb-2">Enhanced Features</h6>
+                                <ul class="small mb-3">
+                                    <li>Background sync system</li>
+                                    <li>Voice input for meter readings</li>
+                                    <li>Advanced offline capabilities</li>
+                                    <li>Conflict resolution</li>
+                                    <li>Push notifications</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="alert alert-light text-center mt-4">
+                        <h6 class="mb-2">
+                            <i class="bi bi-info-circle me-2"></i>Implementation Progress
+                        </h6>
+                        <p class="mb-0">Currently: <strong>11 of 25 phases completed</strong> (44% complete). The system follows a structured phase implementation approach with a 98% success rate target. New features are added incrementally based on phase completion.</p>
+                    </div>
+                </div>
+            </div>
+            
             <!-- Visual Guide Section -->
-            <div class="help-card" style="margin-top: 2rem;">
+            <div class="help-card mt-4">
                 <div class="help-content">
                     <h3 class="mb-4 text-center">
                         <i class="bi bi-calendar-check me-2 text-primary"></i>Reading Schedule & Billing Impact
@@ -548,6 +798,20 @@
                             <h6 class="mb-2">14. Connection Restored</h6>
                             <p class="small text-muted">Confirmation notification when internet connection returns</p>
                         </div>
+                        
+                        <!-- Duplicate Reading Prevention -->
+                        <div class="screenshot-item">
+                            <img src="assets/images/015 qr-meter-reading - MAIN PAGE - Duplicate Reading Detected.png" alt="Duplicate Reading Prevention" class="ui-screenshot" onclick="showImageModal('assets/images/015 qr-meter-reading - MAIN PAGE - Duplicate Reading Detected.png', '15. Duplicate Reading Prevention', 'System automatically prevents duplicate readings with clear notification')">
+                            <h6 class="mb-2">15. Duplicate Reading Prevention</h6>
+                            <p class="small text-muted">System automatically prevents duplicate readings with clear notification</p>
+                        </div>
+                        
+                        <!-- Offline Reading Saved -->
+                        <div class="screenshot-item">
+                            <img src="assets/images/016 qr-meter-reading - MAIN PAGE - Reading Saved Offline.png" alt="Offline Reading Saved" class="ui-screenshot" onclick="showImageModal('assets/images/016 qr-meter-reading - MAIN PAGE - Reading Saved Offline.png', '16. Offline Reading Saved', 'Confirmation that reading was saved offline and will sync when connection is restored')">
+                            <h6 class="mb-2">16. Offline Reading Saved</h6>
+                            <p class="small text-muted">Confirmation that reading was saved offline and will sync when connection is restored</p>
+                        </div>
                     </div>
                     
                     <div class="text-center mt-4">
@@ -586,7 +850,7 @@
             </div>
             
             <!-- System Information -->
-            <div class="help-card">
+            <div class="help-card mt-4">
                 <div class="help-content">
                     <h3 class="mb-4 text-center">
                         <i class="bi bi-info-circle me-2 text-primary"></i>System Information
@@ -616,22 +880,29 @@
                 </div>
             </div>
             
-            <!-- Footer -->
-            <footer class="text-center mt-5 pt-4 border-top">
-                <div class="row mb-4">
-                    <div class="col-md-6">
-                        <a href="../index.php" class="btn btn-primary btn-lg w-100">
-                            <i class="bi bi-qr-code-scan me-2"></i>Back to Scanner
+            <!-- Footer Navigation -->
+            <footer class="mt-5 pt-4 border-top">
+                <div class="text-center mb-4">
+                    <p class="text-muted mb-3">
+                        <i class="bi bi-compass me-2"></i>Navigate Help Documentation
+                    </p>
+                    <div class="d-flex flex-wrap justify-content-center gap-2">
+                        <a href="index.html" class="btn btn-outline-primary">
+                            <i class="bi bi-book me-2"></i>User Manual
                         </a>
-                    </div>
-                    <div class="col-md-6">
-                        <a href="../qr-generator.html" class="btn btn-success btn-lg w-100">
-                            <i class="bi bi-qr-code me-2"></i>QR Generator
+                        <a href="quick-reference.html" class="btn btn-outline-success">
+                            <i class="bi bi-lightning-charge me-2"></i>Quick Reference
+                        </a>
+                        <a href="troubleshooting.html" class="btn btn-outline-warning">
+                            <i class="bi bi-tools me-2"></i>Troubleshooting
+                        </a>
+                        <a href="../index.php" class="btn btn-primary">
+                            <i class="bi bi-qr-code-scan me-2"></i>Back to Scanner
                         </a>
                     </div>
                 </div>
                 
-                <div class="pt-3 border-top">
+                <div class="text-center pt-3 border-top">
                     <p class="text-muted mb-2">
                         <i class="bi bi-shield-check me-2"></i>
                         QR Meter Reading System v1.2 - Help Documentation
@@ -697,7 +968,9 @@
             { src: 'assets/images/011 qr-meter-reading - MAIN PAGE - Auto Sync - Unstable or Failed Sync Indicator.png', title: '11. Failed Sync', desc: 'Failed sync indicator when connection becomes unstable' },
             { src: 'assets/images/012 qr-meter-reading - MAIN PAGE - Manual Sync Progress Indicator.png', title: '12. Manual Sync Progress', desc: 'Detailed progress indicator for manual sync operations' },
             { src: 'assets/images/013 qr-meter-reading - MAIN PAGE - Connection Lost Notification.png', title: '13. Connection Lost', desc: 'Prominent notification when internet connection is lost' },
-            { src: 'assets/images/014 qr-meter-reading - MAIN PAGE - Connection Restored Notification.png', title: '14. Connection Restored', desc: 'Confirmation notification when internet connection returns' }
+            { src: 'assets/images/014 qr-meter-reading - MAIN PAGE - Connection Restored Notification.png', title: '14. Connection Restored', desc: 'Confirmation notification when internet connection returns' },
+            { src: 'assets/images/015 qr-meter-reading - MAIN PAGE - Duplicate Reading Detected.png', title: '15. Duplicate Reading Prevention', desc: 'System automatically prevents duplicate readings with clear notification' },
+            { src: 'assets/images/016 qr-meter-reading - MAIN PAGE - Reading Saved Offline.png', title: '16. Offline Reading Saved', desc: 'Confirmation that reading was saved offline and will sync when connection is restored' }
         ];
         
         let currentImageIndex = 0;
@@ -755,6 +1028,147 @@
             if (e.target === this) {
                 closeGallery();
             }
+        });
+        
+        // Search functionality implementation
+        class HelpSearch {
+            constructor() {
+                this.searchInput = document.getElementById('helpSearch');
+                this.searchResults = document.getElementById('searchResults');
+                this.clearButton = document.getElementById('clearSearch');
+                this.searchData = [];
+                this.init();
+            }
+
+            init() {
+                this.loadSearchData();
+                this.setupEventListeners();
+            }
+
+            loadSearchData() {
+                // Search data structure for all help pages
+                this.searchData = [
+                    // User Manual content
+                    { title: "QR Code Scanning", content: "Complete QR scanning workflow with step-by-step instructions", url: "index.html", section: "QR Scanning" },
+                    { title: "Duplicate Reading Prevention", content: "System automatically prevents duplicate readings to ensure data accuracy", url: "index.html", section: "Duplicate Detection" },
+                    { title: "Offline Mode", content: "Full system operation without internet connection using offline storage", url: "index.html", section: "Offline & Sync" },
+                    { title: "Connection Status Indicators", content: "Green, red, and orange dots indicate connection and sync status", url: "index.html", section: "Offline & Sync" },
+                    { title: "Last Reading Card", content: "Prominent display of last reading information for validation", url: "index.html", section: "QR Scanning" },
+                    { title: "Meter Reading Form", content: "Auto-populated form with tenant information after QR scan", url: "index.html", section: "QR Scanning" },
+                    { title: "Recent QR Readings", content: "Table showing recent meter reading submissions with status", url: "index.html", section: "Recent Readings" },
+                    { title: "Offline Reading Display", content: "Complete visibility of offline readings with status tracking", url: "index.html", section: "Offline Reading Display" },
+                    
+                    // Quick Reference content
+                    { title: "Quick Start Guide", content: "5-step process for field technicians to start scanning immediately", url: "quick-reference.html", section: "Quick Start" },
+                    { title: "QR Code Format", content: "Understanding QR code data structure and format requirements", url: "quick-reference.html", section: "QR Format" },
+                    { title: "Pro Tips", content: "Best practices and efficiency tips for meter reading", url: "quick-reference.html", section: "Pro Tips" },
+                    { title: "Emergency Contacts", content: "Support contacts for technical assistance", url: "quick-reference.html", section: "Emergency Contacts" },
+                    
+                    // Troubleshooting content
+                    { title: "Camera Issues", content: "Solutions for camera-related problems and QR code detection", url: "troubleshooting.html", section: "Camera Issues" },
+                    { title: "Network Problems", content: "Troubleshooting connectivity and offline mode issues", url: "troubleshooting.html", section: "Network Issues" },
+                    { title: "Access Denied", content: "Resolving authentication and permission problems", url: "troubleshooting.html", section: "Access Issues" },
+                    { title: "Sync Problems", content: "Resolving synchronization issues between offline and online data", url: "troubleshooting.html", section: "Sync Issues" },
+                    { title: "Duplicate Reading Errors", content: "Understanding and resolving duplicate reading prevention messages", url: "troubleshooting.html", section: "Data Issues" },
+                    
+                    // Help Center content
+                    { title: "About This Project", content: "Utility Rate QR Meter Reading System overview and what this system does", url: "help-center.html", section: "About" },
+                    { title: "Complete Feature List", content: "All implemented and upcoming features in the system", url: "help-center.html", section: "Features" },
+                    { title: "Implemented Features", content: "Currently available features including QR scanning, offline mode, data validation, and documentation", url: "help-center.html", section: "Features" },
+                    { title: "Upcoming Features", content: "Planned features including workflow automation, reporting, and utility rate management", url: "help-center.html", section: "Features" },
+                    { title: "Visual Guide", content: "Complete visual guide with screenshots of all system features", url: "help-center.html", section: "Visual Guide" },
+                    { title: "System Information", content: "Technical specifications and system requirements", url: "help-center.html", section: "System Information" }
+                ];
+            }
+
+            setupEventListeners() {
+                this.searchInput.addEventListener('input', this.debounce(this.handleSearch.bind(this), 300));
+                this.clearButton.addEventListener('click', this.clearSearch.bind(this));
+                
+                // Close search results when clicking outside
+                document.addEventListener('click', (e) => {
+                    if (!e.target.closest('.search-container')) {
+                        this.hideResults();
+                    }
+                });
+            }
+
+            handleSearch(e) {
+                const query = e.target.value.trim().toLowerCase();
+                
+                if (query.length < 2) {
+                    this.hideResults();
+                    this.clearButton.style.display = 'none';
+                    return;
+                }
+
+                this.clearButton.style.display = 'block';
+                const results = this.searchContent(query);
+                this.displayResults(results, query);
+            }
+
+            searchContent(query) {
+                return this.searchData.filter(item => {
+                    const titleMatch = item.title.toLowerCase().includes(query);
+                    const contentMatch = item.content.toLowerCase().includes(query);
+                    const sectionMatch = item.section.toLowerCase().includes(query);
+                    
+                    return titleMatch || contentMatch || sectionMatch;
+                }).slice(0, 10); // Limit to 10 results
+            }
+
+            displayResults(results, query) {
+                if (results.length === 0) {
+                    this.searchResults.innerHTML = '<div class="no-results">No results found for "' + query + '"</div>';
+                } else {
+                    this.searchResults.innerHTML = results.map(item => `
+                        <div class="search-result-item" onclick="window.location.href='${item.url}#${this.getAnchor(item.section)}'">
+                            <div class="search-result-title">${this.highlightText(item.title, query)}</div>
+                            <div class="search-result-snippet">${this.highlightText(item.content, query)}</div>
+                            <small class="text-muted">${item.section} • ${item.url}</small>
+                        </div>
+                    `).join('');
+                }
+                
+                this.searchResults.style.display = 'block';
+            }
+
+            highlightText(text, query) {
+                const regex = new RegExp(`(${query})`, 'gi');
+                return text.replace(regex, '<span class="search-highlight">$1</span>');
+            }
+
+            getAnchor(section) {
+                return section.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]/g, '');
+            }
+
+            clearSearch() {
+                this.searchInput.value = '';
+                this.hideResults();
+                this.clearButton.style.display = 'none';
+                this.searchInput.focus();
+            }
+
+            hideResults() {
+                this.searchResults.style.display = 'none';
+            }
+
+            debounce(func, wait) {
+                let timeout;
+                return function executedFunction(...args) {
+                    const later = () => {
+                        clearTimeout(timeout);
+                        func(...args);
+                    };
+                    clearTimeout(timeout);
+                    timeout = setTimeout(later, wait);
+                };
+            }
+        }
+
+        // Initialize search when DOM is loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            new HelpSearch();
         });
     </script>
 </body>
