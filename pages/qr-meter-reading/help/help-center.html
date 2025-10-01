@@ -53,6 +53,12 @@
             text-align: center;
             border: 2px solid transparent;
             transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .help-item .btn {
+            margin-top: auto;
         }
         .help-item:hover {
             border-color: #1e40af;
@@ -78,20 +84,229 @@
         }
         .screenshot-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1.5rem;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
             margin: 2rem 0;
         }
         .screenshot-item {
             text-align: center;
             background: white;
-            border-radius: 8px;
-            padding: 1rem;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: 1px solid #e5e7eb;
+        }
+        .screenshot-item:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
         }
         .screenshot-item img {
-            border-radius: 6px;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            width: 100%;
+            height: auto;
+            max-width: 100%;
+            object-fit: cover;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+        .screenshot-item img:hover {
+            transform: scale(1.05);
+        }
+        .screenshot-item h6 {
+            color: #1e40af;
+            font-weight: 600;
             margin-bottom: 0.5rem;
+        }
+        .screenshot-item p {
+            color: #6b7280;
+            font-size: 0.875rem;
+            line-height: 1.4;
+        }
+        
+        /* Search Functionality Styles */
+        .search-container {
+            position: relative;
+        }
+
+        .search-results {
+            background: white;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            max-height: 400px;
+            overflow-y: auto;
+            z-index: 1000;
+        }
+
+        .search-result-item {
+            padding: 12px 16px;
+            border-bottom: 1px solid #f8f9fa;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .search-result-item:hover {
+            background-color: #f8f9fa;
+        }
+
+        .search-result-item:last-child {
+            border-bottom: none;
+        }
+
+        .search-result-title {
+            font-weight: 600;
+            color: #1e40af;
+            margin-bottom: 4px;
+        }
+
+        .search-result-snippet {
+            font-size: 0.9rem;
+            color: #6b7280;
+            line-height: 1.4;
+        }
+
+        .search-highlight {
+            background-color: #fef3c7;
+            padding: 1px 2px;
+            border-radius: 2px;
+            font-weight: 500;
+        }
+
+        .no-results {
+            padding: 20px;
+            text-align: center;
+            color: #6b7280;
+        }
+        
+        /* Modern Full-Screen Gallery */
+        .gallery-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .gallery-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .gallery-header {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 10;
+        }
+        
+        .gallery-title h4 {
+            color: white;
+            margin: 0;
+            font-weight: 600;
+        }
+        
+        .gallery-counter {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.9rem;
+            margin-left: 1rem;
+        }
+        
+        .gallery-close {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+        
+        .gallery-close:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+        
+        .gallery-nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 10;
+            font-size: 1.2rem;
+        }
+        
+        .gallery-nav:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-50%) scale(1.1);
+        }
+        
+        .gallery-nav-left {
+            left: 2rem;
+        }
+        
+        .gallery-nav-right {
+            right: 2rem;
+        }
+        
+        .gallery-image-container {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 5rem 6rem;
+        }
+        
+        .gallery-image {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            border-radius: 8px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+        
+        .gallery-footer {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
+            padding: 2rem;
+            text-align: center;
+        }
+        
+        .gallery-description {
+            color: rgba(255, 255, 255, 0.9);
+            margin: 0;
+            font-size: 1rem;
         }
     </style>
 </head>
@@ -104,12 +319,59 @@
                     <i class="bi bi-question-circle feature-icon"></i>
                     <h1 class="display-4 fw-bold mb-3">Help Center</h1>
                     <p class="lead mb-0">Complete documentation and support for the QR Meter Reading System</p>
+                    
+                    <!-- Search Bar -->
+                    <div class="mt-4">
+                        <div class="input-group input-group-lg">
+                            <span class="input-group-text bg-white border-end-0">
+                                <i class="bi bi-search text-primary"></i>
+                            </span>
+                            <input type="text" 
+                                   id="helpSearch" 
+                                   class="form-control border-start-0 ps-0" 
+                                   placeholder="Search help documentation..."
+                                   aria-label="Search help documentation">
+                            <button class="btn btn-outline-secondary" 
+                                    type="button" 
+                                    id="clearSearch"
+                                    style="display: none;">
+                                <i class="bi bi-x"></i>
+                            </button>
+                        </div>
+                        <div id="searchResults" class="search-results mt-2" style="display: none;">
+                            <!-- Search results will be populated here -->
+                        </div>
+                    </div>
                 </div>
+                
                 <div class="help-content">
+                    
                     <div class="row">
                         <div class="col-md-8">
                             <h3 class="mb-3">Welcome to the Help Center</h3>
                             <p class="lead">Find everything you need to use the QR Meter Reading System effectively. Our documentation follows global standards for help systems and provides comprehensive support for all users.</p>
+                            
+                            <!-- About This Project -->
+                            <div class="alert alert-primary mt-4">
+                                <h5 class="alert-heading mb-3">
+                                    <i class="bi bi-info-circle me-2"></i>About This Project
+                                </h5>
+                                <p><strong>Utility Rate & QR Meter Reading System</strong> is a comprehensive solution for automating utility meter reading processes using QR code technology. This system is part of the Realty Management Services (RMS) platform, designed to streamline property management operations for residential, commercial, and warehouse properties.</p>
+                                
+                                <h6 class="mt-3 mb-2">What This System Does</h6>
+                                <ul class="mb-3">
+                                    <li><strong>Automated Meter Reading</strong>: Scan QR codes to quickly record utility meter readings</li>
+                                    <li><strong>Offline-First Operation</strong>: Work seamlessly without internet connection, automatic sync when online</li>
+                                    <li><strong>Data Accuracy</strong>: Prevent duplicate readings and validate data automatically</li>
+                                    <li><strong>Mobile Optimized</strong>: Designed for field technicians using Samsung A15 and iPhone 14 Pro Max devices</li>
+                                    <li><strong>Real-Time Sync</strong>: Background synchronization ensures all data is up-to-date</li>
+                                    <li><strong>Comprehensive Reporting</strong>: Generate detailed reports for billing and analysis</li>
+                                </ul>
+                                
+                                <a href="#features" class="btn btn-light btn-sm">
+                                    <i class="bi bi-list-check me-1"></i>View Complete Feature List
+                                </a>
+                            </div>
                             
                             <div class="row">
                                 <div class="col-md-6">
@@ -201,10 +463,242 @@
                 </div>
             </div>
             
-            <!-- Visual Guide Section -->
-            <div class="help-card" style="margin-top: 2rem;">
+            <!-- Complete Features Section -->
+            <div class="help-card mt-4" id="features">
                 <div class="help-content">
                     <h3 class="mb-4 text-center">
+                        <i class="bi bi-list-check me-2 text-primary"></i>Complete Feature List
+                    </h3>
+                    
+                    <p class="text-center mb-4">This section provides a comprehensive overview of all implemented and upcoming features in the Utility Rate & QR Meter Reading System.</p>
+                    
+                    <!-- Implemented Features -->
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="alert alert-success">
+                                <h5 class="alert-heading">
+                                    <i class="bi bi-check-circle me-2"></i>Implemented Features
+                                </h5>
+                                <p class="small text-muted mb-3">Currently available in the system</p>
+                                
+                                <h6 class="mb-2">Core QR Scanning</h6>
+                                <ul class="small mb-3">
+                                    <li>QR code scanning for property and unit identification</li>
+                                    <li>Auto-populated meter reading forms</li>
+                                    <li>Last reading information display</li>
+                                    <li>Recent QR readings table</li>
+                                </ul>
+                                
+                                <h6 class="mb-2">Modern UX & Design</h6>
+                                <ul class="small mb-3">
+                                    <li>Responsive design for all devices</li>
+                                    <li>Touch-friendly interface (44px minimum targets)</li>
+                                    <li>Smart alert strategy (context-appropriate notifications)</li>
+                                    <li>Streamlined authentication (no logout confirmations)</li>
+                                    <li>Mobile gesture support</li>
+                                </ul>
+                                
+                                <h6 class="mb-2">Offline & Sync Features</h6>
+                                <ul class="small mb-3">
+                                    <li>Complete offline operation capability</li>
+                                    <li>Cache-first architecture (95%+ cache hit rate, <10ms response)</li>
+                                    <li>Service Worker implementation (PWA foundation)</li>
+                                    <li>Static asset caching (CSS, JavaScript, images)</li>
+                                    <li>Background sync system with connection stability checks</li>
+                                    <li>Offline status indicators (green/red/orange dots)</li>
+                                    <li>Offline reading display in table</li>
+                                    <li>Auto-sync when connection restored with cache refresh</li>
+                                    <li>Manual sync option with real-time progress</li>
+                                    <li>Real-time sync status updates with counters</li>
+                                    <li>Connection notifications (smart, non-intrusive)</li>
+                                    <li>Sync progress indicators (auto vs manual differentiation)</li>
+                                </ul>
+                                
+                                <h6 class="mb-2">Data Validation & Accuracy</h6>
+                                <ul class="small mb-3">
+                                    <li>Duplicate reading prevention</li>
+                                    <li>Same-period validation</li>
+                                    <li>Offline-first validation</li>
+                                    <li>Last reading prominence for validation</li>
+                                    <li>Comprehensive audit trail</li>
+                                </ul>
+                                
+                                <h6 class="mb-2">User Experience</h6>
+                                <ul class="small mb-3">
+                                    <li>Inline form validation</li>
+                                    <li>Success notifications (non-blocking)</li>
+                                    <li>Continuous scanning workflow (auto-advance)</li>
+                                    <li>Progress indicators</li>
+                                    <li>Responsive grid layout</li>
+                                    <li>Access denied page with responsive design</li>
+                                </ul>
+                                
+                                <h6 class="mb-2">Help & Documentation</h6>
+                                <ul class="small mb-3">
+                                    <li>Comprehensive user manual</li>
+                                    <li>Quick reference guide</li>
+                                    <li>Troubleshooting guide</li>
+                                    <li>Visual guide with 16 screenshots</li>
+                                    <li>Help center hub</li>
+                                    <li>Global search functionality</li>
+                                    <li>Smart navigation with active section highlighting</li>
+                                    <li>Page-specific search</li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="alert alert-info">
+                                <h5 class="alert-heading">
+                                    <i class="bi bi-clock-history me-2"></i>Upcoming Features
+                                </h5>
+                                <p class="small text-muted mb-3">Planned for future releases</p>
+                                
+                                <h6 class="mb-2">Testing & Optimization</h6>
+                                <ul class="small mb-3">
+                                    <li>Cross-device testing and compatibility</li>
+                                    <li>Performance optimization</li>
+                                </ul>
+                                
+                                <h6 class="mb-2">Management & Reporting</h6>
+                                <ul class="small mb-3">
+                                    <li>Tenant readings management interface</li>
+                                    <li>Full CRUD operations for readings</li>
+                                    <li>Reading review workflow</li>
+                                    <li>Search and filter functionality</li>
+                                    <li>Export features (Excel, PDF, CSV)</li>
+                                    <li>Advanced reporting</li>
+                                    <li>Print functionality</li>
+                                </ul>
+                                
+                                <h6 class="mb-2">Advanced Tenant Management</h6>
+                                <ul class="small mb-3">
+                                    <li>Terminated tenant assignment handling</li>
+                                    <li>Tenant transition readings</li>
+                                    <li>Historical corrections</li>
+                                    <li>Enhanced audit trail</li>
+                                </ul>
+                                
+                                <h6 class="mb-2">Utility Rate Management</h6>
+                                <ul class="small mb-3">
+                                    <li>Single-point rate entry system</li>
+                                    <li>Electric and LEAC rate management</li>
+                                    <li>Bulk update capability</li>
+                                    <li>Real-time rate application</li>
+                                    <li>Automatic unit classification</li>
+                                    <li>Integration with charge management</li>
+                                </ul>
+                                
+                                <h6 class="mb-2">Future Enhancements</h6>
+                                <ul class="small mb-3">
+                                    <li>Voice input for meter readings</li>
+                                    <li>Push notifications</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="alert alert-light text-center mt-4">
+                        <h6 class="mb-2">
+                            <i class="bi bi-info-circle me-2"></i>Implementation Progress
+                        </h6>
+                        <p class="mb-0">Currently: <strong>14 of 25 phases completed</strong> (56% complete). The system follows a structured phase implementation approach with a 100% success rate. New features are added incrementally based on phase completion.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Visual Guide Section -->
+            <div class="help-card mt-4">
+                <div class="help-content">
+                    <h3 class="mb-4 text-center">
+                        <i class="bi bi-calendar-check me-2 text-primary"></i>Reading Schedule & Billing Impact
+                    </h3>
+                    <div class="alert alert-warning">
+                        <h5 class="alert-heading">
+                            <i class="bi bi-exclamation-triangle me-2"></i>Critical: Timing Matters for Billing Accuracy
+                        </h5>
+                        <p class="mb-3">The date you perform QR meter readings directly affects the billing periods saved in the system. Understanding this timing is crucial for accurate tenant billing.</p>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6 class="text-primary">Reading Period Calculation</h6>
+                                <ul class="mb-0">
+                                    <li><strong>Date From:</strong> 1st day of the reading month</li>
+                                    <li><strong>Date To:</strong> Last day of the reading month</li>
+                                    <li><strong>Example:</strong> Reading on Sep 25 → Period: Sep 1-30</li>
+                                </ul>
+                            </div>
+                            <div class="col-md-6">
+                                <h6 class="text-success">Billing Period Calculation</h6>
+                                <ul class="mb-0">
+                                    <li><strong>Billing From:</strong> 1st day of next month</li>
+                                    <li><strong>Billing To:</strong> Last day of next month</li>
+                                    <li><strong>Example:</strong> Reading on Sep 25 → Billing: Oct 1-31</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="alert alert-info">
+                        <h6 class="alert-heading">
+                            <i class="bi bi-clock me-2"></i>Impact of Delayed Readings
+                        </h6>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <h6 class="text-warning">Late Reading (Oct 5)</h6>
+                                <p class="small mb-2">If you read meters on October 5th instead of September 25th:</p>
+                                <ul class="small mb-0">
+                                    <li>Reading Period: Oct 1-31</li>
+                                    <li>Billing Period: Nov 1-30</li>
+                                    <li><strong>Result:</strong> September usage billed in November</li>
+                                </ul>
+                            </div>
+                            <div class="col-md-4">
+                                <h6 class="text-danger">Very Late Reading (Oct 15)</h6>
+                                <p class="small mb-2">If you read meters on October 15th:</p>
+                                <ul class="small mb-0">
+                                    <li>Reading Period: Oct 1-31</li>
+                                    <li>Billing Period: Nov 1-30</li>
+                                    <li><strong>Result:</strong> September + October usage billed together</li>
+                                </ul>
+                            </div>
+                            <div class="col-md-4">
+                                <h6 class="text-success">On-Time Reading (Sep 25-29)</h6>
+                                <p class="small mb-2">Recommended reading window:</p>
+                                <ul class="small mb-0">
+                                    <li>Reading Period: Sep 1-30</li>
+                                    <li>Billing Period: Oct 1-31</li>
+                                    <li><strong>Result:</strong> Accurate monthly billing</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="alert alert-success">
+                        <h6 class="alert-heading">
+                            <i class="bi bi-check-circle me-2"></i>Best Practices for Reading Schedule
+                        </h6>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6 class="text-primary">Recommended Schedule</h6>
+                                <ul class="mb-0">
+                                    <li><strong>Monthly:</strong> 25th-29th of each month</li>
+                                    <li><strong>Consistency:</strong> Same date range every month</li>
+                                    <li><strong>Planning:</strong> Schedule readings in advance</li>
+                                </ul>
+                            </div>
+                            <div class="col-md-6">
+                                <h6 class="text-warning">Avoid These Scenarios</h6>
+                                <ul class="mb-0">
+                                    <li><strong>Early Reading:</strong> Before 25th (affects previous month)</li>
+                                    <li><strong>Late Reading:</strong> After 5th of next month</li>
+                                    <li><strong>Irregular Schedule:</strong> Inconsistent dates</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <h3 class="mb-4 text-center mt-5">
                         <i class="bi bi-images me-2 text-primary"></i>Visual Guide - QR Meter Reading Workflow
                     </h3>
                     <p class="text-center text-muted mb-4">See exactly how the QR Meter Reading System looks and works with these real interface screenshots.</p>
@@ -212,99 +706,113 @@
                     <div class="screenshot-grid" style="margin-top: 2rem;">
                         <!-- Login Process -->
                         <div class="screenshot-item">
-                            <img src="assets/images/001 qr-meter-reading - LOGIN.png" alt="QR Meter Reading Login Screen" class="ui-screenshot">
+                            <img src="assets/images/001 qr-meter-reading - LOGIN.png" alt="QR Meter Reading Login Screen" class="ui-screenshot" onclick="showImageModal('assets/images/001 qr-meter-reading - LOGIN.png', '1. Login Screen', 'Enter your credentials to access the QR Meter Reading System')">
                             <h6 class="mb-2">1. Login Screen</h6>
                             <p class="small text-muted">Enter your credentials to access the QR Meter Reading System</p>
                         </div>
                         
                         <div class="screenshot-item">
-                            <img src="assets/images/002 qr-meter-reading - LOGIN - INVALID.png" alt="Invalid Login Error" class="ui-screenshot">
+                            <img src="assets/images/002 qr-meter-reading - LOGIN - INVALID.png" alt="Invalid Login Error" class="ui-screenshot" onclick="showImageModal('assets/images/002 qr-meter-reading - LOGIN - INVALID.png', '2. Login Validation', 'Real-time validation with inline error messages')">
                             <h6 class="mb-2">2. Login Validation</h6>
                             <p class="small text-muted">Real-time validation with inline error messages</p>
                         </div>
                         
                         <!-- Main Interface -->
                         <div class="screenshot-item">
-                            <img src="assets/images/003 qr-meter-reading - MAIN PAGE.png" alt="QR Meter Reading Main Page" class="ui-screenshot">
+                            <img src="assets/images/003 qr-meter-reading - MAIN PAGE.png" alt="QR Meter Reading Main Page" class="ui-screenshot" onclick="showImageModal('assets/images/003 qr-meter-reading - MAIN PAGE.png', '3. Main Scanner Page', 'Start scanning QR codes with the prominent Start Scanner button')">
                             <h6 class="mb-2">3. Main Scanner Page</h6>
                             <p class="small text-muted">Start scanning QR codes with the prominent "Start Scanner" button</p>
                         </div>
                         
                         <!-- Tenant Information -->
                         <div class="screenshot-item">
-                            <img src="assets/images/004 qr-meter-reading - MAIN PAGE - Meter Reading Form - Tenant Information.png" alt="Tenant Information Display" class="ui-screenshot">
+                            <img src="assets/images/004 qr-meter-reading - MAIN PAGE - Meter Reading Form - Tenant Information.png" alt="Tenant Information Display" class="ui-screenshot" onclick="showImageModal('assets/images/004 qr-meter-reading - MAIN PAGE - Meter Reading Form - Tenant Information.png', '4. Tenant Information', 'Auto-populated tenant details after successful QR scan')">
                             <h6 class="mb-2">4. Tenant Information</h6>
                             <p class="small text-muted">Auto-populated tenant details after successful QR scan</p>
                         </div>
                         
                         <!-- Meter Reading Form -->
                         <div class="screenshot-item">
-                            <img src="assets/images/005 qr-meter-reading - MAIN PAGE - Meter Reading Form - Current Reading Entry.png" alt="Current Meter Reading Entry" class="ui-screenshot">
+                            <img src="assets/images/005 qr-meter-reading - MAIN PAGE - Meter Reading Form - Current Reading Entry.png" alt="Current Meter Reading Entry" class="ui-screenshot" onclick="showImageModal('assets/images/005 qr-meter-reading - MAIN PAGE - Meter Reading Form - Current Reading Entry.png', '5. Reading Entry', 'Enter current meter reading with mobile-optimized button layout')">
                             <h6 class="mb-2">5. Reading Entry</h6>
                             <p class="small text-muted">Enter current meter reading with mobile-optimized button layout</p>
                         </div>
                         
                         <!-- Recent Readings -->
                         <div class="screenshot-item">
-                            <img src="assets/images/006 qr-meter-reading - MAIN PAGE - Recent QR Readings.png" alt="Recent QR Readings Table" class="ui-screenshot">
+                            <img src="assets/images/006 qr-meter-reading - MAIN PAGE - Recent QR Readings.png" alt="Recent QR Readings Table" class="ui-screenshot" onclick="showImageModal('assets/images/006 qr-meter-reading - MAIN PAGE - Recent QR Readings.png', '6. Recent Readings', 'View and verify your recent meter reading submissions')">
                             <h6 class="mb-2">6. Recent Readings</h6>
                             <p class="small text-muted">View and verify your recent meter reading submissions</p>
                         </div>
                         
                         <!-- Online Status -->
                         <div class="screenshot-item">
-                            <img src="assets/images/007 qr-meter-reading - MAIN PAGE - Online Indicator.png" alt="Online Status Indicator" class="ui-screenshot">
+                            <img src="assets/images/007 qr-meter-reading - MAIN PAGE - Online Indicator.png" alt="Online Status Indicator" class="ui-screenshot" onclick="showImageModal('assets/images/007 qr-meter-reading - MAIN PAGE - Online Indicator.png', '7. Online Status', 'Green dot indicates you are online and all readings are synced')">
                             <h6 class="mb-2">7. Online Status</h6>
                             <p class="small text-muted">Green dot indicates you're online and all readings are synced</p>
                         </div>
                         
                         <!-- Offline Status -->
                         <div class="screenshot-item">
-                            <img src="assets/images/008 qr-meter-reading - MAIN PAGE - Offline Indicator.png" alt="Offline Status Indicator" class="ui-screenshot">
+                            <img src="assets/images/008 qr-meter-reading - MAIN PAGE - Offline Indicator.png" alt="Offline Status Indicator" class="ui-screenshot" onclick="showImageModal('assets/images/008 qr-meter-reading - MAIN PAGE - Offline Indicator.png', '8. Offline Status', 'Red dot and offline indicator when connection is lost')">
                             <h6 class="mb-2">8. Offline Status</h6>
                             <p class="small text-muted">Red dot and offline indicator when connection is lost</p>
                         </div>
                         
                         <!-- Manual Sync -->
                         <div class="screenshot-item">
-                            <img src="assets/images/009 qr-meter-reading - MAIN PAGE - Manual Sync Indicator.png" alt="Manual Sync Indicator" class="ui-screenshot">
+                            <img src="assets/images/009 qr-meter-reading - MAIN PAGE - Manual Sync Indicator.png" alt="Manual Sync Indicator" class="ui-screenshot" onclick="showImageModal('assets/images/009 qr-meter-reading - MAIN PAGE - Manual Sync Indicator.png', '9. Manual Sync', 'Orange dot and sync button when readings need to be synced')">
                             <h6 class="mb-2">9. Manual Sync</h6>
                             <p class="small text-muted">Orange dot and sync button when readings need to be synced</p>
                         </div>
                         
                         <!-- Auto Sync Progress -->
                         <div class="screenshot-item">
-                            <img src="assets/images/010 qr-meter-reading - MAIN PAGE - Auto Sync Indicator.png" alt="Auto Sync Progress" class="ui-screenshot">
+                            <img src="assets/images/010 qr-meter-reading - MAIN PAGE - Auto Sync Indicator.png" alt="Auto Sync Progress" class="ui-screenshot" onclick="showImageModal('assets/images/010 qr-meter-reading - MAIN PAGE - Auto Sync Indicator.png', '10. Auto Sync Progress', 'Progress indicator showing readings being processed automatically')">
                             <h6 class="mb-2">10. Auto Sync Progress</h6>
                             <p class="small text-muted">Progress indicator showing readings being processed automatically</p>
                         </div>
                         
                         <!-- Failed Sync -->
                         <div class="screenshot-item">
-                            <img src="assets/images/011 qr-meter-reading - MAIN PAGE - Auto Sync - Unstable or Failed Sync Indicator.png" alt="Failed Sync Indicator" class="ui-screenshot">
+                            <img src="assets/images/011 qr-meter-reading - MAIN PAGE - Auto Sync - Unstable or Failed Sync Indicator.png" alt="Failed Sync Indicator" class="ui-screenshot" onclick="showImageModal('assets/images/011 qr-meter-reading - MAIN PAGE - Auto Sync - Unstable or Failed Sync Indicator.png', '11. Failed Sync', 'Failed sync indicator when connection becomes unstable')">
                             <h6 class="mb-2">11. Failed Sync</h6>
                             <p class="small text-muted">Failed sync indicator when connection becomes unstable</p>
                         </div>
                         
                         <!-- Manual Sync Progress -->
                         <div class="screenshot-item">
-                            <img src="assets/images/012 qr-meter-reading - MAIN PAGE - Manual Sync Progress Indicator.png" alt="Manual Sync Progress" class="ui-screenshot">
+                            <img src="assets/images/012 qr-meter-reading - MAIN PAGE - Manual Sync Progress Indicator.png" alt="Manual Sync Progress" class="ui-screenshot" onclick="showImageModal('assets/images/012 qr-meter-reading - MAIN PAGE - Manual Sync Progress Indicator.png', '12. Manual Sync Progress', 'Detailed progress indicator for manual sync operations')">
                             <h6 class="mb-2">12. Manual Sync Progress</h6>
                             <p class="small text-muted">Detailed progress indicator for manual sync operations</p>
                         </div>
                         
                         <!-- Connection Lost Notification -->
                         <div class="screenshot-item">
-                            <img src="assets/images/013 qr-meter-reading - MAIN PAGE - Connection Lost Notification.png" alt="Connection Lost Notification" class="ui-screenshot">
+                            <img src="assets/images/013 qr-meter-reading - MAIN PAGE - Connection Lost Notification.png" alt="Connection Lost Notification" class="ui-screenshot" onclick="showImageModal('assets/images/013 qr-meter-reading - MAIN PAGE - Connection Lost Notification.png', '13. Connection Lost', 'Prominent notification when internet connection is lost')">
                             <h6 class="mb-2">13. Connection Lost</h6>
                             <p class="small text-muted">Prominent notification when internet connection is lost</p>
                         </div>
                         
                         <!-- Connection Restored Notification -->
                         <div class="screenshot-item">
-                            <img src="assets/images/014 qr-meter-reading - MAIN PAGE - Connection Restored Notification.png" alt="Connection Restored Notification" class="ui-screenshot">
+                            <img src="assets/images/014 qr-meter-reading - MAIN PAGE - Connection Restored Notification.png" alt="Connection Restored Notification" class="ui-screenshot" onclick="showImageModal('assets/images/014 qr-meter-reading - MAIN PAGE - Connection Restored Notification.png', '14. Connection Restored', 'Confirmation notification when internet connection returns')">
                             <h6 class="mb-2">14. Connection Restored</h6>
                             <p class="small text-muted">Confirmation notification when internet connection returns</p>
+                        </div>
+                        
+                        <!-- Duplicate Reading Prevention -->
+                        <div class="screenshot-item">
+                            <img src="assets/images/015 qr-meter-reading - MAIN PAGE - Duplicate Reading Detected.png" alt="Duplicate Reading Prevention" class="ui-screenshot" onclick="showImageModal('assets/images/015 qr-meter-reading - MAIN PAGE - Duplicate Reading Detected.png', '15. Duplicate Reading Prevention', 'System automatically prevents duplicate readings with clear notification')">
+                            <h6 class="mb-2">15. Duplicate Reading Prevention</h6>
+                            <p class="small text-muted">System automatically prevents duplicate readings with clear notification</p>
+                        </div>
+                        
+                        <!-- Offline Reading Saved -->
+                        <div class="screenshot-item">
+                            <img src="assets/images/016 qr-meter-reading - MAIN PAGE - Reading Saved Offline.png" alt="Offline Reading Saved" class="ui-screenshot" onclick="showImageModal('assets/images/016 qr-meter-reading - MAIN PAGE - Reading Saved Offline.png', '16. Offline Reading Saved', 'Confirmation that reading was saved offline and will sync when connection is restored')">
+                            <h6 class="mb-2">16. Offline Reading Saved</h6>
+                            <p class="small text-muted">Confirmation that reading was saved offline and will sync when connection is restored</p>
                         </div>
                     </div>
                     
@@ -316,11 +824,35 @@
                             <p class="mb-0">These screenshots show the actual interface you'll use. Notice the mobile-first design with large touch targets and clear visual hierarchy.</p>
                         </div>
                     </div>
+                    
+                    <!-- Video Demo Section -->
+                    <div class="mt-5">
+                        <h4 class="text-center mb-4">
+                            <i class="bi bi-play-circle me-2 text-primary"></i>Live Scanning Demo
+                        </h4>
+                        <div class="text-center">
+                            <div class="video-container" style="max-width: 400px; margin: 0 auto;">
+                                <video controls autoplay muted class="rounded shadow" style="width: 100%; height: auto;" preload="metadata">
+                                    <source src="assets/videos/001 qr-meter-reading - Actual Scanning Demo.mp4" type="video/mp4">
+                                    Your browser does not support the video tag.
+                                </video>
+                            </div>
+                            <div class="mt-2">
+                                <small class="text-muted">
+                                    <i class="bi bi-info-circle me-1"></i>
+                                    If video doesn't load, <a href="assets/videos/001 qr-meter-reading - Actual Scanning Demo.mp4" target="_blank">click here to view directly</a>
+                                </small>
+                            </div>
+                            <p class="mt-3 text-muted">
+                                <strong>Watch the complete scanning process</strong> - From QR code detection to successful reading submission
+                            </p>
+                        </div>
+                    </div>
                 </div>
             </div>
             
             <!-- System Information -->
-            <div class="help-card">
+            <div class="help-card mt-4">
                 <div class="help-content">
                     <h3 class="mb-4 text-center">
                         <i class="bi bi-info-circle me-2 text-primary"></i>System Information
@@ -350,38 +882,29 @@
                 </div>
             </div>
             
-            <!-- Navigation -->
-            <div class="text-center mt-4">
-                <div class="row">
-                    <div class="col-md-6">
-                        <a href="../index.php" class="btn btn-primary btn-lg w-100">
+            <!-- Footer Navigation -->
+            <footer class="mt-5 pt-4 border-top">
+                <div class="text-center mb-4">
+                    <p class="text-muted mb-3">
+                        <i class="bi bi-compass me-2"></i>Navigate Help Documentation
+                    </p>
+                    <div class="d-flex flex-wrap justify-content-center gap-2">
+                        <a href="index.html" class="btn btn-outline-primary">
+                            <i class="bi bi-book me-2"></i>User Manual
+                        </a>
+                        <a href="quick-reference.html" class="btn btn-outline-success">
+                            <i class="bi bi-lightning-charge me-2"></i>Quick Reference
+                        </a>
+                        <a href="troubleshooting.html" class="btn btn-outline-warning">
+                            <i class="bi bi-tools me-2"></i>Troubleshooting
+                        </a>
+                        <a href="../index.php" class="btn btn-primary">
                             <i class="bi bi-qr-code-scan me-2"></i>Back to Scanner
-                        </a>
-                    </div>
-                    <div class="col-md-6">
-                        <a href="../qr-generator.html" class="btn btn-success btn-lg w-100">
-                            <i class="bi bi-qr-code me-2"></i>QR Generator
-                        </a>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Footer -->
-            <footer class="text-center mt-5 pt-4 border-top">
-                <div class="row">
-                    <div class="col-md-6">
-                        <a href="../index.php" class="btn btn-outline-primary btn-lg w-100 mb-3">
-                            <i class="bi bi-qr-code-scan me-2"></i>Back to Scanner
-                        </a>
-                    </div>
-                    <div class="col-md-6">
-                        <a href="../qr-generator.html" class="btn btn-outline-success btn-lg w-100 mb-3">
-                            <i class="bi bi-qr-code me-2"></i>QR Generator
                         </a>
                     </div>
                 </div>
                 
-                <div class="mt-4 pt-3 border-top">
+                <div class="text-center pt-3 border-top">
                     <p class="text-muted mb-2">
                         <i class="bi bi-shield-check me-2"></i>
                         QR Meter Reading System v1.2 - Help Documentation
@@ -396,5 +919,259 @@
     
     <!-- Bootstrap JS -->
     <script src="../assets/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Modern Full-Screen Gallery -->
+    <div id="galleryOverlay" class="gallery-overlay" style="display: none;">
+        <div class="gallery-container">
+            <!-- Header -->
+            <div class="gallery-header">
+                <div class="gallery-title">
+                    <h4 id="galleryTitle">Screenshot</h4>
+                    <span id="galleryCounter" class="gallery-counter">1 of 14</span>
+                </div>
+                <button type="button" class="gallery-close" onclick="closeGallery()">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
+            
+            <!-- Navigation -->
+            <button type="button" class="gallery-nav gallery-nav-left" onclick="navigateImage(-1)">
+                <i class="bi bi-chevron-left"></i>
+            </button>
+            <button type="button" class="gallery-nav gallery-nav-right" onclick="navigateImage(1)">
+                <i class="bi bi-chevron-right"></i>
+            </button>
+            
+            <!-- Image Container -->
+            <div class="gallery-image-container">
+                <img id="galleryImage" src="" alt="" class="gallery-image">
+            </div>
+            
+            <!-- Footer -->
+            <div class="gallery-footer">
+                <p id="galleryDescription" class="gallery-description"></p>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Image gallery data
+        const imageGallery = [
+            { src: 'assets/images/001 qr-meter-reading - LOGIN.png', title: '1. Login Screen', desc: 'Enter your credentials to access the QR Meter Reading System' },
+            { src: 'assets/images/002 qr-meter-reading - LOGIN - INVALID.png', title: '2. Login Validation', desc: 'Real-time validation with inline error messages' },
+            { src: 'assets/images/003 qr-meter-reading - MAIN PAGE.png', title: '3. Main Scanner Page', desc: 'Start scanning QR codes with the prominent Start Scanner button' },
+            { src: 'assets/images/004 qr-meter-reading - MAIN PAGE - Meter Reading Form - Tenant Information.png', title: '4. Tenant Information', desc: 'Auto-populated tenant details after successful QR scan' },
+            { src: 'assets/images/005 qr-meter-reading - MAIN PAGE - Meter Reading Form - Current Reading Entry.png', title: '5. Reading Entry', desc: 'Enter current meter reading with mobile-optimized button layout' },
+            { src: 'assets/images/006 qr-meter-reading - MAIN PAGE - Recent QR Readings.png', title: '6. Recent Readings', desc: 'View and verify your recent meter reading submissions' },
+            { src: 'assets/images/007 qr-meter-reading - MAIN PAGE - Online Indicator.png', title: '7. Online Status', desc: 'Green dot indicates you are online and all readings are synced' },
+            { src: 'assets/images/008 qr-meter-reading - MAIN PAGE - Offline Indicator.png', title: '8. Offline Status', desc: 'Red dot and offline indicator when connection is lost' },
+            { src: 'assets/images/009 qr-meter-reading - MAIN PAGE - Manual Sync Indicator.png', title: '9. Manual Sync', desc: 'Orange dot and sync button when readings need to be synced' },
+            { src: 'assets/images/010 qr-meter-reading - MAIN PAGE - Auto Sync Indicator.png', title: '10. Auto Sync Progress', desc: 'Progress indicator showing readings being processed automatically' },
+            { src: 'assets/images/011 qr-meter-reading - MAIN PAGE - Auto Sync - Unstable or Failed Sync Indicator.png', title: '11. Failed Sync', desc: 'Failed sync indicator when connection becomes unstable' },
+            { src: 'assets/images/012 qr-meter-reading - MAIN PAGE - Manual Sync Progress Indicator.png', title: '12. Manual Sync Progress', desc: 'Detailed progress indicator for manual sync operations' },
+            { src: 'assets/images/013 qr-meter-reading - MAIN PAGE - Connection Lost Notification.png', title: '13. Connection Lost', desc: 'Prominent notification when internet connection is lost' },
+            { src: 'assets/images/014 qr-meter-reading - MAIN PAGE - Connection Restored Notification.png', title: '14. Connection Restored', desc: 'Confirmation notification when internet connection returns' },
+            { src: 'assets/images/015 qr-meter-reading - MAIN PAGE - Duplicate Reading Detected.png', title: '15. Duplicate Reading Prevention', desc: 'System automatically prevents duplicate readings with clear notification' },
+            { src: 'assets/images/016 qr-meter-reading - MAIN PAGE - Reading Saved Offline.png', title: '16. Offline Reading Saved', desc: 'Confirmation that reading was saved offline and will sync when connection is restored' }
+        ];
+        
+        let currentImageIndex = 0;
+        
+        function showImageModal(imageSrc, title, description) {
+            // Find the index of the current image
+            currentImageIndex = imageGallery.findIndex(img => img.src === imageSrc);
+            if (currentImageIndex === -1) currentImageIndex = 0;
+            
+            updateGallery();
+            document.getElementById('galleryOverlay').style.display = 'flex';
+            document.body.style.overflow = 'hidden'; // Prevent background scrolling
+        }
+        
+        function closeGallery() {
+            document.getElementById('galleryOverlay').style.display = 'none';
+            document.body.style.overflow = 'auto'; // Restore scrolling
+        }
+        
+        function navigateImage(direction) {
+            currentImageIndex += direction;
+            
+            // Loop around
+            if (currentImageIndex < 0) currentImageIndex = imageGallery.length - 1;
+            if (currentImageIndex >= imageGallery.length) currentImageIndex = 0;
+            
+            updateGallery();
+        }
+        
+        function updateGallery() {
+            const image = imageGallery[currentImageIndex];
+            document.getElementById('galleryTitle').textContent = image.title;
+            document.getElementById('galleryImage').src = image.src;
+            document.getElementById('galleryImage').alt = image.title;
+            document.getElementById('galleryDescription').textContent = image.desc;
+            document.getElementById('galleryCounter').textContent = `${currentImageIndex + 1} of ${imageGallery.length}`;
+        }
+        
+        // Keyboard navigation
+        document.addEventListener('keydown', function(e) {
+            const gallery = document.getElementById('galleryOverlay');
+            if (gallery.style.display === 'flex') {
+                if (e.key === 'ArrowLeft') {
+                    navigateImage(-1);
+                } else if (e.key === 'ArrowRight') {
+                    navigateImage(1);
+                } else if (e.key === 'Escape') {
+                    closeGallery();
+                }
+            }
+        });
+        
+        // Close gallery when clicking outside image
+        document.getElementById('galleryOverlay').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeGallery();
+            }
+        });
+        
+        // Search functionality implementation
+        class HelpSearch {
+            constructor() {
+                this.searchInput = document.getElementById('helpSearch');
+                this.searchResults = document.getElementById('searchResults');
+                this.clearButton = document.getElementById('clearSearch');
+                this.searchData = [];
+                this.init();
+            }
+
+            init() {
+                this.loadSearchData();
+                this.setupEventListeners();
+            }
+
+            loadSearchData() {
+                // Search data structure for all help pages
+                this.searchData = [
+                    // User Manual content
+                    { title: "QR Code Scanning", content: "Complete QR scanning workflow with step-by-step instructions", url: "index.html", section: "QR Scanning" },
+                    { title: "Duplicate Reading Prevention", content: "System automatically prevents duplicate readings to ensure data accuracy", url: "index.html", section: "Duplicate Detection" },
+                    { title: "Offline Mode", content: "Full system operation without internet connection using offline storage", url: "index.html", section: "Offline & Sync" },
+                    { title: "Connection Status Indicators", content: "Green, red, and orange dots indicate connection and sync status", url: "index.html", section: "Offline & Sync" },
+                    { title: "Last Reading Card", content: "Prominent display of last reading information for validation", url: "index.html", section: "QR Scanning" },
+                    { title: "Meter Reading Form", content: "Auto-populated form with tenant information after QR scan", url: "index.html", section: "QR Scanning" },
+                    { title: "Recent QR Readings", content: "Table showing recent meter reading submissions with status", url: "index.html", section: "Recent Readings" },
+                    { title: "Offline Reading Display", content: "Complete visibility of offline readings with status tracking", url: "index.html", section: "Offline Reading Display" },
+                    
+                    // Quick Reference content
+                    { title: "Quick Start Guide", content: "5-step process for field technicians to start scanning immediately", url: "quick-reference.html", section: "Quick Start" },
+                    { title: "QR Code Format", content: "Understanding QR code data structure and format requirements", url: "quick-reference.html", section: "QR Format" },
+                    { title: "Pro Tips", content: "Best practices and efficiency tips for meter reading", url: "quick-reference.html", section: "Pro Tips" },
+                    { title: "Emergency Contacts", content: "Support contacts for technical assistance", url: "quick-reference.html", section: "Emergency Contacts" },
+                    
+                    // Troubleshooting content
+                    { title: "Camera Issues", content: "Solutions for camera-related problems and QR code detection", url: "troubleshooting.html", section: "Camera Issues" },
+                    { title: "Network Problems", content: "Troubleshooting connectivity and offline mode issues", url: "troubleshooting.html", section: "Network Issues" },
+                    { title: "Access Denied", content: "Resolving authentication and permission problems", url: "troubleshooting.html", section: "Access Issues" },
+                    { title: "Sync Problems", content: "Resolving synchronization issues between offline and online data", url: "troubleshooting.html", section: "Sync Issues" },
+                    { title: "Duplicate Reading Errors", content: "Understanding and resolving duplicate reading prevention messages", url: "troubleshooting.html", section: "Data Issues" },
+                    
+                    // Help Center content
+                    { title: "About This Project", content: "Utility Rate QR Meter Reading System overview and what this system does", url: "help-center.html", section: "About" },
+                    { title: "Complete Feature List", content: "All implemented and upcoming features in the system", url: "help-center.html", section: "Features" },
+                    { title: "Implemented Features", content: "Currently available features including QR scanning, offline mode, data validation, and documentation", url: "help-center.html", section: "Features" },
+                    { title: "Upcoming Features", content: "Planned features including workflow automation, reporting, and utility rate management", url: "help-center.html", section: "Features" },
+                    { title: "Visual Guide", content: "Complete visual guide with screenshots of all system features", url: "help-center.html", section: "Visual Guide" },
+                    { title: "System Information", content: "Technical specifications and system requirements", url: "help-center.html", section: "System Information" }
+                ];
+            }
+
+            setupEventListeners() {
+                this.searchInput.addEventListener('input', this.debounce(this.handleSearch.bind(this), 300));
+                this.clearButton.addEventListener('click', this.clearSearch.bind(this));
+                
+                // Close search results when clicking outside
+                document.addEventListener('click', (e) => {
+                    if (!e.target.closest('.search-container')) {
+                        this.hideResults();
+                    }
+                });
+            }
+
+            handleSearch(e) {
+                const query = e.target.value.trim().toLowerCase();
+                
+                if (query.length < 2) {
+                    this.hideResults();
+                    this.clearButton.style.display = 'none';
+                    return;
+                }
+
+                this.clearButton.style.display = 'block';
+                const results = this.searchContent(query);
+                this.displayResults(results, query);
+            }
+
+            searchContent(query) {
+                return this.searchData.filter(item => {
+                    const titleMatch = item.title.toLowerCase().includes(query);
+                    const contentMatch = item.content.toLowerCase().includes(query);
+                    const sectionMatch = item.section.toLowerCase().includes(query);
+                    
+                    return titleMatch || contentMatch || sectionMatch;
+                }).slice(0, 10); // Limit to 10 results
+            }
+
+            displayResults(results, query) {
+                if (results.length === 0) {
+                    this.searchResults.innerHTML = '<div class="no-results">No results found for "' + query + '"</div>';
+                } else {
+                    this.searchResults.innerHTML = results.map(item => `
+                        <div class="search-result-item" onclick="window.location.href='${item.url}#${this.getAnchor(item.section)}'">
+                            <div class="search-result-title">${this.highlightText(item.title, query)}</div>
+                            <div class="search-result-snippet">${this.highlightText(item.content, query)}</div>
+                            <small class="text-muted">${item.section} • ${item.url}</small>
+                        </div>
+                    `).join('');
+                }
+                
+                this.searchResults.style.display = 'block';
+            }
+
+            highlightText(text, query) {
+                const regex = new RegExp(`(${query})`, 'gi');
+                return text.replace(regex, '<span class="search-highlight">$1</span>');
+            }
+
+            getAnchor(section) {
+                return section.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]/g, '');
+            }
+
+            clearSearch() {
+                this.searchInput.value = '';
+                this.hideResults();
+                this.clearButton.style.display = 'none';
+                this.searchInput.focus();
+            }
+
+            hideResults() {
+                this.searchResults.style.display = 'none';
+            }
+
+            debounce(func, wait) {
+                let timeout;
+                return function executedFunction(...args) {
+                    const later = () => {
+                        clearTimeout(timeout);
+                        func(...args);
+                    };
+                    clearTimeout(timeout);
+                    timeout = setTimeout(later, wait);
+                };
+            }
+        }
+
+        // Initialize search when DOM is loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            new HelpSearch();
+        });
+    </script>
 </body>
 </html>

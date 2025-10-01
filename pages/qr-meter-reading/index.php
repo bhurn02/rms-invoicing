@@ -13,6 +13,9 @@ header("Pragma: no-cache");
 require_once 'auth/auth.php';
 requireQRMeterReadingAccess();
 
+// Include configuration for environment detection
+require_once 'config/config.local.php';
+
 // Get current user information
 $currentUser = getCurrentUsername();
 $currentCompany = getCurrentCompanyCode();
@@ -81,6 +84,7 @@ $currentCompany = getCurrentCompanyCode();
                         <span class="d-none d-md-inline">Tools</span>
                     </button>
                     <ul class="dropdown-menu dropdown-menu-end">
+                        <?php if (APP_ENV !== 'production'): ?>
                         <li><h6 class="dropdown-header">Development Tools</h6></li>
                         <li>
                             <a class="dropdown-item" href="camera-test.html" target="_blank">
@@ -89,24 +93,30 @@ $currentCompany = getCurrentCompanyCode();
                             </a>
                         </li>
                         <li>
+                            <a class="dropdown-item" href="qr-test.html" target="_blank">
+                                <i class="bi bi-bug"></i>
+                                QR Test Utility
+                            </a>
+                        </li>
+                        <li><hr class="dropdown-divider"></li>
+                        <?php endif; ?>
+                        
+                        <li><h6 class="dropdown-header">QR Tools</h6></li>
+                        <li>
                             <a class="dropdown-item" href="qr-generator.html" target="_blank">
                                 <i class="bi bi-qr-code"></i>
                                 QR Generator
                             </a>
                         </li>
+                        <?php if (APP_ENV !== 'production'): ?>
                         <li>
                             <a class="dropdown-item" href="qr-generator-simple.html" target="_blank">
                                 <i class="bi bi-qr-code-scan"></i>
                                 Simple QR Generator
                             </a>
                         </li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li>
-                            <a class="dropdown-item" href="qr-test.html" target="_blank">
-                                <i class="bi bi-bug"></i>
-                                QR Test Utility
-                            </a>
-                        </li>
+                        <?php endif; ?>
+                        
                         <li><hr class="dropdown-divider"></li>
                         <li><h6 class="dropdown-header">Help & Support</h6></li>
                         <li>
@@ -208,7 +218,8 @@ $currentCompany = getCurrentCompanyCode();
                 </div>
 
                 <!-- Reading Form Card - Bootstrap responsive -->
-                <div id="reading-form-card" class="card card-professional shadow-sm border-0 scanner-hidden">
+                <div id="reading-form-card" class="card card-professional shadow-sm border-0 scanner-hidden touch-target"
+                     data-gesture-enabled="true">
                     <div class="card-header bg-success text-white border-0 py-3">
                         <h5 class="card-title mb-0 d-flex align-items-center">
                             <i class="bi bi-check-circle me-2 fs-5"></i>
@@ -221,34 +232,34 @@ $currentCompany = getCurrentCompanyCode();
                             <!-- Tenant info will be populated dynamically -->
                         </div>
                         
-                        <!-- Last Reading Information Display -->
+                        <!-- Last Reading Information Display - Prominent Card -->
                         <div id="last-reading-info" class="mb-4">
                             <!-- Last reading info will be populated dynamically -->
                         </div>
                         
                         <form id="reading-form">
-                            <!-- Property Information - Bootstrap responsive grid -->
+                            <!-- Property Information - Enhanced responsive grid -->
                             <div class="row g-3 mb-4">
-                                <div class="col-12 col-md-6">
+                                <div class="col-6 col-md-6">
                                     <label for="property-id" class="form-label field-label">Property ID</label>
                                     <input type="text" class="form-control form-field" 
                                            id="property-id" name="propertyCode" readonly>
                                 </div>
-                                <div class="col-12 col-md-6">
+                                <div class="col-6 col-md-6">
                                     <label for="unit-number" class="form-label field-label">Unit Number</label>
                                     <input type="text" class="form-control form-field" 
                                            id="unit-number" name="unitNo" readonly>
                                 </div>
                             </div>
                             
-                            <!-- Meter Information - Bootstrap responsive grid -->
+                            <!-- Meter Information - Enhanced responsive grid -->
                             <div class="row g-3 mb-4">
-                                <div class="col-12 col-md-6">
+                                <div class="col-6 col-md-6">
                                     <label for="meter-id" class="form-label field-label">Meter ID</label>
                                     <input type="text" class="form-control form-field" 
                                            id="meter-id" name="meterId" readonly>
                                 </div>
-                                <div class="col-12 col-md-6">
+                                <div class="col-6 col-md-6">
                                     <label for="reading-date" class="form-label field-label">Reading Date</label>
                                     <input type="text" class="form-control form-field" 
                                            id="reading-date" value="<?php echo date('Y-m-d H:i:s'); ?>" readonly>
@@ -256,24 +267,32 @@ $currentCompany = getCurrentCompanyCode();
                                 </div>
                             </div>
                             
-                            <!-- Reading Information - Bootstrap responsive grid -->
+                            <!-- Reading Information - Enhanced responsive grid -->
                             <div class="row g-3 mb-4">
-                                <div class="col-12 col-md-6">
-                                    <label for="current-meter-reading" class="form-label field-label">
-                                        <i class="bi bi-speedometer2 me-2"></i>Current Meter Reading
+                                <div class="col-6 col-md-6">
+                                    <label for="current-meter-reading" class="form-label field-label touch-target">
+                                        <i class="bi bi-speedometer2 me-2"></i>Current Reading
                                     </label>
-                                    <input type="number" class="form-control form-field" 
+                                    <input type="number" class="form-control form-field touch-target" 
                                            id="current-meter-reading" name="currentReading" 
-                                           step="0.01" min="0.01" required>
+                                           step="0.01" min="0.01" required
+                                           data-gesture-input="true"
+                                           autocomplete="off"
+                                           inputmode="numeric"
+                                           enterkeyhint="done">
                                     <small class="text-muted">Enter the current meter reading value</small>
                                 </div>
-                                <div class="col-12 col-md-6">
-                                    <label for="remarks" class="form-label field-label">
+                                <div class="col-6 col-md-6">
+                                    <label for="remarks" class="form-label field-label touch-target">
                                         <i class="bi bi-chat-text me-2"></i>Remarks
                                     </label>
-                                    <textarea class="form-control form-field" 
+                                    <textarea class="form-control form-field touch-target" 
                                               id="remarks" name="remarks" 
-                                              rows="3" placeholder="Optional notes about the reading..."></textarea>
+                                              rows="3" placeholder="Optional notes about the reading..."
+                                              data-gesture-input="true"
+                                              autocomplete="off"
+                                              enterkeyhint="done"
+                                              style="min-height: 38px;"></textarea>
                                     <small class="text-muted">Add any relevant notes or observations</small>
                                 </div>
                             </div>

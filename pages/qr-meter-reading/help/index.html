@@ -48,6 +48,89 @@
             margin: 1rem 0;
             border-radius: 0 8px 8px 0;
         }
+        
+        /* Smart Navigation Styles */
+        .nav-link {
+            position: relative;
+            transition: all 0.3s ease;
+            border-radius: 8px;
+            margin-bottom: 4px;
+            padding: 12px 16px;
+        }
+
+        .nav-link:hover {
+            background-color: #f8f9fa;
+            transform: translateX(4px);
+        }
+
+        .nav-link.active {
+            background-color: #1e40af;
+            color: white;
+            box-shadow: 0 2px 8px rgba(30, 64, 175, 0.3);
+        }
+
+        .nav-link.active::before {
+            content: '';
+            position: absolute;
+            left: -16px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 4px;
+            height: 24px;
+            background-color: #1e40af;
+            border-radius: 2px;
+        }
+
+        .nav-link i {
+            margin-right: 8px;
+            width: 16px;
+            text-align: center;
+        }
+
+        /* Progress Indicator */
+        .nav-progress {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background-color: #e5e7eb;
+            z-index: 1000;
+        }
+
+        .nav-progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #1e40af, #3b82f6);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        /* Search Highlighting */
+        .search-highlight {
+            background-color: #fef3c7;
+            padding: 1px 2px;
+            border-radius: 2px;
+            font-weight: 500;
+        }
+
+        mark.search-highlight {
+            background-color: #fef3c7;
+            color: inherit;
+        }
+
+        /* Mobile Optimization */
+        @media (max-width: 768px) {
+            .nav-link {
+                padding: 10px 12px;
+                font-size: 0.9rem;
+            }
+            
+            .nav-link.active::before {
+                left: -12px;
+                width: 3px;
+                height: 20px;
+            }
+        }
         .warning-box {
             background: #fef3c7;
             border: 1px solid #f59e0b;
@@ -82,26 +165,37 @@
                         <h5 class="mb-3">
                             <i class="bi bi-book me-2"></i>User Manual
                         </h5>
-                        <nav class="nav flex-column">
-                            <a class="nav-link" href="#overview">
+                        <nav class="nav nav-pills flex-column" id="helpNavigation">
+                            <a class="nav-link" href="#overview" data-section="overview">
                                 <i class="bi bi-info-circle me-2"></i>System Overview
                             </a>
-                            <a class="nav-link" href="#getting-started">
+                            <a class="nav-link" href="#getting-started" data-section="getting-started">
                                 <i class="bi bi-play-circle me-2"></i>Getting Started
                             </a>
-                            <a class="nav-link" href="#qr-scanning">
+                            <a class="nav-link" href="#reading-schedule" data-section="reading-schedule">
+                                <i class="bi bi-calendar-check me-2"></i>Reading Schedule
+                            </a>
+                            <a class="nav-link" href="#qr-scanning" data-section="qr-scanning">
                                 <i class="bi bi-qr-code-scan me-2"></i>QR Scanning
                             </a>
-                            <a class="nav-link" href="#offline-sync">
+                            <a class="nav-link" href="#duplicate-detection" data-section="duplicate-detection">
+                                <i class="bi bi-shield-check me-2"></i>Duplicate Detection
+                                <span class="badge bg-success ms-2">New</span>
+                            </a>
+                            <a class="nav-link" href="#offline-sync" data-section="offline-sync">
                                 <i class="bi bi-wifi-off me-2"></i>Offline & Sync
                             </a>
-                            <a class="nav-link" href="#qr-generator">
+                            <a class="nav-link" href="#offline-reading-display" data-section="offline-reading-display">
+                                <i class="bi bi-list-check me-2"></i>Offline Reading Display
+                                <span class="badge bg-success ms-2">New</span>
+                            </a>
+                            <a class="nav-link" href="#qr-generator" data-section="qr-generator">
                                 <i class="bi bi-qr-code me-2"></i>QR Generator
                             </a>
-                            <a class="nav-link" href="#troubleshooting">
+                            <a class="nav-link" href="#troubleshooting" data-section="troubleshooting">
                                 <i class="bi bi-tools me-2"></i>Troubleshooting
                             </a>
-                            <a class="nav-link" href="#faq">
+                            <a class="nav-link" href="#faq" data-section="faq">
                                 <i class="bi bi-question-circle me-2"></i>FAQ
                             </a>
                         </nav>
@@ -109,7 +203,7 @@
                         <hr class="my-4">
                         
                         <div class="text-center">
-                            <a href="../index.php" class="btn btn-primary">
+                            <a href="../index.php" class="btn btn-primary w-100">
                                 <i class="bi bi-arrow-left me-2"></i>Back to Scanner
                             </a>
                         </div>
@@ -124,6 +218,30 @@
                             <h1 class="display-4 fw-bold text-primary mb-3">
                                 <i class="bi bi-qr-code-scan me-3"></i>QR Meter Reading System
                             </h1>
+                            
+                            <!-- Page Search -->
+                            <div class="search-section mb-4">
+                                <div class="row justify-content-center">
+                                    <div class="col-lg-8">
+                                        <div class="input-group">
+                                            <span class="input-group-text bg-light">
+                                                <i class="bi bi-search"></i>
+                                            </span>
+                                            <input type="text" 
+                                                   id="pageSearch" 
+                                                   class="form-control" 
+                                                   placeholder="Search this page..."
+                                                   aria-label="Search this page">
+                                            <button class="btn btn-outline-secondary" 
+                                                    type="button" 
+                                                    id="clearPageSearch"
+                                                    style="display: none;">
+                                                <i class="bi bi-x"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                             <p class="lead text-muted">Complete User Manual & Guide</p>
                             <div class="badge bg-success fs-6">Version 1.2</div>
                         </div>
@@ -245,6 +363,98 @@
                             </div>
                         </section>
                         
+                        <!-- Reading Schedule & Billing Impact -->
+                        <section id="reading-schedule" class="mb-5">
+                            <h2 class="h3 mb-4">
+                                <i class="bi bi-calendar-check me-2 text-primary"></i>Reading Schedule & Billing Impact
+                            </h2>
+                            
+                            <div class="alert alert-warning">
+                                <h5 class="alert-heading">
+                                    <i class="bi bi-exclamation-triangle me-2"></i>Critical: Timing Matters for Billing Accuracy
+                                </h5>
+                                <p class="mb-3">The date you perform QR meter readings directly affects the billing periods saved in the system. Understanding this timing is crucial for accurate tenant billing.</p>
+                                
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <h6 class="text-primary">Reading Period Calculation</h6>
+                                        <ul class="mb-0">
+                                            <li><strong>Date From:</strong> 1st day of the reading month</li>
+                                            <li><strong>Date To:</strong> Last day of the reading month</li>
+                                            <li><strong>Example:</strong> Reading on Sep 25 → Period: Sep 1-30</li>
+                                        </ul>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <h6 class="text-success">Billing Period Calculation</h6>
+                                        <ul class="mb-0">
+                                            <li><strong>Billing From:</strong> 1st day of next month</li>
+                                            <li><strong>Billing To:</strong> Last day of next month</li>
+                                            <li><strong>Example:</strong> Reading on Sep 25 → Billing: Oct 1-31</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="alert alert-info">
+                                <h6 class="alert-heading">
+                                    <i class="bi bi-clock me-2"></i>Impact of Delayed Readings
+                                </h6>
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <h6 class="text-warning">Late Reading (Oct 5)</h6>
+                                        <p class="small mb-2">If you read meters on October 5th instead of September 25th:</p>
+                                        <ul class="small mb-0">
+                                            <li>Reading Period: Oct 1-31</li>
+                                            <li>Billing Period: Nov 1-30</li>
+                                            <li><strong>Result:</strong> September usage billed in November</li>
+                                        </ul>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <h6 class="text-danger">Very Late Reading (Oct 15)</h6>
+                                        <p class="small mb-2">If you read meters on October 15th:</p>
+                                        <ul class="small mb-0">
+                                            <li>Reading Period: Oct 1-31</li>
+                                            <li>Billing Period: Nov 1-30</li>
+                                            <li><strong>Result:</strong> September + October usage billed together</li>
+                                        </ul>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <h6 class="text-success">On-Time Reading (Sep 25-29)</h6>
+                                        <p class="small mb-2">Recommended reading window:</p>
+                                        <ul class="small mb-0">
+                                            <li>Reading Period: Sep 1-30</li>
+                                            <li>Billing Period: Oct 1-31</li>
+                                            <li><strong>Result:</strong> Accurate monthly billing</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="alert alert-success">
+                                <h6 class="alert-heading">
+                                    <i class="bi bi-check-circle me-2"></i>Best Practices for Reading Schedule
+                                </h6>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <h6 class="text-primary">Recommended Schedule</h6>
+                                        <ul class="mb-0">
+                                            <li><strong>Monthly:</strong> 25th-29th of each month</li>
+                                            <li><strong>Consistency:</strong> Same date range every month</li>
+                                            <li><strong>Planning:</strong> Schedule readings in advance</li>
+                                        </ul>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <h6 class="text-warning">Avoid These Scenarios</h6>
+                                        <ul class="mb-0">
+                                            <li><strong>Early Reading:</strong> Before 25th (affects previous month)</li>
+                                            <li><strong>Late Reading:</strong> After 5th of next month</li>
+                                            <li><strong>Irregular Schedule:</strong> Inconsistent dates</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+                        
                         <!-- QR Scanning -->
                         <section id="qr-scanning" class="mb-5">
                             <h2 class="h3 mb-4">
@@ -350,6 +560,83 @@
                                     <li>Clean the QR code if it's dirty or damaged</li>
                                     <li>Use the "Recent QR Readings" section to verify your submissions</li>
                                 </ul>
+                            </div>
+                            
+                            <!-- Video Demo Section -->
+                            <div class="mt-5">
+                                <h4 class="text-center mb-4">
+                                    <i class="bi bi-play-circle me-2 text-primary"></i>Live Scanning Demo
+                                </h4>
+                                <div class="text-center">
+                                    <div class="ratio ratio-9x16" style="max-width: 350px; margin: 0 auto;">
+                                        <video controls class="rounded shadow">
+                                            <source src="assets/videos/001 qr-meter-reading - Actual Scanning Demo.mp4" type="video/mp4">
+                                            Your browser does not support the video tag.
+                                        </video>
+                                    </div>
+                                    <p class="mt-3 text-muted">
+                                        <strong>Watch the complete scanning process</strong> - From QR code detection to successful reading submission
+                                    </p>
+                                </div>
+                            </div>
+                        </section>
+                        
+                        <!-- Duplicate Reading Prevention -->
+                        <section id="duplicate-detection" class="mb-5">
+                            <h2 class="h3 mb-4">
+                                <i class="bi bi-shield-check me-2 text-primary"></i>Duplicate Reading Prevention
+                                <span class="badge bg-success ms-2">New Feature</span>
+                            </h2>
+                            
+                            <div class="feature-card">
+                                <h5 class="mb-3">Automatic Duplicate Detection</h5>
+                                <p>The system automatically prevents duplicate readings for the same property and unit within the same reading period. This ensures data accuracy and prevents billing errors.</p>
+                            </div>
+                            
+                            <h5 class="mb-3">How Duplicate Prevention Works</h5>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="alert alert-info">
+                                        <h6><i class="bi bi-info-circle me-2"></i>Validation Process</h6>
+                                        <ul class="mb-0">
+                                            <li>Checks offline queue first for recent readings</li>
+                                            <li>Validates against comprehensive cache</li>
+                                            <li>Verifies same reading period (current month)</li>
+                                            <li>Blocks submission if duplicate found</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="alert alert-warning">
+                                        <h6><i class="bi bi-exclamation-triangle me-2"></i>Duplicate Notification</h6>
+                                        <ul class="mb-0">
+                                            <li>Shows "Already Scanned" message</li>
+                                            <li>Displays property and unit information</li>
+                                            <li>Shows date and value of previous reading</li>
+                                            <li>Hides form to prevent resubmission</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h6 class="mb-3">Duplicate Reading Detected</h6>
+                                    <img src="assets/images/015 qr-meter-reading - MAIN PAGE - Duplicate Reading Detected.png" 
+                                         alt="Duplicate Reading Detected Screenshot" 
+                                         class="img-fluid rounded shadow-sm mb-3">
+                                    <p class="text-muted small">When a duplicate reading is detected, the system shows a clear notification and prevents form submission.</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <h6 class="mb-3">Benefits of Duplicate Prevention</h6>
+                                    <ul class="list-unstyled">
+                                        <li><i class="bi bi-check-circle text-success me-2"></i>Prevents billing errors</li>
+                                        <li><i class="bi bi-check-circle text-success me-2"></i>Ensures data accuracy</li>
+                                        <li><i class="bi bi-check-circle text-success me-2"></i>Saves technician time</li>
+                                        <li><i class="bi bi-check-circle text-success me-2"></i>Reduces manual corrections</li>
+                                        <li><i class="bi bi-check-circle text-success me-2"></i>Improves system reliability</li>
+                                    </ul>
+                                </div>
                             </div>
                         </section>
                         
@@ -483,6 +770,70 @@
                                     <li><strong>"Connection Restored"</strong> - Confirms when connection returns</li>
                                     <li><strong>Auto-dismiss:</strong> Notifications automatically disappear after a few seconds</li>
                                 </ul>
+                            </div>
+                        </section>
+                        
+                        <!-- Offline Reading Display -->
+                        <section id="offline-reading-display" class="mb-5">
+                            <h2 class="h3 mb-4">
+                                <i class="bi bi-list-check me-2 text-primary"></i>Offline Reading Display
+                                <span class="badge bg-success ms-2">Enhanced</span>
+                            </h2>
+                            
+                            <div class="feature-card">
+                                <h5 class="mb-3">Complete Offline Reading Visibility</h5>
+                                <p>Offline readings are now immediately visible in the Recent QR Readings table with complete tenant and property information. This provides full visibility into all readings, whether online or offline.</p>
+                            </div>
+                            
+                            <h5 class="mb-3">How Offline Reading Display Works</h5>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="alert alert-info">
+                                        <h6><i class="bi bi-info-circle me-2"></i>Immediate Display</h6>
+                                        <ul class="mb-0">
+                                            <li>Offline readings appear instantly in table</li>
+                                            <li>Shows complete tenant and property names</li>
+                                            <li>Displays reading value and timestamp</li>
+                                            <li>Updates table immediately after save</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="alert alert-success">
+                                        <h6><i class="bi bi-check-circle me-2"></i>Status Tracking</h6>
+                                        <ul class="mb-0">
+                                            <li><strong>"Saved Offline"</strong> - Orange badge for offline readings</li>
+                                            <li><strong>"Synced"</strong> - Green badge for synced readings</li>
+                                            <li>Real-time status updates after sync</li>
+                                            <li>Clear visual distinction between states</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h6 class="mb-3">Reading Saved Offline</h6>
+                                    <img src="assets/images/016 qr-meter-reading - MAIN PAGE - Reading Saved Offline.png" 
+                                         alt="Reading Saved Offline Screenshot" 
+                                         class="img-fluid rounded shadow-sm mb-3">
+                                    <p class="text-muted small">Offline readings are immediately visible in the Recent QR Readings table with "Saved Offline" status.</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <h6 class="mb-3">Benefits of Offline Display</h6>
+                                    <ul class="list-unstyled">
+                                        <li><i class="bi bi-check-circle text-success me-2"></i>Complete reading history visibility</li>
+                                        <li><i class="bi bi-check-circle text-success me-2"></i>No data loss concerns</li>
+                                        <li><i class="bi bi-check-circle text-success me-2"></i>Real-time status tracking</li>
+                                        <li><i class="bi bi-check-circle text-success me-2"></i>Confidence in offline operations</li>
+                                        <li><i class="bi bi-check-circle text-success me-2"></i>Easy sync verification</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            
+                            <div class="alert alert-light">
+                                <h6><i class="bi bi-lightbulb me-2"></i>Pro Tip</h6>
+                                <p class="mb-0">The Recent QR Readings table now shows ALL readings (online and offline) in chronological order. Look for the status badges to quickly identify which readings need to be synced when you go back online.</p>
                             </div>
                         </section>
                         
@@ -774,15 +1125,37 @@
                             </div>
                         </section>
                         
-                        <!-- Footer -->
-                        <footer class="text-center mt-5 pt-4 border-top">
-                            <p class="text-muted">
-                                <i class="bi bi-shield-check me-2"></i>
-                                QR Meter Reading System v1.2 - Secure & Reliable
-                            </p>
-                            <p class="small text-muted">
-                                For technical support, contact your system administrator.
-                            </p>
+                        <!-- Footer Navigation -->
+                        <footer class="mt-5 pt-4 border-top">
+                            <div class="text-center mb-4">
+                                <p class="text-muted mb-3">
+                                    <i class="bi bi-compass me-2"></i>Navigate Help Documentation
+                                </p>
+                                <div class="d-flex flex-wrap justify-content-center gap-2">
+                                    <a href="help-center.html" class="btn btn-outline-primary">
+                                        <i class="bi bi-house-door me-2"></i>Help Center
+                                    </a>
+                                    <a href="quick-reference.html" class="btn btn-outline-success">
+                                        <i class="bi bi-lightning-charge me-2"></i>Quick Reference
+                                    </a>
+                                    <a href="troubleshooting.html" class="btn btn-outline-warning">
+                                        <i class="bi bi-tools me-2"></i>Troubleshooting
+                                    </a>
+                                    <a href="../index.php" class="btn btn-primary">
+                                        <i class="bi bi-qr-code-scan me-2"></i>Back to Scanner
+                                    </a>
+                                </div>
+                            </div>
+                            
+                            <div class="text-center pt-3 border-top">
+                                <p class="text-muted mb-2">
+                                    <i class="bi bi-shield-check me-2"></i>
+                                    QR Meter Reading System v1.2 - User Manual
+                                </p>
+                                <p class="small text-muted mb-0">
+                                    For technical support, contact your system administrator.
+                                </p>
+                            </div>
                         </footer>
                     </div>
                 </div>
@@ -795,17 +1168,238 @@
     
     <!-- Smooth scrolling for navigation links -->
     <script>
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                const target = document.querySelector(this.getAttribute('href'));
-                if (target) {
-                    target.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'start'
+        // Smart Navigation with Active Section Highlighting
+        class SmartNavigation {
+            constructor() {
+                this.navLinks = document.querySelectorAll('#helpNavigation .nav-link');
+                this.sections = document.querySelectorAll('[id]');
+                this.currentActive = null;
+                this.isScrolling = false;
+                this.init();
+            }
+
+            init() {
+                this.createProgressBar();
+                this.setupEventListeners();
+                this.updateActiveSection();
+            }
+
+            createProgressBar() {
+                const progressBar = document.createElement('div');
+                progressBar.className = 'nav-progress';
+                progressBar.innerHTML = '<div class="nav-progress-bar"></div>';
+                document.body.appendChild(progressBar);
+                this.progressBar = progressBar.querySelector('.nav-progress-bar');
+            }
+
+            setupEventListeners() {
+                // Smooth scrolling for navigation links
+                this.navLinks.forEach(link => {
+                    link.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        const targetId = link.getAttribute('href').substring(1);
+                        this.scrollToSection(targetId);
                     });
+                });
+
+                // Scroll event for active section detection
+                window.addEventListener('scroll', this.throttle(() => {
+                    this.updateActiveSection();
+                    this.updateProgressBar();
+                }, 100));
+
+                // Resize event for mobile optimization
+                window.addEventListener('resize', this.debounce(() => {
+                    this.updateActiveSection();
+                }, 250));
+            }
+
+            scrollToSection(sectionId) {
+                const targetSection = document.getElementById(sectionId);
+                if (targetSection) {
+                    const offsetTop = targetSection.offsetTop - 100; // Account for sticky header
+                    
+                    window.scrollTo({
+                        top: offsetTop,
+                        behavior: 'smooth'
+                    });
+                    
+                    // Update active state immediately for better UX
+                    this.setActiveLink(sectionId);
                 }
-            });
+            }
+
+            updateActiveSection() {
+                const scrollPosition = window.scrollY + 150; // Offset for better detection
+                let currentSection = null;
+
+                // Find the current section based on scroll position
+                this.sections.forEach(section => {
+                    const sectionTop = section.offsetTop;
+                    const sectionHeight = section.offsetHeight;
+                    const sectionId = section.getAttribute('id');
+
+                    if (scrollPosition >= sectionTop && scrollPosition < sectionTop + sectionHeight) {
+                        currentSection = sectionId;
+                    }
+                });
+
+                // Handle case when scrolled past all sections
+                if (!currentSection && scrollPosition > 0) {
+                    const lastSection = this.sections[this.sections.length - 1];
+                    if (lastSection && scrollPosition > lastSection.offsetTop + lastSection.offsetHeight - 200) {
+                        currentSection = lastSection.getAttribute('id');
+                    }
+                }
+
+                // Update active link
+                if (currentSection && currentSection !== this.currentActive) {
+                    this.setActiveLink(currentSection);
+                    this.currentActive = currentSection;
+                }
+            }
+
+            setActiveLink(sectionId) {
+                // Remove active class from all links
+                this.navLinks.forEach(link => {
+                    link.classList.remove('active');
+                });
+
+                // Add active class to current link
+                const activeLink = document.querySelector(`#helpNavigation .nav-link[href="#${sectionId}"]`);
+                if (activeLink) {
+                    activeLink.classList.add('active');
+                    
+                    // Ensure active link is visible in mobile view
+                    this.ensureLinkVisible(activeLink);
+                }
+            }
+
+            ensureLinkVisible(activeLink) {
+                const navContainer = document.getElementById('helpNavigation');
+                const containerRect = navContainer.getBoundingClientRect();
+                const linkRect = activeLink.getBoundingClientRect();
+
+                // Check if link is visible in mobile view
+                if (window.innerWidth <= 768) {
+                    if (linkRect.top < containerRect.top || linkRect.bottom > containerRect.bottom) {
+                        activeLink.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'center',
+                            inline: 'nearest'
+                        });
+                    }
+                }
+            }
+
+            updateProgressBar() {
+                const windowHeight = window.innerHeight;
+                const documentHeight = document.documentElement.scrollHeight;
+                const scrollTop = window.scrollY;
+                const scrollPercent = (scrollTop / (documentHeight - windowHeight)) * 100;
+                
+                this.progressBar.style.width = `${Math.min(scrollPercent, 100)}%`;
+            }
+
+            // Utility functions
+            throttle(func, limit) {
+                let inThrottle;
+                return function() {
+                    const args = arguments;
+                    const context = this;
+                    if (!inThrottle) {
+                        func.apply(context, args);
+                        inThrottle = true;
+                        setTimeout(() => inThrottle = false, limit);
+                    }
+                };
+            }
+
+            debounce(func, wait) {
+                let timeout;
+                return function executedFunction(...args) {
+                    const later = () => {
+                        clearTimeout(timeout);
+                        func(...args);
+                    };
+                    clearTimeout(timeout);
+                    timeout = setTimeout(later, wait);
+                };
+            }
+        }
+
+        // Page-specific search functionality
+        class PageSearch {
+            constructor() {
+                this.searchInput = document.getElementById('pageSearch');
+                this.clearButton = document.getElementById('clearPageSearch');
+                this.content = document.querySelector('.help-content');
+                this.originalContent = this.content.innerHTML;
+                this.init();
+            }
+
+            init() {
+                this.setupEventListeners();
+            }
+
+            setupEventListeners() {
+                this.searchInput.addEventListener('input', this.debounce(this.handleSearch.bind(this), 300));
+                this.clearButton.addEventListener('click', this.clearSearch.bind(this));
+            }
+
+            handleSearch(e) {
+                const query = e.target.value.trim().toLowerCase();
+                
+                if (query.length < 2) {
+                    this.clearSearch();
+                    return;
+                }
+
+                this.clearButton.style.display = 'block';
+                this.highlightSearchResults(query);
+            }
+
+            highlightSearchResults(query) {
+                const regex = new RegExp(`(${query})`, 'gi');
+                let content = this.originalContent;
+                
+                // Replace matches with highlighted versions
+                content = content.replace(regex, '<mark class="search-highlight">$1</mark>');
+                
+                this.content.innerHTML = content;
+                
+                // Scroll to first match
+                const firstMatch = this.content.querySelector('mark');
+                if (firstMatch) {
+                    firstMatch.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+            }
+
+            clearSearch() {
+                this.searchInput.value = '';
+                this.content.innerHTML = this.originalContent;
+                this.clearButton.style.display = 'none';
+            }
+
+            debounce(func, wait) {
+                let timeout;
+                return function executedFunction(...args) {
+                    const later = () => {
+                        clearTimeout(timeout);
+                        func(...args);
+                    };
+                    clearTimeout(timeout);
+                    timeout = setTimeout(later, wait);
+                };
+            }
+        }
+
+        // Initialize both functionalities when DOM is loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            new SmartNavigation();
+            if (document.getElementById('pageSearch')) {
+                new PageSearch();
+            }
         });
     </script>
 </body>

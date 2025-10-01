@@ -61,6 +61,36 @@ try {
         throw new Exception('Current reading must be greater than 0');
     }
     
+    // PHASE 11: Duplicate Reading Validation
+    // Check for existing reading in the same billing period for the same property+unit
+    // Get current month's reading period (01 to last day of month)
+    $currentMonth = date('Y-m-01'); // First day of current month
+    $lastDayOfMonth = date('Y-m-t'); // Last day of current month
+    
+    $duplicateCheckSql = "
+        SELECT TOP 1 tr.reading_id, tr.reading_date, tr.current_reading, t.tenant_name, tr.date_from, tr.date_to
+        FROM t_tenant_reading tr
+        INNER JOIN m_tenant t ON tr.tenant_code = t.tenant_code
+        WHERE t.real_property_code = ? 
+        AND t.unit_no = ?
+        AND tr.date_from >= ?
+        AND tr.date_to <= ?
+        ORDER BY tr.reading_date DESC
+    ";
+    
+    $duplicateStmt = $pdo->prepare($duplicateCheckSql);
+    $duplicateStmt->execute([$propertyCode, $unitNo, $currentMonth, $lastDayOfMonth]);
+    $duplicateReading = $duplicateStmt->fetch(PDO::FETCH_ASSOC);
+    
+    if ($duplicateReading) {
+        $duplicateDate = date('Y-m-d H:i:s', strtotime($duplicateReading['reading_date']));
+        $duplicateReadingValue = $duplicateReading['current_reading'];
+        $tenantName = $duplicateReading['tenant_name'];
+        $readingPeriod = date('M d', strtotime($duplicateReading['date_from'])) . ' - ' . date('M d', strtotime($duplicateReading['date_to']));
+        
+        throw new Exception("Duplicate reading detected! A reading for {$propertyCode}-{$unitNo} ({$tenantName}) already exists for period {$readingPeriod} on {$duplicateDate} with value {$duplicateReadingValue}. Please verify this is not a duplicate entry.");
+    }
+    
     // Get current user info
     $currentUserId = getCurrentUserId();
     $currentUsername = getCurrentUsername();

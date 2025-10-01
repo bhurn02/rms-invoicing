@@ -71,57 +71,153 @@
             font-family: 'Courier New', monospace;
             margin: 1rem 0;
         }
+        
+        /* Smart Navigation Styles */
+        .help-nav {
+            position: sticky;
+            top: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 1.5rem;
+        }
+        
+        .nav-link {
+            position: relative;
+            transition: all 0.3s ease;
+            border-radius: 8px;
+            margin-bottom: 4px;
+            padding: 12px 16px;
+        }
+
+        .nav-link:hover {
+            background-color: #f8f9fa;
+            transform: translateX(4px);
+        }
+
+        .nav-link.active {
+            background-color: #1e40af;
+            color: white;
+            box-shadow: 0 2px 8px rgba(30, 64, 175, 0.3);
+        }
+
+        .nav-link.active::before {
+            content: '';
+            position: absolute;
+            left: -16px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 4px;
+            height: 24px;
+            background-color: #1e40af;
+            border-radius: 2px;
+        }
+
+        .nav-link i {
+            margin-right: 8px;
+            width: 16px;
+            text-align: center;
+        }
+
+        /* Progress Indicator */
+        .nav-progress {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background-color: #e5e7eb;
+            z-index: 1000;
+        }
+
+        .nav-progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #1e40af, #3b82f6);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        /* Mobile Optimization */
+        @media (max-width: 768px) {
+            .nav-link {
+                padding: 10px 12px;
+                font-size: 0.9rem;
+            }
+            
+            .nav-link.active::before {
+                left: -12px;
+                width: 3px;
+                height: 20px;
+            }
+        }
     </style>
 </head>
 <body class="bg-light">
     <div class="container-fluid py-4">
         <div class="troubleshoot-container">
-            <!-- Header -->
-            <div class="text-center mb-4">
-                <h1 class="display-5 fw-bold text-primary mb-2">
-                    <i class="bi bi-tools me-3"></i>Troubleshooting Guide
-                </h1>
-                <p class="lead text-muted">Solutions for Common QR Meter Reading Issues</p>
-                <div class="badge bg-warning fs-6">Technical Support Reference</div>
-            </div>
-            
-            <!-- Quick Navigation -->
-            <div class="row mb-4">
-                <div class="col-md-3">
-                    <div class="card text-center">
-                        <div class="card-body">
-                            <i class="bi bi-camera-video text-primary fs-3"></i>
-                            <h6 class="mt-2">Camera Issues</h6>
+            <div class="row">
+                <!-- Navigation Sidebar -->
+                <div class="col-lg-3">
+                    <div class="help-nav">
+                        <h5 class="mb-3">
+                            <i class="bi bi-tools me-2"></i>Troubleshooting
+                        </h5>
+                        <nav class="nav nav-pills flex-column" id="troubleshootNavigation">
+                            <a class="nav-link" href="#camera-issues" data-section="camera-issues">
+                                <i class="bi bi-camera-video"></i>Camera Issues
+                            </a>
+                            <a class="nav-link" href="#scanning-issues" data-section="scanning-issues">
+                                <i class="bi bi-qr-code-scan"></i>Scanning Issues
+                            </a>
+                            <a class="nav-link" href="#form-issues" data-section="form-issues">
+                                <i class="bi bi-file-text"></i>Form Issues
+                            </a>
+                            <a class="nav-link" href="#duplicate-issues" data-section="duplicate-issues">
+                                <i class="bi bi-shield-check"></i>Duplicate Detection
+                            </a>
+                            <a class="nav-link" href="#offline-issues" data-section="offline-issues">
+                                <i class="bi bi-list-check"></i>Offline Display
+                            </a>
+                            <a class="nav-link" href="#sync-issues" data-section="sync-issues">
+                                <i class="bi bi-arrow-repeat"></i>Sync Issues
+                            </a>
+                            <a class="nav-link" href="#network-issues" data-section="network-issues">
+                                <i class="bi bi-wifi-off"></i>Network Issues
+                            </a>
+                            <a class="nav-link" href="#access-issues" data-section="access-issues">
+                                <i class="bi bi-person-x"></i>Access Issues
+                            </a>
+                            <a class="nav-link" href="#error-messages" data-section="error-messages">
+                                <i class="bi bi-exclamation-triangle"></i>Error Messages
+                            </a>
+                            <a class="nav-link" href="#prevention" data-section="prevention">
+                                <i class="bi bi-shield-check"></i>Prevention Tips
+                            </a>
+                        </nav>
+                        
+                        <hr class="my-4">
+                        
+                        <div class="text-center">
+                            <a href="../index.php" class="btn btn-primary w-100">
+                                <i class="bi bi-arrow-left me-2"></i>Back to Scanner
+                            </a>
                         </div>
                     </div>
                 </div>
-                <div class="col-md-3">
-                    <div class="card text-center">
-                        <div class="card-body">
-                            <i class="bi bi-qr-code-scan text-success fs-3"></i>
-                            <h6 class="mt-2">Scanning Issues</h6>
-                        </div>
+                
+                <!-- Main Content -->
+                <div class="col-lg-9">
+                    <!-- Header -->
+                    <div class="text-center mb-4">
+                        <h1 class="display-5 fw-bold text-primary mb-2">
+                            <i class="bi bi-tools me-3"></i>Troubleshooting Guide
+                        </h1>
+                        <p class="lead text-muted">Solutions for Common QR Meter Reading Issues</p>
+                        <div class="badge bg-warning fs-6">Technical Support Reference</div>
                     </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="card text-center">
-                        <div class="card-body">
-                            <i class="bi bi-wifi text-warning fs-3"></i>
-                            <h6 class="mt-2">Network Issues</h6>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="card text-center">
-                        <div class="card-body">
-                            <i class="bi bi-person-x text-danger fs-3"></i>
-                            <h6 class="mt-2">Access Issues</h6>
-                        </div>
-                    </div>
-                </div>
-            </div>
             
             <!-- Camera Issues -->
+            <section id="camera-issues">
             <div class="issue-card">
                 <div class="issue-header severity-high">
                     <h4 class="mb-0">
@@ -170,7 +266,10 @@
                 </div>
             </div>
             
-            <!-- QR Code Scanning Issues -->
+            </section>
+            
+            <!-- Scanning Issues -->
+            <section id="scanning-issues">
             <div class="issue-card">
                 <div class="issue-header severity-medium">
                     <h4 class="mb-0">
@@ -226,7 +325,10 @@
                 </div>
             </div>
             
-            <!-- Form Not Auto-Populating -->
+            </section>
+            
+            <!-- Form Issues -->
+            <section id="form-issues">
             <div class="issue-card">
                 <div class="issue-header severity-medium">
                     <h4 class="mb-0">
@@ -271,7 +373,146 @@
                 </div>
             </div>
             
+            </section>
+            
+            <!-- Duplicate Issues -->
+            <section id="duplicate-issues">
+            <div class="issue-card">
+                <div class="issue-header severity-low">
+                    <h4 class="mb-0">
+                        <i class="bi bi-shield-check me-2"></i>"Already Scanned" Notification
+                    </h4>
+                </div>
+                <div class="issue-content">
+                    <p><strong>Scenario:</strong> After scanning a QR code, you see "Already Scanned" notification and the form doesn't appear.</p>
+                    
+                    <div class="success-note">
+                        <h6 class="mb-2">
+                            <i class="bi bi-check-circle me-2"></i>This is Normal Behavior
+                        </h6>
+                        <p class="mb-0">The duplicate prevention feature is working correctly! The system detected that this property/unit was already read in the current reading period.</p>
+                    </div>
+                    
+                    <h6 class="mt-4 mb-3">What This Means:</h6>
+                    
+                    <div class="solution-step">
+                        <h6 class="mb-2">
+                            <i class="bi bi-calendar-check me-2 text-primary"></i>Same Period Detection
+                        </h6>
+                        <p class="mb-0">The system checks if the same property and unit combination was read in the current reading period (typically current month). This prevents accidental duplicate readings.</p>
+                    </div>
+                    
+                    <div class="solution-step">
+                        <h6 class="mb-2">
+                            <i class="bi bi-info-circle me-2 text-info"></i>Check the Details
+                        </h6>
+                        <p class="mb-0">The notification shows when the reading was previously recorded and what value was entered. Verify this matches your expectations.</p>
+                    </div>
+                    
+                    <h6 class="mt-4 mb-3">What to Do:</h6>
+                    
+                    <div class="solution-step">
+                        <h6 class="mb-2">
+                            <i class="bi bi-1-circle-fill me-2 text-success"></i>Verify the Date
+                        </h6>
+                        <p class="mb-0">Check the date shown in the notification. If it's from the current reading period, proceed to the next meter.</p>
+                    </div>
+                    
+                    <div class="solution-step">
+                        <h6 class="mb-2">
+                            <i class="bi bi-2-circle-fill me-2 text-success"></i>Check Recent Readings Table
+                        </h6>
+                        <p class="mb-0">Scroll down to the Recent QR Readings table to see the previous reading details including tenant name and reading value.</p>
+                    </div>
+                    
+                    <div class="warning-note">
+                        <h6 class="mb-2">
+                            <i class="bi bi-exclamation-triangle me-2"></i>If Reading Seems Wrong
+                        </h6>
+                        <p class="mb-0">If you believe the duplicate notification is incorrect (wrong property/unit or wrong period), contact your administrator. Do not attempt to bypass the duplicate prevention system.</p>
+                    </div>
+                </div>
+            </div>
+            
+            </section>
+            
+            <!-- Offline Issues -->
+            <section id="offline-issues">
+            <div class="issue-card">
+                <div class="issue-header severity-low">
+                    <h4 class="mb-0">
+                        <i class="bi bi-list-check me-2"></i>Offline Readings Not Showing in Table
+                    </h4>
+                </div>
+                <div class="issue-content">
+                    <p><strong>Problem:</strong> You saved a reading while offline but don't see it in the Recent QR Readings table.</p>
+                    
+                    <h6 class="mt-4 mb-3">Solutions:</h6>
+                    
+                    <div class="solution-step">
+                        <h6 class="mb-2">
+                            <i class="bi bi-arrow-clockwise me-2 text-primary"></i>Refresh the Page
+                        </h6>
+                        <p class="mb-0">Try refreshing the browser page (F5 or pull-to-refresh on mobile). Offline readings should appear with "Saved Offline" orange badge.</p>
+                    </div>
+                    
+                    <div class="solution-step">
+                        <h6 class="mb-2">
+                            <i class="bi bi-journal-check me-2 text-info"></i>Check Browser Console
+                        </h6>
+                        <p class="mb-0">For technical users: Open browser console (F12) and check for any JavaScript errors related to localStorage or data loading.</p>
+                    </div>
+                    
+                    <div class="success-note">
+                        <h6 class="mb-2">
+                            <i class="bi bi-check-circle me-2"></i>Data is Still Safe
+                        </h6>
+                        <p class="mb-0">Even if the reading doesn't appear in the table immediately, it's safely stored in your browser's local storage and will sync when connection is restored.</p>
+                    </div>
+                </div>
+            </div>
+            
+            </section>
+            
+            <!-- Sync Issues -->
+            <section id="sync-issues">
+            <div class="issue-card">
+                <div class="issue-header severity-medium">
+                    <h4 class="mb-0">
+                        <i class="bi bi-arrow-repeat me-2"></i>Table Not Updating After Sync
+                    </h4>
+                </div>
+                <div class="issue-content">
+                    <p><strong>Problem:</strong> After syncing offline readings, the Recent QR Readings table still shows "Saved Offline" badges or doesn't update.</p>
+                    
+                    <h6 class="mt-4 mb-3">Solutions:</h6>
+                    
+                    <div class="solution-step">
+                        <h6 class="mb-2">
+                            <i class="bi bi-arrow-clockwise me-2 text-primary"></i>Manual Refresh
+                        </h6>
+                        <p class="mb-0">Refresh the browser page to reload the Recent QR Readings table with the latest synced data.</p>
+                    </div>
+                    
+                    <div class="solution-step">
+                        <h6 class="mb-2">
+                            <i class="bi bi-clock-history me-2 text-warning"></i>Wait for Sync Completion
+                        </h6>
+                        <p class="mb-0">Ensure the sync process has fully completed. Look for the sync progress indicator to disappear and the avatar dot to turn green (all synced) before expecting table updates.</p>
+                    </div>
+                    
+                    <div class="solution-step">
+                        <h6 class="mb-2">
+                            <i class="bi bi-wifi me-2 text-success"></i>Verify Connection
+                        </h6>
+                        <p class="mb-0">Check that you have a stable internet connection. The table auto-refresh only happens after successful sync completion.</p>
+                    </div>
+                </div>
+            </div>
+            </section>
+            
             <!-- Network Issues -->
+            <section id="network-issues">
             <div class="issue-card">
                 <div class="issue-header severity-low">
                     <h4 class="mb-0">
@@ -313,11 +554,11 @@
                 </div>
             </div>
             
-            <!-- Sync Issues -->
+            <!-- Sync Failing Issue -->
             <div class="issue-card">
                 <div class="issue-header severity-medium">
                     <h4 class="mb-0">
-                        <i class="bi bi-arrow-clockwise me-2"></i>Sync Issues
+                        <i class="bi bi-arrow-clockwise me-2"></i>Sync Failing Repeatedly
                     </h4>
                 </div>
                 <div class="issue-content">
@@ -383,7 +624,8 @@
                 </div>
             </div>
             
-            <!-- Access Denied Issues -->
+            <!-- Access Issues -->
+            <section id="access-issues">
             <div class="issue-card">
                 <div class="issue-header severity-critical">
                     <h4 class="mb-0">
@@ -425,7 +667,10 @@
                 </div>
             </div>
             
-            <!-- Error Messages Reference -->
+            </section>
+            
+            <!-- Error Messages -->
+            <section id="error-messages">
             <div class="issue-card">
                 <div class="issue-header severity-medium">
                     <h4 class="mb-0">
@@ -468,7 +713,10 @@
                 </div>
             </div>
             
-            <!-- Prevention Tips -->
+            </section>
+            
+            <!-- Prevention -->
+            <section id="prevention">
             <div class="issue-card">
                 <div class="issue-header severity-low">
                     <h4 class="mb-0">
@@ -498,33 +746,40 @@
                     </div>
                 </div>
             </div>
+            </section>
             
-            <!-- Contact Information -->
-            <div class="text-center mt-5">
-                <div class="card">
-                    <div class="card-body">
-                        <h5 class="card-title">
-                            <i class="bi bi-headset me-2"></i>Still Need Help?
-                        </h5>
-                        <p class="card-text">Contact your system administrator or IT support team with specific error details.</p>
-                        <div class="row">
-                            <div class="col-md-4">
-                                <a href="index.html" class="btn btn-outline-primary">
-                                    <i class="bi bi-book me-2"></i>Full Manual
-                                </a>
-                            </div>
-                            <div class="col-md-4">
-                                <a href="quick-reference.html" class="btn btn-outline-success">
-                                    <i class="bi bi-lightning-charge me-2"></i>Quick Reference
-                                </a>
-                            </div>
-                            <div class="col-md-4">
-                                <a href="../index.php" class="btn btn-outline-info">
-                                    <i class="bi bi-qr-code-scan me-2"></i>Back to Scanner
-                                </a>
-                            </div>
-                        </div>
+                    <!-- Footer Navigation -->
+                    <footer class="mt-5 pt-4 border-top">
+                <div class="text-center mb-4">
+                    <p class="text-muted mb-3">
+                        <i class="bi bi-compass me-2"></i>Navigate Help Documentation
+                    </p>
+                    <div class="d-flex flex-wrap justify-content-center gap-2">
+                        <a href="help-center.html" class="btn btn-outline-primary">
+                            <i class="bi bi-house-door me-2"></i>Help Center
+                        </a>
+                        <a href="index.html" class="btn btn-outline-primary">
+                            <i class="bi bi-book me-2"></i>User Manual
+                        </a>
+                        <a href="quick-reference.html" class="btn btn-outline-success">
+                            <i class="bi bi-lightning-charge me-2"></i>Quick Reference
+                        </a>
+                        <a href="../index.php" class="btn btn-primary">
+                            <i class="bi bi-qr-code-scan me-2"></i>Back to Scanner
+                        </a>
                     </div>
+                </div>
+                
+                <div class="text-center pt-3 border-top">
+                    <p class="text-muted mb-2">
+                        <i class="bi bi-shield-check me-2"></i>
+                        QR Meter Reading System v1.2 - Troubleshooting Guide
+                    </p>
+                    <p class="small text-muted mb-0">
+                        For technical support, contact your system administrator.
+                    </p>
+                </div>
+            </footer>
                 </div>
             </div>
         </div>
@@ -532,5 +787,162 @@
     
     <!-- Bootstrap JS -->
     <script src="../assets/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Smart Navigation Script -->
+    <script>
+        // Smart Navigation with Active Section Highlighting
+        class SmartNavigation {
+            constructor() {
+                this.navLinks = document.querySelectorAll('#troubleshootNavigation .nav-link');
+                this.sections = document.querySelectorAll('[id]');
+                this.currentActive = null;
+                this.init();
+            }
+
+            init() {
+                this.createProgressBar();
+                this.setupEventListeners();
+                this.updateActiveSection();
+            }
+
+            createProgressBar() {
+                const progressBar = document.createElement('div');
+                progressBar.className = 'nav-progress';
+                progressBar.innerHTML = '<div class="nav-progress-bar"></div>';
+                document.body.appendChild(progressBar);
+                this.progressBar = progressBar.querySelector('.nav-progress-bar');
+            }
+
+            setupEventListeners() {
+                // Smooth scrolling for navigation links
+                this.navLinks.forEach(link => {
+                    link.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        const targetId = link.getAttribute('href').substring(1);
+                        this.scrollToSection(targetId);
+                    });
+                });
+
+                // Scroll event for active section detection
+                window.addEventListener('scroll', this.throttle(() => {
+                    this.updateActiveSection();
+                    this.updateProgressBar();
+                }, 100));
+
+                // Resize event for mobile optimization
+                window.addEventListener('resize', this.debounce(() => {
+                    this.updateActiveSection();
+                }, 250));
+            }
+
+            scrollToSection(sectionId) {
+                const targetSection = document.getElementById(sectionId);
+                if (targetSection) {
+                    const offsetTop = targetSection.offsetTop - 100;
+                    
+                    window.scrollTo({
+                        top: offsetTop,
+                        behavior: 'smooth'
+                    });
+                    
+                    this.setActiveLink(sectionId);
+                }
+            }
+
+            updateActiveSection() {
+                const scrollPosition = window.scrollY + 150;
+                let currentSection = null;
+
+                this.sections.forEach(section => {
+                    const sectionTop = section.offsetTop;
+                    const sectionHeight = section.offsetHeight;
+                    const sectionId = section.getAttribute('id');
+
+                    if (scrollPosition >= sectionTop && scrollPosition < sectionTop + sectionHeight) {
+                        currentSection = sectionId;
+                    }
+                });
+
+                if (!currentSection && scrollPosition > 0) {
+                    const lastSection = this.sections[this.sections.length - 1];
+                    if (lastSection && scrollPosition > lastSection.offsetTop + lastSection.offsetHeight - 200) {
+                        currentSection = lastSection.getAttribute('id');
+                    }
+                }
+
+                if (currentSection && currentSection !== this.currentActive) {
+                    this.setActiveLink(currentSection);
+                    this.currentActive = currentSection;
+                }
+            }
+
+            setActiveLink(sectionId) {
+                this.navLinks.forEach(link => {
+                    link.classList.remove('active');
+                });
+
+                const activeLink = document.querySelector(`#troubleshootNavigation .nav-link[href="#${sectionId}"]`);
+                if (activeLink) {
+                    activeLink.classList.add('active');
+                    this.ensureLinkVisible(activeLink);
+                }
+            }
+
+            ensureLinkVisible(activeLink) {
+                const navContainer = document.getElementById('troubleshootNavigation');
+                const containerRect = navContainer.getBoundingClientRect();
+                const linkRect = activeLink.getBoundingClientRect();
+
+                if (window.innerWidth <= 768) {
+                    if (linkRect.top < containerRect.top || linkRect.bottom > containerRect.bottom) {
+                        activeLink.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'center',
+                            inline: 'nearest'
+                        });
+                    }
+                }
+            }
+
+            updateProgressBar() {
+                const windowHeight = window.innerHeight;
+                const documentHeight = document.documentElement.scrollHeight;
+                const scrollTop = window.scrollY;
+                const scrollPercent = (scrollTop / (documentHeight - windowHeight)) * 100;
+                
+                this.progressBar.style.width = `${Math.min(scrollPercent, 100)}%`;
+            }
+
+            throttle(func, limit) {
+                let inThrottle;
+                return function() {
+                    const args = arguments;
+                    const context = this;
+                    if (!inThrottle) {
+                        func.apply(context, args);
+                        inThrottle = true;
+                        setTimeout(() => inThrottle = false, limit);
+                    }
+                };
+            }
+
+            debounce(func, wait) {
+                let timeout;
+                return function executedFunction(...args) {
+                    const later = () => {
+                        clearTimeout(timeout);
+                        func(...args);
+                    };
+                    clearTimeout(timeout);
+                    timeout = setTimeout(later, wait);
+                };
+            }
+        }
+
+        // Initialize when DOM is loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            new SmartNavigation();
+        });
+    </script>
 </body>
 </html>

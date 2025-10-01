@@ -70,6 +70,7 @@
                 <div class="badge bg-success fs-6">QR Meter Reading System</div>
             </div>
             
+            
             <!-- Quick Start Steps -->
             <div class="step-card">
                 <div class="step-header">
@@ -187,6 +188,68 @@
                                 </ul>
                             </div>
                         </div>
+                        <div class="col-md-6 mt-3">
+                            <div class="highlight-box">
+                                <h6 class="text-info mb-2">
+                                    <i class="bi bi-info-circle me-2"></i>"Already Scanned"
+                                </h6>
+                                <p class="small mb-2"><strong>This is normal!</strong> Duplicate prevention working correctly.</p>
+                                <ul class="small mb-0">
+                                    <li>Check date shown in notification</li>
+                                    <li>Verify it's the same reading period</li>
+                                    <li>Scan next meter if correct</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mt-3">
+                            <div class="success-box">
+                                <h6 class="text-success mb-2">
+                                    <i class="bi bi-check-circle me-2"></i>"Saved Offline" Badge
+                                </h6>
+                                <p class="small mb-2"><strong>This is normal!</strong> Reading saved securely.</p>
+                                <ul class="small mb-0">
+                                    <li>Reading is safe in local storage</li>
+                                    <li>Will sync when connection returns</li>
+                                    <li>Check orange dot on avatar</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Data Accuracy Features -->
+            <div class="step-card">
+                <div class="step-header">
+                    <h4 class="mb-0">
+                        <i class="bi bi-shield-check me-2"></i>Data Accuracy Features
+                    </h4>
+                </div>
+                <div class="step-content">
+                    <div class="warning-box">
+                        <h6 class="mb-2">
+                            <i class="bi bi-exclamation-triangle me-2"></i>Duplicate Prevention
+                        </h6>
+                        <p class="mb-2">System automatically prevents duplicate readings for the same property/unit in the same period.</p>
+                        <ul class="small mb-0">
+                            <li><strong>Instant Check:</strong> Validation happens immediately upon QR scan</li>
+                            <li><strong>"Already Scanned":</strong> Clear notification if duplicate detected</li>
+                            <li><strong>Form Hidden:</strong> Prevents accidental resubmission</li>
+                            <li><strong>Details Shown:</strong> See when and what value was previously recorded</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="highlight-box mt-3">
+                        <h6 class="mb-2">
+                            <i class="bi bi-speedometer2 me-2"></i>Last Reading Validation
+                        </h6>
+                        <p class="mb-2">Last reading displayed prominently above current reading input for easy validation.</p>
+                        <ul class="small mb-0">
+                            <li><strong>Large Display:</strong> Last reading shown in large, bold text</li>
+                            <li><strong>Date Shown:</strong> See when the last reading was taken</li>
+                            <li><strong>Usage Calc:</strong> Previous reading and usage displayed</li>
+                            <li><strong>No Scrolling:</strong> Everything visible without scrolling</li>
+                        </ul>
                     </div>
                 </div>
             </div>
@@ -208,6 +271,7 @@
                             <li>Look for status dots on your avatar</li>
                             <li>Readings sync automatically when online</li>
                             <li>No data loss - everything is saved</li>
+                            <li><strong>NEW:</strong> Offline readings visible immediately in Recent Readings table</li>
                         </ul>
                     </div>
                     
@@ -247,6 +311,19 @@
                             <li><strong>Connection Restored:</strong> Green notification confirming reconnection</li>
                             <li><strong>Auto-dismiss:</strong> Notifications disappear automatically</li>
                             <li><strong>Non-intrusive:</strong> Don't block your work flow</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="success-box mt-3">
+                        <h6 class="mb-2">
+                            <i class="bi bi-list-check me-2"></i>Recent Readings Table
+                        </h6>
+                        <p class="mb-2"><strong>NEW:</strong> See all readings (online and offline) in one table.</p>
+                        <ul class="small mb-0">
+                            <li><strong>"Saved Offline":</strong> Orange badge for offline readings</li>
+                            <li><strong>"Synced":</strong> Green badge after successful sync</li>
+                            <li><strong>Complete Info:</strong> Tenant name, property, reading value, timestamp</li>
+                            <li><strong>Auto-Update:</strong> Table refreshes after sync completion</li>
                         </ul>
                     </div>
                 </div>
@@ -311,15 +388,60 @@
                 </div>
             </div>
             
-            <!-- Navigation -->
-            <div class="text-center mt-4">
-                <a href="index.html" class="btn btn-primary btn-lg me-3">
-                    <i class="bi bi-book me-2"></i>Full Manual
-                </a>
-                <a href="../index.php" class="btn btn-success btn-lg">
-                    <i class="bi bi-qr-code-scan me-2"></i>Start Scanning
-                </a>
+            <!-- Video Demo -->
+            <div class="step-card">
+                <div class="step-header">
+                    <h4 class="mb-0">
+                        <i class="bi bi-play-circle me-2"></i>Watch Live Demo
+                    </h4>
+                </div>
+                <div class="step-content">
+                    <div class="text-center">
+                        <div class="ratio ratio-9x16 mb-3">
+                            <video controls class="rounded shadow">
+                                <source src="assets/videos/001 qr-meter-reading - Actual Scanning Demo.mp4" type="video/mp4">
+                                Your browser does not support the video tag.
+                            </video>
+                        </div>
+                        <p class="text-muted">
+                            <strong>Complete scanning process</strong> - See exactly how it works
+                        </p>
+                    </div>
+                </div>
             </div>
+            
+            <!-- Footer Navigation -->
+            <footer class="mt-5 pt-4 border-top">
+                <div class="text-center mb-4">
+                    <p class="text-muted mb-3">
+                        <i class="bi bi-compass me-2"></i>Navigate Help Documentation
+                    </p>
+                    <div class="d-flex flex-wrap justify-content-center gap-2">
+                        <a href="help-center.html" class="btn btn-outline-primary">
+                            <i class="bi bi-house-door me-2"></i>Help Center
+                        </a>
+                        <a href="index.html" class="btn btn-outline-primary">
+                            <i class="bi bi-book me-2"></i>User Manual
+                        </a>
+                        <a href="troubleshooting.html" class="btn btn-outline-warning">
+                            <i class="bi bi-tools me-2"></i>Troubleshooting
+                        </a>
+                        <a href="../index.php" class="btn btn-primary">
+                            <i class="bi bi-qr-code-scan me-2"></i>Back to Scanner
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="text-center pt-3 border-top">
+                    <p class="text-muted mb-2">
+                        <i class="bi bi-shield-check me-2"></i>
+                        QR Meter Reading System v1.2 - Quick Reference Guide
+                    </p>
+                    <p class="small text-muted mb-0">
+                        For technical support, contact your system administrator.
+                    </p>
+                </div>
+            </footer>
         </div>
     </div>
     

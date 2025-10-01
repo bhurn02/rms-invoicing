@@ -19,13 +19,43 @@ class QRMeterReadingApp {
         this.wasOffline = false; // Track if we were previously offline
         this.lastFormInteraction = 0; // Track last form interaction time
         
+        // Phase 9: Cache-first tenant resolution system
+        this.comprehensiveCache = null; // Cache for all tenant data
+        this.tenantResolutionService = null; // Will be initialized after cache
+        this.dataValidationPipeline = new DataValidationPipeline();
+        this.enhancedOfflineStorage = new EnhancedOfflineStorage();
+        
+        // Phase 11: Store current tenant data for offline use
+        this.currentTenantData = null; // Will be set when fetching tenant info
+        
         this.init();
+    }
+
+    // Utility function to normalize property codes and unit numbers
+    normalizePropertyCode(propertyCode) {
+        return propertyCode ? propertyCode.trim() : '';
+    }
+
+    normalizeUnitNo(unitNo) {
+        return unitNo ? unitNo.trim() : '';
+    }
+
+    // Utility function to normalize both property code and unit number
+    normalizePropertyAndUnit(propertyCode, unitNo) {
+        return {
+            propertyCode: this.normalizePropertyCode(propertyCode),
+            unitNo: this.normalizeUnitNo(unitNo)
+        };
     }
 
     async init() {
         await this.loadAppConfig();
         this.checkAuthentication();
         this.setupEventListeners();
+        
+        // Phase 9: Initialize cache-first system
+        await this.initializeComprehensiveCache();
+        
         this.loadRecentReadings();
         this.setupOfflineSync();
         this.setupOfflineDetection();
@@ -536,12 +566,15 @@ class QRMeterReadingApp {
         const formCard = document.getElementById('reading-form-card');
         const form = document.getElementById('reading-form');
         
+        // Normalize property code and unit number
+        const normalized = this.normalizePropertyAndUnit(propertyCode, unitNo);
+        
         // Clear previous form data
         form.reset();
         
-        // Set property and unit information
-        document.getElementById('property-id').value = propertyCode;
-        document.getElementById('unit-number').value = unitNo;
+        // Set property and unit information (use normalized values)
+        document.getElementById('property-id').value = normalized.propertyCode;
+        document.getElementById('unit-number').value = normalized.unitNo;
         document.getElementById('meter-id').value = meterId || '';
         
         // Show the form
@@ -552,28 +585,50 @@ class QRMeterReadingApp {
         formCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
         
         // Fetch tenant information and last reading, then auto-focus
-        this.fetchTenantAndReadingInfo(propertyCode, unitNo);
+        this.fetchTenantAndReadingInfo(normalized.propertyCode, normalized.unitNo);
     }
     
-    // Fetch tenant information and last reading data
+    // Phase 9: Cache-first tenant and reading information fetch
     async fetchTenantAndReadingInfo(propertyCode, unitNo) {
         try {
-            // Fetch tenant information
-            const tenantResponse = await fetch(`api/get-tenant-by-unit.php?propertyCode=${encodeURIComponent(propertyCode)}&unitNo=${encodeURIComponent(unitNo)}`);
-            const tenantData = await tenantResponse.json();
+            console.log(`Fetching tenant and reading info for ${propertyCode}-${unitNo}`);
             
-            if (tenantData.success && tenantData.data) {
+            // Phase 9: Use cache-first tenant resolution
+            if (!this.tenantResolutionService) {
+                throw new Error('Tenant resolution service not initialized');
+            }
+            const tenantData = await this.tenantResolutionService.resolveTenantWithFallback(propertyCode, unitNo);
+            
+            if (tenantData && tenantData.success) {
                 // Update tenant information display
                 this.updateTenantInfo(tenantData.data);
+            } else {
+                console.warn('No tenant data found for property/unit');
+                this.showStatus('No tenant information found for this property/unit', 'warning');
             }
             
-            // Fetch last reading
-            const readingResponse = await fetch(`api/get-last-reading.php?propertyCode=${encodeURIComponent(propertyCode)}&unitNo=${encodeURIComponent(unitNo)}`);
-            const readingData = await readingResponse.json();
+            // Phase 9: Get previous reading from cache or network
+            const readingData = await this.getPreviousReadingData(propertyCode, unitNo);
             
-            if (readingData.success && readingData.data) {
+            if (readingData && readingData.success) {
                 // Update last reading display
                 this.updateLastReadingInfo(readingData.data);
+                
+                // PHASE 11: Check for duplicate reading in the same reading period upon QR scan
+                const duplicateCheck = await this.checkDuplicateReading(propertyCode, unitNo);
+                if (duplicateCheck.isDuplicate) {
+                    // Show duplicate notification (following UX design standards)
+                    this.showDuplicateNotification(duplicateCheck.message, duplicateCheck.details);
+                    // Hide the form since it's a duplicate
+                    const formCard = document.getElementById('reading-form-card');
+                    formCard.classList.add('scanner-hidden');
+                    formCard.classList.remove('scanner-visible');
+                    // Don't proceed further
+                    return;
+                }
+            } else {
+                console.warn('No previous reading data found');
+                this.showStatus('No previous reading found - this may be the first reading', 'info');
             }
             
             // Auto-focus on current meter reading input after data is loaded
@@ -600,6 +655,9 @@ class QRMeterReadingApp {
     
     // Update tenant information display
     updateTenantInfo(tenantData) {
+        // PHASE 11: Store tenant data for offline use
+        this.currentTenantData = tenantData;
+        
         const tenantInfoDiv = document.getElementById('tenant-info');
         if (tenantInfoDiv) {
             tenantInfoDiv.innerHTML = `
@@ -629,18 +687,48 @@ class QRMeterReadingApp {
             const currentReading = readingData.currentReading || 'N/A';
             const usage = readingData.usage || 'N/A';
             
+                        // Create prominent Last Reading card with Executive Professional styling
             lastReadingDiv.innerHTML = `
-                <div class="alert alert-warning border-0">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <strong>Last Reading:</strong> ${currentReading}<br>
-                            <strong>Previous Reading:</strong> ${prevReading}<br>
-                            <strong>Last Reading Date:</strong> ${readingData.readingDate ? new Date(readingData.readingDate).toLocaleDateString() : 'N/A'}<br>
-                            <strong>Usage:</strong> ${usage}
+                <div class="card border-0 shadow-sm last-reading-card">
+                    <div class="card-header bg-primary text-white">
+                        <h6 class="card-title mb-0">
+                            <i class="bi bi-clock-history me-2"></i>Last Reading Information
+                        </h6>
                         </div>
-                        <div class="col-md-6">
-                            <strong>Reading Period:</strong> ${readingData.dateFrom ? new Date(readingData.dateFrom).toLocaleDateString() : 'N/A'} - ${readingData.dateTo ? new Date(readingData.dateTo).toLocaleDateString() : 'N/A'}<br>
-                            <strong>Billing Period:</strong> ${readingData.billingDateFrom ? new Date(readingData.billingDateFrom).toLocaleDateString() : 'N/A'} - ${readingData.billingDateTo ? new Date(readingData.billingDateTo).toLocaleDateString() : 'N/A'}
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-4">
+                                <div class="text-center">
+                                    <div class="text-muted small">Last Reading</div>
+                                    <div class="h2 mb-0 text-info fw-bold">${currentReading}</div>
+                                    <div class="small text-muted">${readingData.readingDate ? new Date(readingData.readingDate).toLocaleDateString() : 'N/A'}</div>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="text-center">
+                                    <div class="text-muted small">Previous</div>
+                                    <div class="h2 mb-0 text-muted">${prevReading}</div>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="text-center">
+                                    <div class="text-muted small">Usage</div>
+                                    <div class="h2 mb-0 text-muted">${usage}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <hr class="my-3">
+                        <div class="row g-2">
+                            <div class="col-6 text-center">
+                                <small class="text-muted">
+                                    <strong>Reading Period:</strong><br>${readingData.dateFrom ? new Date(readingData.dateFrom).toLocaleDateString() : 'N/A'} - ${readingData.dateTo ? new Date(readingData.dateTo).toLocaleDateString() : 'N/A'}
+                                </small>
+                            </div>
+                            <div class="col-6 text-center">
+                                <small class="text-muted">
+                                    <strong>Billing Period:</strong><br>${readingData.billingDateFrom ? new Date(readingData.billingDateFrom).toLocaleDateString() : 'N/A'} - ${readingData.billingDateTo ? new Date(readingData.billingDateTo).toLocaleDateString() : 'N/A'}
+                                </small>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -659,8 +747,8 @@ class QRMeterReadingApp {
         
         const formData = new FormData(event.target);
         const readingData = {
-            propertyCode: formData.get('propertyCode'),
-            unitNo: formData.get('unitNo'),
+            propertyCode: this.normalizePropertyCode(formData.get('propertyCode')),
+            unitNo: this.normalizeUnitNo(formData.get('unitNo')),
             currentReading: parseFloat(formData.get('currentReading')),
             remarks: formData.get('remarks') || '',
             locationData: await this.getLocationData()
@@ -677,22 +765,115 @@ class QRMeterReadingApp {
             return;
         }
         
+        // PHASE 11: Offline-First Duplicate Validation using existing cache system
+        // Use existing TenantResolutionService and comprehensiveCache
+        console.log('=== Duplicate Validation Debug ===');
+        console.log('Property Code:', readingData.propertyCode);
+        console.log('Unit No:', readingData.unitNo);
+        console.log('Tenant Resolution Service exists:', !!this.tenantResolutionService);
+        
+        if (this.tenantResolutionService) {
+            // Check offline readings first (primary data source in offline-first)
+            const offlineReadings = this.tenantResolutionService.getOfflineReadings();
+            console.log('Offline readings count:', offlineReadings.length);
+            console.log('Offline readings:', offlineReadings);
+            
+            const offlineDuplicate = offlineReadings.find(reading => 
+                reading.propertyCode === readingData.propertyCode && 
+                reading.unitNo === readingData.unitNo
+            );
+            
+            console.log('Offline duplicate found:', offlineDuplicate);
+            
+            if (offlineDuplicate) {
+                const duplicateDate = new Date(offlineDuplicate.timestamp).toLocaleDateString();
+                const duplicateValue = offlineDuplicate.currentReading;
+                const errorMessage = `Duplicate reading detected! A reading for ${readingData.propertyCode}-${readingData.unitNo} is already saved offline on ${duplicateDate} with value ${duplicateValue}. Please verify this is not a duplicate entry.`;
+                console.log('Showing offline duplicate error:', errorMessage);
+                this.showInlineValidationError('current-meter-reading', errorMessage);
+                return;
+            }
+            
+            // Check comprehensive cache for recent readings in the same billing period
+            if (this.comprehensiveCache && this.comprehensiveCache.latestReadings) {
+                console.log('Cache readings count:', this.comprehensiveCache.latestReadings.length);
+                
+                const normalized = this.tenantResolutionService.normalizePropertyAndUnit(readingData.propertyCode, readingData.unitNo);
+                console.log('Normalized property code:', normalized.propertyCode);
+                console.log('Normalized unit no:', normalized.unitNo);
+                
+                // Get current month range for billing period check
+                const now = new Date();
+                const currentMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+                const currentMonthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+                console.log('Current month range:', currentMonthStart, 'to', currentMonthEnd);
+                
+                const cacheDuplicate = this.comprehensiveCache.latestReadings.find(reading => {
+                    const normalizedProp = this.tenantResolutionService.normalizePropertyCode(reading.property_code);
+                    const normalizedUnit = this.tenantResolutionService.normalizeUnitNo(reading.unit_no);
+                    const propertyMatches = normalizedProp === normalized.propertyCode && normalizedUnit === normalized.unitNo;
+                    
+                    if (propertyMatches) {
+                        // Check if reading is in the same reading period (current month)
+                        // Use reading_date_from and reading_date_to (not date_from/date_to)
+                        const readingDateFrom = new Date(reading.reading_date_from || reading.date_from);
+                        const readingDateTo = new Date(reading.reading_date_to || reading.date_to);
+                        const inSamePeriod = readingDateFrom >= currentMonthStart && readingDateTo <= currentMonthEnd;
+                        
+                        console.log('Property match found:', reading);
+                        console.log('Reading period:', readingDateFrom, 'to', readingDateTo);
+                        console.log('In same reading period:', inSamePeriod);
+                        
+                        return inSamePeriod;
+                    }
+                    return false;
+                });
+                
+                console.log('Cache duplicate found:', cacheDuplicate);
+                
+                if (cacheDuplicate) {
+                    const duplicateDate = new Date(cacheDuplicate.reading_date).toLocaleDateString();
+                    const duplicateValue = cacheDuplicate.current_reading;
+                    const dateFrom = cacheDuplicate.reading_date_from || cacheDuplicate.date_from;
+                    const dateTo = cacheDuplicate.reading_date_to || cacheDuplicate.date_to;
+                    const readingPeriod = new Date(dateFrom).toLocaleDateString('en-US', {month: 'short', day: 'numeric'}) + ' - ' + new Date(dateTo).toLocaleDateString('en-US', {month: 'short', day: 'numeric'});
+                    const errorMessage = `Duplicate reading detected! A reading for ${readingData.propertyCode}-${readingData.unitNo} already exists for reading period ${readingPeriod} on ${duplicateDate} with value ${duplicateValue}. Please verify this is not a duplicate entry.`;
+                    console.log('Showing cache duplicate error:', errorMessage);
+                    this.showInlineValidationError('current-meter-reading', errorMessage);
+                    return;
+                }
+            }
+        }
+        console.log('=== No duplicates found, continuing ===');
+        
         // Set submitting state
         this.isSubmitting = true;
         
-        // Show loading state
-        const submitBtn = event.target.querySelector('button[type="submit"]');
-        const originalText = submitBtn.innerHTML;
+        // PHASE 11: Get ALL submit buttons (mobile and desktop)
+        const submitBtns = event.target.querySelectorAll('button[type="submit"]');
+        const originalTexts = Array.from(submitBtns).map(btn => btn.innerHTML);
         
         try {
-            submitBtn.innerHTML = '<i class="bi bi-hourglass-split me-2"></i>Saving...';
-            submitBtn.disabled = true;
+            // Update all submit buttons
+            submitBtns.forEach(btn => {
+                btn.innerHTML = '<i class="bi bi-hourglass-split me-2"></i>Saving...';
+                btn.disabled = true;
+            });
             
             // Check if online
             if (!this.isOnline) {
-                // Store offline and show success
-                this.storeOfflineReading(readingData);
+                // PHASE 11: Show offline-specific progress indicator on ALL buttons
+                submitBtns.forEach(btn => {
+                    btn.innerHTML = '<i class="bi bi-cloud-download me-2"></i>Saving Offline...';
+                });
                 
+                // PHASE 11: Allow DOM to repaint before storing (makes button update visible)
+                await new Promise(resolve => setTimeout(resolve, 100));
+                
+                // Store offline and wait for completion (now async)
+                const saveSuccess = await this.storeOfflineReading(readingData);
+                
+                if (saveSuccess) {
                 this.showSuccessToast(
                     'Reading Saved Offline!',
                     'Will sync when connection is restored'
@@ -703,11 +884,24 @@ class QRMeterReadingApp {
                 const formCard = document.getElementById('reading-form-card');
                 formCard.classList.add('scanner-hidden');
                 formCard.classList.remove('scanner-visible');
+                    
+                    // Reset all submit buttons for next scan
+                    submitBtns.forEach((btn, index) => {
+                        btn.innerHTML = originalTexts[index];
+                        btn.disabled = false;
+                    });
                 
                 // Auto-advance: Focus scanner for next reading after brief delay
                 setTimeout(() => {
                     this.focusScannerForNext();
                 }, 800);
+                } else {
+                    // If save failed, restore all button states
+                    submitBtns.forEach((btn, index) => {
+                        btn.innerHTML = originalTexts[index];
+                        btn.disabled = false;
+                    });
+                }
                 
                 return;
             }
@@ -776,6 +970,11 @@ class QRMeterReadingApp {
                 }, 800);
                 
             } else {
+                // PHASE 11: Check if it's a duplicate reading error for inline validation
+                if (error.message && error.message.includes('Duplicate reading detected')) {
+                    // Show inline validation error for duplicate readings
+                    this.showInlineValidationError('current-meter-reading', error.message);
+            } else {
                 // Show error message with SweetAlert for other errors
             Swal.fire({
                 icon: 'error',
@@ -784,16 +983,19 @@ class QRMeterReadingApp {
                 confirmButtonText: 'OK',
                 confirmButtonColor: '#dc3545'
             });
+                }
             }
             
         } finally {
             // Reset submitting state
             this.isSubmitting = false;
             
-            // Restore button state
-            const submitBtn = event.target.querySelector('button[type="submit"]');
-            submitBtn.innerHTML = originalText;
-            submitBtn.disabled = false;
+            // PHASE 11: Restore ALL button states (mobile and desktop)
+            const allSubmitBtns = event.target.querySelectorAll('button[type="submit"]');
+            allSubmitBtns.forEach((btn, index) => {
+                btn.innerHTML = originalTexts[index] || '<i class="bi bi-check-circle me-2"></i>Submit Reading';
+                btn.disabled = false;
+            });
         }
     }
     
@@ -922,13 +1124,54 @@ class QRMeterReadingApp {
         }
     }
 
-    storeOfflineReading(readingData) {
-        this.offlineQueue.push(readingData);
-        localStorage.setItem('qr_meter_readings_offline', JSON.stringify(this.offlineQueue));
-        
-        // Update UI to show offline status
-        this.updateOfflineStatus();
-        this.updateOfflineIndicator();
+    // Phase 9: Enhanced offline storage with validation
+    async storeOfflineReading(readingData) {
+        try {
+            // PHASE 11: Enhance reading data with tenant and property information
+            const enhancedData = {
+                ...readingData,
+                tenantName: this.currentTenantData?.tenantName || 'N/A',
+                propertyName: this.currentTenantData?.realPropertyName || readingData.propertyCode,
+                timestamp: new Date().toISOString()
+            };
+            
+            // Phase 9: Validate data before storing offline
+            const validationResult = this.dataValidationPipeline.validateOfflineReading(enhancedData);
+            
+            if (!validationResult.valid) {
+                console.error('Offline reading validation failed:', validationResult.errors);
+                this.showStatus('Data validation failed - reading not saved offline', 'danger');
+                return false;
+            }
+            
+            // PHASE 11: Allow UI to update before heavy operations
+            await new Promise(resolve => setTimeout(resolve, 50));
+            
+            // Phase 9: Add validation metadata
+            const enhancedReadingData = this.enhancedOfflineStorage.addValidationMetadata(enhancedData, validationResult);
+            
+            // Store in offline queue
+            this.offlineQueue.push(enhancedReadingData);
+            localStorage.setItem('qr_meter_readings_offline', JSON.stringify(this.offlineQueue));
+            
+            console.log('Reading stored offline with validation metadata:', enhancedReadingData);
+            
+            // PHASE 11: Allow UI to update
+            await new Promise(resolve => setTimeout(resolve, 50));
+            
+            // Update UI to show offline status
+            this.updateOfflineStatus();
+            this.updateOfflineIndicator();
+            
+            // PHASE 11: Refresh Recent QR Readings table to show offline reading
+            await this.loadRecentReadings(true);
+            
+            return true;
+        } catch (error) {
+            console.error('Error storing offline reading:', error);
+            this.showStatus('Error storing reading offline', 'danger');
+            return false;
+        }
     }
 
     async setupOfflineSync() {
@@ -942,6 +1185,146 @@ class QRMeterReadingApp {
         // Try to sync offline readings
         if (this.offlineQueue.length > 0) {
             await this.syncOfflineReadings();
+        }
+    }
+
+    // Phase 9: Initialize comprehensive cache on page load
+    // Project specs: Always update localStorage with recent data upon page load
+    async initializeComprehensiveCache() {
+        try {
+            console.log('Initializing comprehensive cache...');
+            
+            // Always try to refresh cache with recent data on page load
+            if (this.isOnline) {
+                try {
+                    await this.refreshComprehensiveCache();
+                    console.log('Cache refreshed with recent data on page load');
+                    return;
+                } catch (error) {
+                    console.warn('Failed to refresh cache on page load, using existing cache:', error);
+                }
+            }
+            
+            // Fallback: Use existing cache if refresh failed or offline
+            const cachedData = localStorage.getItem('qr_comprehensive_cache');
+                if (cachedData) {
+                    const parsedCache = JSON.parse(cachedData);
+                    this.comprehensiveCache = parsedCache;
+                // Phase 9: Initialize tenant resolution service with existing cache
+                    this.tenantResolutionService = new TenantResolutionService(this.comprehensiveCache);
+                console.log('Using existing cache as fallback');
+            } else {
+                console.warn('No cache available and cannot refresh');
+            }
+        } catch (error) {
+            console.error('Error initializing comprehensive cache:', error);
+        }
+    }
+
+    // Phase 9: Refresh comprehensive cache using vw_LatestTenantReadings
+    async refreshComprehensiveCache() {
+        try {
+            console.log('Refreshing comprehensive cache...');
+            
+            const response = await fetch('api/get-latest-tenant-readings.php');
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
+            
+            const data = await response.json();
+            if (!data.success) {
+                throw new Error(data.message || 'Failed to load latest tenant readings');
+            }
+            
+            const updatedCache = {
+                latestReadings: data.data || [],
+                cachedAt: new Date().toISOString(),
+                expiresAt: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString(), // 90 days
+                source: 'page_load_refresh'
+            };
+            
+            this.comprehensiveCache = updatedCache;
+            localStorage.setItem('qr_comprehensive_cache', JSON.stringify(updatedCache));
+            
+            // Phase 9: Initialize tenant resolution service with comprehensive cache
+            this.tenantResolutionService = new TenantResolutionService(this.comprehensiveCache);
+            
+            console.log(`Cache refreshed with ${updatedCache.latestReadings.length} tenant readings`);
+            return updatedCache;
+        } catch (error) {
+            console.error('Error refreshing comprehensive cache:', error);
+            throw error;
+        }
+    }
+
+    // Phase 9: Check if cache is valid
+    isCacheValid(cache) {
+        if (!cache || !cache.expiresAt) {
+            return false;
+        }
+        
+        const now = new Date();
+        const expiresAt = new Date(cache.expiresAt);
+        return now < expiresAt;
+    }
+
+    // Phase 9: Get previous reading data from cache or network
+    async getPreviousReadingData(propertyCode, unitNo) {
+        try {
+            // First check comprehensive cache
+            if (this.comprehensiveCache && this.comprehensiveCache.latestReadings) {
+                // Normalize property code and unit number for comparison
+                const normalized = this.normalizePropertyAndUnit(propertyCode, unitNo);
+                
+                const cachedReading = this.comprehensiveCache.latestReadings.find(reading => 
+                    this.normalizePropertyCode(reading.property_code) === normalized.propertyCode && 
+                    this.normalizeUnitNo(reading.unit_no) === normalized.unitNo
+                );
+                
+                if (cachedReading) {
+                    console.log('Previous reading found in cache');
+                    return {
+                        success: true,
+                        data: {
+                            prevReading: cachedReading.prev_reading,
+                            currentReading: cachedReading.current_reading,
+                            usage: cachedReading.usage,
+                            readingDate: cachedReading.reading_date,
+                            dateFrom: cachedReading.reading_date_from,
+                            dateTo: cachedReading.reading_date_to,
+                            billingDateFrom: cachedReading.billing_from,
+                            billingDateTo: cachedReading.billing_to
+                        },
+                        source: 'cache'
+                    };
+                } else {
+                    console.log('Previous reading not found in cache for:', propertyCode, unitNo);
+                    console.log('Looking for normalized:', normalized.propertyCode, normalized.unitNo);
+                }
+            }
+            
+            // Fallback to network if online
+            if (this.isOnline) {
+                const response = await fetch(`api/get-last-reading.php?propertyCode=${encodeURIComponent(propertyCode)}&unitNo=${encodeURIComponent(unitNo)}`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    console.log('Previous reading fetched from network');
+                    return data;
+                }
+            }
+            
+            // No data found
+            return {
+                success: false,
+                message: 'No previous reading found'
+            };
+        } catch (error) {
+            console.error('Error getting previous reading data:', error);
+            return {
+                success: false,
+                message: error.message
+            };
         }
     }
 
@@ -1014,8 +1397,11 @@ class QRMeterReadingApp {
         this.updateOfflineStatus();
         this.updateOfflineIndicator();
         
+        // PHASE 11: Refresh Recent QR Readings table after sync completion
         if (syncedCount > 0) {
             this.showStatus(`${syncedCount} reading(s) synced successfully`, 'success');
+            // Refresh the Recent QR Readings table to show updated status badges
+            await this.loadRecentReadings(false);
         }
         
         if (failedCount > 0) {
@@ -1328,13 +1714,21 @@ class QRMeterReadingApp {
         this.createOfflineIndicator();
         
         // Enhanced online/offline event handling with connection stability check
-        window.addEventListener('online', () => {
+        window.addEventListener('online', async () => {
             console.log('Browser online event detected');
             this.isOnline = true;
             this.updateOfflineIndicator();
             
             // Hide offline notification if showing
             this.hideOfflineNotification();
+            
+            // Phase 9: Refresh cache first when connection is restored
+            try {
+                await this.refreshComprehensiveCache();
+                console.log('Cache refreshed on connection restore');
+            } catch (error) {
+                console.error('Cache refresh failed on connection restore:', error);
+            }
             
             // Show online notification if we were previously offline
             if (this.wasOffline) {
@@ -1611,6 +2005,246 @@ class QRMeterReadingApp {
         }
     }
 
+    getOfflineReadings() {
+        try {
+            const offlineData = localStorage.getItem('qr_meter_readings_offline');
+            if (offlineData) {
+                const offlineReadings = JSON.parse(offlineData);
+                console.log('Raw offline data from localStorage:', offlineReadings);
+                const mapped = offlineReadings.map(reading => {
+                    const mappedReading = {
+                        ...reading,
+                        isOffline: true,
+                        readingDate: reading.timestamp,
+                        // Ensure tenant and property data is preserved
+                        tenantName: reading.tenantName,
+                        propertyName: reading.propertyName
+                    };
+                    console.log('Mapped offline reading:', mappedReading);
+                    return mappedReading;
+                });
+                return mapped;
+            }
+        } catch (error) {
+            console.error('Error retrieving offline readings:', error);
+        }
+        return [];
+    }
+
+    // PHASE 11: Check for duplicate reading upon QR scan
+    async checkDuplicateReading(propertyCode, unitNo) {
+        console.log('=== Checking for duplicate reading upon QR scan ===');
+        console.log('Property Code:', propertyCode);
+        console.log('Unit No:', unitNo);
+        
+        if (!this.tenantResolutionService) {
+            console.warn('Tenant resolution service not available');
+            return { isDuplicate: false };
+        }
+        
+        // Check offline readings first (primary data source in offline-first)
+        const offlineReadings = this.tenantResolutionService.getOfflineReadings();
+        console.log('Offline readings count:', offlineReadings.length);
+        
+        const offlineDuplicate = offlineReadings.find(reading => 
+            reading.propertyCode === propertyCode && 
+            reading.unitNo === unitNo
+        );
+        
+        if (offlineDuplicate) {
+            const duplicateDate = new Date(offlineDuplicate.timestamp).toLocaleDateString();
+            const duplicateValue = offlineDuplicate.currentReading;
+            console.log('Offline duplicate found');
+            return { 
+                isDuplicate: true, 
+                details: {
+                    propertyCode,
+                    unitNo,
+                    readingPeriod: 'Saved Offline',
+                    duplicateDate,
+                    duplicateValue
+                }
+            };
+        }
+        
+        // Check comprehensive cache for recent readings in the same reading period
+        if (this.comprehensiveCache && this.comprehensiveCache.latestReadings) {
+            console.log('Cache readings count:', this.comprehensiveCache.latestReadings.length);
+            
+            const normalized = this.tenantResolutionService.normalizePropertyAndUnit(propertyCode, unitNo);
+            
+            // Get current month range for reading period check
+            const now = new Date();
+            const currentMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+            const currentMonthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+            console.log('Current month range:', currentMonthStart, 'to', currentMonthEnd);
+            
+            const cacheDuplicate = this.comprehensiveCache.latestReadings.find(reading => {
+                const normalizedProp = this.tenantResolutionService.normalizePropertyCode(reading.property_code);
+                const normalizedUnit = this.tenantResolutionService.normalizeUnitNo(reading.unit_no);
+                const propertyMatches = normalizedProp === normalized.propertyCode && normalizedUnit === normalized.unitNo;
+                
+                if (propertyMatches) {
+                    const readingDateFrom = new Date(reading.reading_date_from || reading.date_from);
+                    const readingDateTo = new Date(reading.reading_date_to || reading.date_to);
+                    const inSamePeriod = readingDateFrom >= currentMonthStart && readingDateTo <= currentMonthEnd;
+                    
+                    console.log('Property match found:', reading);
+                    console.log('Reading period:', readingDateFrom, 'to', readingDateTo);
+                    console.log('In same reading period:', inSamePeriod);
+                    
+                    return inSamePeriod;
+                }
+                return false;
+            });
+            
+            if (cacheDuplicate) {
+                const duplicateDate = new Date(cacheDuplicate.reading_date).toLocaleDateString();
+                const duplicateValue = cacheDuplicate.current_reading;
+                const dateFrom = cacheDuplicate.reading_date_from || cacheDuplicate.date_from;
+                const dateTo = cacheDuplicate.reading_date_to || cacheDuplicate.date_to;
+                const readingPeriod = new Date(dateFrom).toLocaleDateString('en-US', {month: 'short', day: 'numeric'}) + ' - ' + new Date(dateTo).toLocaleDateString('en-US', {month: 'short', day: 'numeric'});
+                console.log('Cache duplicate found');
+                return { 
+                    isDuplicate: true, 
+                    details: {
+                        propertyCode,
+                        unitNo,
+                        readingPeriod,
+                        duplicateDate,
+                        duplicateValue
+                    }
+                };
+            }
+        }
+        
+        console.log('No duplicates found');
+        return { isDuplicate: false };
+    }
+
+    // PHASE 11: Show duplicate reading notification (following UX design standards)
+    showDuplicateNotification(message, details) {
+        // Remove existing notification if any
+        this.hideDuplicateNotification();
+        
+        const notification = document.createElement('div');
+        notification.id = 'duplicate-notification';
+        notification.style.cssText = `
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, #ff9800, #f57c00);
+            color: white;
+            padding: 20px 28px;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(255, 152, 0, 0.4);
+            z-index: 10000;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            text-align: center;
+            max-width: 90%;
+            width: 400px;
+            animation: slideDown 0.3s ease-out;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        `;
+        
+        notification.innerHTML = `
+            <div style="display: flex; flex-direction: column; align-items: center; gap: 8px;">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <i class="bi bi-exclamation-triangle-fill" style="font-size: 20px;"></i>
+                    <span style="font-weight: 600; font-size: 16px;">Already Scanned</span>
+                </div>
+                <div style="font-size: 15px; font-weight: 500; margin-top: 4px; line-height: 1.4;">
+                    ${details.propertyCode} - Unit ${details.unitNo.trim()}
+                </div>
+                <div style="font-size: 14px; opacity: 0.95; margin-top: 2px; line-height: 1.5;">
+                    This meter was already read on ${details.duplicateDate}
+                </div>
+                <div style="font-size: 13px; opacity: 0.9; margin-top: 4px; padding: 8px 12px; background: rgba(255, 255, 255, 0.15); border-radius: 6px;">
+                    Last Reading: ${details.duplicateValue}
+                </div>
+            </div>
+            <style>
+                @keyframes slideDown {
+                    from { transform: translateX(-50%) translateY(-20px); opacity: 0; }
+                    to { transform: translateX(-50%) translateY(0); opacity: 1; }
+                }
+            </style>
+        `;
+        
+        document.body.appendChild(notification);
+        
+        // Auto-hide after 6 seconds
+        setTimeout(() => {
+            this.hideDuplicateNotification();
+        }, 6000);
+    }
+
+    hideDuplicateNotification() {
+        const notification = document.getElementById('duplicate-notification');
+        if (notification) {
+            notification.remove();
+        }
+    }
+
+    // PHASE 11: Show inline validation error for duplicate readings
+    showInlineValidationError(fieldId, errorMessage) {
+        const field = document.getElementById(fieldId);
+        if (!field) return;
+        
+        // Remove existing error styling and message
+        this.clearInlineValidationError(fieldId);
+        
+        // Add error styling to the field
+        field.classList.add('is-invalid');
+        
+        // Create error message element
+        const errorDiv = document.createElement('div');
+        errorDiv.className = 'invalid-feedback';
+        errorDiv.id = `${fieldId}-error`;
+        errorDiv.textContent = errorMessage;
+        
+        // Insert error message after the field
+        field.parentNode.insertBefore(errorDiv, field.nextSibling);
+        
+        // Focus the field for user attention
+        field.focus();
+        
+        // Auto-clear error after 10 seconds
+        setTimeout(() => {
+            this.clearInlineValidationError(fieldId);
+        }, 10000);
+    }
+
+    // PHASE 11: Clear inline validation error
+    clearInlineValidationError(fieldId) {
+        const field = document.getElementById(fieldId);
+        if (field) {
+            field.classList.remove('is-invalid');
+        }
+        
+        const errorDiv = document.getElementById(`${fieldId}-error`);
+        if (errorDiv) {
+            errorDiv.remove();
+        }
+    }
+
+    // PHASE 11: Get recent readings for duplicate validation
+    async getRecentReadingsForValidation() {
+        try {
+            const response = await fetch('api/get-recent-readings.php');
+            if (response.ok) {
+                const result = await response.json();
+                if (result.success) {
+                    return result.data || [];
+                }
+            }
+        } catch (error) {
+            console.error('Error fetching recent readings for validation:', error);
+        }
+        return [];
+    }
+
     async loadRecentReadings(isNewReading = false) {
         try {
             console.log('Loading recent readings...');
@@ -1640,26 +2274,54 @@ class QRMeterReadingApp {
         console.log('Displaying recent readings:', readings);
         const tbody = document.getElementById('readings-table-body');
         
-        if (!readings || readings.length === 0) {
+        // Get offline readings from localStorage
+        const offlineReadings = this.getOfflineReadings();
+        
+        // Combine online and offline readings
+        const allReadings = [...readings, ...offlineReadings];
+        
+        if (!allReadings || allReadings.length === 0) {
             console.log('No readings to display');
             tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted">No recent readings</td></tr>';
             return;
         }
 
-        tbody.innerHTML = readings.map((reading, index) => {
+        // Sort by date (most recent first)
+        allReadings.sort((a, b) => {
+            const dateA = new Date(a.readingDate || a.timestamp);
+            const dateB = new Date(b.readingDate || b.timestamp);
+            return dateB - dateA;
+        });
+
+        tbody.innerHTML = allReadings.map((reading, index) => {
             // Apply animation class only to the top row if this is a new reading
             const rowClass = (isNewReading && index === 0) ? 'new-reading-row' : '';
             
+            // Determine if this is an offline reading
+            const isOffline = reading.isOffline || false;
+            const statusBadge = isOffline ? 
+                '<span class="badge bg-warning">Saved Offline</span>' : 
+                '<span class="badge bg-success">Synced</span>';
+            
+            // Debug logging for each reading
+            if (isOffline) {
+                console.log('Rendering offline reading:', {
+                    propertyName: reading.propertyName,
+                    unitNo: reading.unitNo,
+                    tenantName: reading.tenantName,
+                    currentReading: reading.currentReading,
+                    timestamp: reading.timestamp
+                });
+            }
+            
             return `
                 <tr class="${rowClass}">
-                    <td>${reading.propertyName || reading.propertyId || 'N/A'}</td>
-                    <td>${reading.unitNumber || 'N/A'}</td>
+                    <td>${reading.propertyName || reading.propertyId || reading.propertyCode || 'N/A'}</td>
+                    <td>${reading.unitNumber || reading.unitNo || 'N/A'}</td>
                     <td>${reading.tenantName || 'N/A'}</td>
-                    <td>${reading.meterReading ? reading.meterReading.toLocaleString() : 'N/A'}</td>
-                    <td>${this.formatDate(reading.readingDate)}</td>
-                    <td>
-                        <span class="badge bg-success">Submitted</span>
-                    </td>
+                    <td>${reading.meterReading || reading.currentReading ? (reading.meterReading || reading.currentReading).toLocaleString() : 'N/A'}</td>
+                    <td>${this.formatDate(reading.readingDate || reading.timestamp)}</td>
+                    <td>${statusBadge}</td>
                 </tr>
             `;
         }).join('');
@@ -2300,6 +2962,610 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Initialize the app
     window.qrMeterApp = new QRMeterReadingApp();
+});
+
+// Phase 9: Tenant Resolution Service Class
+class TenantResolutionService {
+    constructor(comprehensiveCache) {
+        this.comprehensiveCache = comprehensiveCache;
+        this.cacheExpiry = 90 * 24 * 60 * 60 * 1000; // 90 days as per creative design
+    }
+
+    // Local normalization helpers to avoid dependency on outer class
+    normalizePropertyCode(propertyCode) {
+        return propertyCode ? String(propertyCode).trim() : '';
+    }
+
+    normalizeUnitNo(unitNo) {
+        return unitNo ? String(unitNo).trim() : '';
+    }
+
+    normalizePropertyAndUnit(propertyCode, unitNo) {
+        return {
+            propertyCode: this.normalizePropertyCode(propertyCode),
+            unitNo: this.normalizeUnitNo(unitNo)
+        };
+    }
+
+    async resolveTenantWithFallback(propertyCode, unitNo) {
+        const strategies = [
+            this.resolveFromCache.bind(this),
+            this.resolveFromOfflineHistory.bind(this),
+            this.resolveFromDefaults.bind(this),
+            this.resolveFromServer.bind(this)
+        ];
+        
+        for (let i = 0; i < strategies.length; i++) {
+            try {
+                const result = await strategies[i](propertyCode, unitNo);
+                if (result && this.validateTenantResult(result)) {
+                    console.log(`Tenant resolved using strategy ${i + 1}: ${result.source}`);
+                    return result;
+                }
+            } catch (error) {
+                console.warn(`Strategy ${i + 1} failed:`, error);
+                continue;
+            }
+        }
+        
+        throw new Error('All tenant resolution strategies failed');
+    }
+
+    resolveFromCache(propertyCode, unitNo) {
+        // Phase 9: Use comprehensive cache as per creative design
+        if (this.comprehensiveCache && this.comprehensiveCache.latestReadings) {
+            console.log('Cache lookup for:', propertyCode, unitNo);
+            console.log('Cache contains:', this.comprehensiveCache.latestReadings.length, 'readings');
+            
+            // Normalize property code and unit number for comparison
+            const normalized = this.normalizePropertyAndUnit(propertyCode, unitNo);
+            
+            const cachedReading = this.comprehensiveCache.latestReadings.find(reading => 
+                this.normalizePropertyCode(reading.property_code) === normalized.propertyCode && 
+                this.normalizeUnitNo(reading.unit_no) === normalized.unitNo
+            );
+            
+            if (cachedReading) {
+                console.log('Cache hit found:', cachedReading);
+                return {
+                    success: true,
+                    data: {
+                        tenantCode: cachedReading.tenant_code,
+                        tenantName: cachedReading.tenant_name,
+                        realPropertyName: cachedReading.property_name,
+                        unitNo: cachedReading.unit_no,
+                        meterNumber: cachedReading.meter_number || null,
+                        unitType: cachedReading.unit_desc || 'Unknown'
+                    },
+                    source: 'cache',
+                    confidence: 0.9
+                };
+            } else {
+                console.log('Cache miss - no reading found for:', propertyCode, unitNo);
+                console.log('Looking for normalized:', normalized.propertyCode, normalized.unitNo);
+                console.log('First 3 cache entries:', this.comprehensiveCache.latestReadings.slice(0, 3));
+            }
+        } else {
+            console.log('No comprehensive cache available');
+        }
+        
+        return null;
+    }
+
+    resolveFromOfflineHistory(propertyCode, unitNo) {
+        const offlineReadings = this.getOfflineReadings();
+        const normalized = this.normalizePropertyAndUnit(propertyCode, unitNo);
+        
+        const recentReading = offlineReadings
+            .filter(r => this.normalizePropertyCode(r.propertyCode) === normalized.propertyCode && 
+                        this.normalizeUnitNo(r.unitNo) === normalized.unitNo)
+            .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))[0];
+        
+        if (recentReading && recentReading.tenantCode) {
+            return {
+                success: true,
+                data: {
+                    tenantCode: recentReading.tenantCode,
+                    tenantName: recentReading.tenantName || 'Unknown Tenant',
+                    realPropertyName: recentReading.realPropertyName || propertyCode,
+                    unitNo: unitNo,
+                    meterNumber: recentReading.meterNumber,
+                    unitType: recentReading.unitType
+                },
+                source: 'offline_history',
+                confidence: 0.7
+            };
+        }
+        
+        return null;
+    }
+
+    resolveFromDefaults(propertyCode, unitNo) {
+        // Phase 9: Return actual defaults as per creative design
+        return {
+            success: true,
+            data: {
+                tenantCode: 'DEFAULT',
+                tenantName: 'Default Tenant',
+                realPropertyName: propertyCode,
+                unitNo: unitNo,
+                meterNumber: null,
+                unitType: 'Unknown'
+            },
+            source: 'defaults',
+            confidence: 0.3
+        };
+    }
+
+    async resolveFromServer(propertyCode, unitNo) {
+        if (!navigator.onLine) {
+            throw new Error('Server resolution requires online connection');
+        }
+        
+        // Phase 9: Use correct API endpoint as per creative design
+        const response = await fetch(`api/get-tenant-data.php?propertyCode=${encodeURIComponent(propertyCode)}&unitNo=${encodeURIComponent(unitNo)}`);
+        
+        if (response.ok) {
+            const data = await response.json();
+            if (data.success && data.data) {
+                return {
+                    success: true,
+                    data: data.data,
+                    source: 'server',
+                    confidence: 1.0
+                };
+            }
+        }
+        
+        throw new Error('Server resolution failed');
+    }
+
+    // Phase 9: Cache management handled by comprehensive cache
+    isCacheExpired(cached) {
+        if (!cached || !cached.expiresAt) {
+            return true;
+        }
+        return new Date() > new Date(cached.expiresAt);
+    }
+
+    validateTenantResult(result) {
+        return result && result.data && result.data.tenantCode;
+    }
+
+    getOfflineReadings() {
+        const offlineData = localStorage.getItem('qr_meter_readings_offline');
+        return offlineData ? JSON.parse(offlineData) : [];
+    }
+
+    // Phase 9: Property defaults handled by resolveFromDefaults method
+}
+
+// Phase 9: Data Validation Pipeline Class
+class DataValidationPipeline {
+    constructor() {
+        this.validationRules = {
+            requiredFields: ['propertyCode', 'unitNo', 'currentReading'],
+            numericFields: ['currentReading'],
+            minValues: { currentReading: 0 },
+            maxValues: { currentReading: 999999 }
+        };
+    }
+
+    validateOfflineReading(readingData) {
+        const results = [];
+        
+        // Validate required fields
+        const requiredValidation = this.validateRequiredFields(readingData);
+        results.push(requiredValidation);
+        
+        // Validate data types
+        const typeValidation = this.validateDataTypes(readingData);
+        results.push(typeValidation);
+        
+        // Validate business rules
+        const businessValidation = this.validateBusinessRules(readingData);
+        results.push(businessValidation);
+        
+        // Check if all validations passed
+        const valid = results.every(result => result.valid);
+        const errors = results.filter(result => !result.valid);
+        
+        return {
+            valid,
+            errors: errors.map(e => e.error),
+            checks: results
+        };
+    }
+
+    validateRequiredFields(readingData) {
+        const missing = this.validationRules.requiredFields.filter(field => 
+            !readingData[field] || readingData[field] === ''
+        );
+        
+        if (missing.length > 0) {
+            return {
+                valid: false,
+                error: `Missing required fields: ${missing.join(', ')}`
+            };
+        }
+        
+        return { valid: true };
+    }
+
+    validateDataTypes(readingData) {
+        for (const field of this.validationRules.numericFields) {
+            if (readingData[field] !== undefined && isNaN(readingData[field])) {
+                return {
+                    valid: false,
+                    error: `Field ${field} must be a number`
+                };
+            }
+        }
+        
+        return { valid: true };
+    }
+
+    validateBusinessRules(readingData) {
+        // Validate current reading is positive
+        if (readingData.currentReading <= 0) {
+            return {
+                valid: false,
+                error: 'Current reading must be greater than 0'
+            };
+        }
+        
+        // Validate current reading is within reasonable range
+        if (readingData.currentReading > this.validationRules.maxValues.currentReading) {
+            return {
+                valid: false,
+                error: 'Current reading exceeds maximum allowed value'
+            };
+        }
+        
+        return { valid: true };
+    }
+}
+
+// Phase 9: Enhanced Offline Storage Class
+class EnhancedOfflineStorage {
+    constructor() {
+        this.metadataFields = [
+            'validationTimestamp',
+            'validationChecks',
+            'deviceInfo',
+            'locationData',
+            'syncId'
+        ];
+    }
+
+    addValidationMetadata(readingData, validationResult) {
+        const enhancedData = {
+            ...readingData,
+            validationMetadata: {
+                validationTimestamp: new Date().toISOString(),
+                validationChecks: validationResult.checks,
+                deviceInfo: this.getDeviceInfo(),
+                locationData: readingData.locationData || null,
+                syncId: this.generateSyncId()
+            }
+        };
+        
+        return enhancedData;
+    }
+
+    getDeviceInfo() {
+        return {
+            userAgent: navigator.userAgent,
+            platform: navigator.platform,
+            language: navigator.language,
+            timestamp: new Date().toISOString()
+        };
+    }
+
+    generateSyncId() {
+        return `sync_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    }
+
+    prepareForSync(offlineReadings) {
+        return offlineReadings.map(reading => ({
+            ...reading,
+            syncPreparedAt: new Date().toISOString(),
+            syncAttempts: reading.syncAttempts || 0
+        }));
+    }
+
+    validateBeforeSync(offlineReadings) {
+        return offlineReadings.filter(reading => {
+            // Only sync readings that have valid metadata
+            return reading.validationMetadata && 
+                   reading.validationMetadata.validationChecks &&
+                   reading.validationMetadata.validationChecks.every(check => check.valid);
+        });
+    }
+}
+
+// ========================
+// PHASE 10: MOBILE GESTURE SUPPORT
+// ========================
+
+/**
+ * Mobile Gesture Detection System
+ * Supports swipe navigation and enhanced touch interactions
+ * Compatible with Samsung A15, iPhone 14 Pro Max, and tablets
+ */
+class MobileGestureHandler {
+    constructor() {
+        this.touchStartX = null;
+        this.touchStartY = null;
+        this.touchCurrentX = null;
+        this.touchCurrentY = null;
+        this.gestureStartTime = null;
+        this.minSwipeDistance = 50; // Minimum distance for swipe recognition
+        this.maxSwipeTime = 500; // Maximum time for swipe gesture
+        this.isGestureActive = false;
+        this.swipeThreshold = 100; // Distance threshold for triggering swipe
+        
+        this.init();
+    }
+
+    init() {
+        this.setupTouchEventListeners();
+        this.addGestureCSS();
+        this.log('MobileGestureHandler initialized');
+    }
+
+    setupTouchEventListeners() {
+        // Add touch event listeners to document for global gesture support
+        document.addEventListener('touchstart', this.handleTouchStart.bind(this), { passive: false });
+        document.addEventListener('touchmove', this.handleTouchMove.bind(this), { passive: false });
+        document.addEventListener('touchend', this.handleTouchEnd.bind(this), { passive: false });
+        
+        this.log('Touch event listeners setup complete');
+    }
+
+    handleTouchStart(event) {
+        const touch = event.touches[0];
+        this.touchStartX = touch.clientX;
+        this.touchStartY = touch.clientY;
+        this.touchCurrentX = touch.clientX;
+        this.touchCurrentY = touch.clientY;
+        this.gestureStartTime = Date.now();
+        this.isGestureActive = true;
+        
+        this.log(`Touch start: (${this.touchStartX}, ${this.touchStartY})`);
+    }
+
+    handleTouchMove(event) {
+        if (!this.isGestureActive) return;
+        
+        const touch = event.touches[0];
+        this.touchCurrentX = touch.clientX;
+        this.touchCurrentY = touch.clientY;
+        
+        // Provide visual feedback during gesture
+        this.showGestureFeedback();
+    }
+
+    handleTouchEnd(event) {
+        if (!this.isGestureActive) return;
+
+        const deltaX = this.touchCurrentX - this.touchStartX;
+        const deltaY = this.touchCurrentY - this.touchStartY;
+        const deltaTime = Date.now() - this.gestureStartTime;
+        const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+        
+        this.log(`Touch end: delta(${deltaX}, ${deltaY}), distance: ${distance}, time: ${deltaTime}ms`);
+        
+        // Detect swipe gestures
+        if (distance > this.minSwipeDistance && deltaTime < this.maxSwipeTime) {
+            this.processSwipeGesture(deltaX, deltaY, distance);
+        }
+        
+        this.clearGestureFeedback();
+        this.resetGestureData();
+    }
+
+    processSwipeGesture(deltaX, deltaY, distance) {
+        const threshold = this.swipeThreshold;
+        
+        // Determine primary swipe direction
+        if (Math.abs(deltaX) > Math.abs(deltaY)) {
+            // Horizontal swipe
+            if (deltaX > threshold) {
+                this.handleSwipeRight(distance);
+            } else if (deltaX < -threshold) {
+                this.handleSwipeLeft(distance);
+            }
+        } else {
+            // Vertical swipe
+            if (deltaY > threshold) {
+                this.handleSwipeDown(distance);
+            } else if (deltaY < -threshold) {
+                this.handleSwipeUp(distance);
+            }
+        }
+    }
+
+    handleSwipeLeft(distance) {
+        this.log('Swipe Left detected');
+        this.executeSwipeAction('left', distance);
+    }
+
+    handleSwipeRight(distance) {
+        this.log('Swipe Right detected');
+        this.executeSwipeAction('right', distance);
+    }
+
+    handleSwipeUp(distance) {
+        this.log('Swipe Up detected');
+        this.executeSwipeAction('up', distance);
+    }
+
+    handleSwipeDown(distance) {
+        this.log('Swipe Down detected');
+        this.executeSwipeAction('down', distance);
+    }
+
+    executeSwipeAction(direction, distance) {
+        // Provide haptic feedback if supported
+        this.provideHapticFeedback();
+        
+        // Execute appropriate action based on direction
+        switch (direction) {
+            case 'left':
+                this.navigateToPreviousSection();
+                break;
+            case 'right':
+                this.navigateToNextSection();
+                break;
+            case 'up':
+                this.scrollUp();
+                break;
+            case 'down':
+                this.scrollDown();
+                break;
+        }
+        
+        // Show swipe confirmation feedback
+        this.showSwipeConfirmation(direction);
+    }
+
+    navigateToPreviousSection() {
+        // Example: Navigate to previous section (could be previous form, previous page, etc.)
+        this.log('Navigating to previous section');
+        // Implementation depends on specific navigation requirements
+    }
+
+    navigateToNextSection() {
+        // Example: Navigate to next section (could be next form, next page, etc.)
+        this.log('Navigating to next section');
+        // Implementation depends on specific navigation requirements
+    }
+
+    scrollUp() {
+        // Smooth scroll up
+        window.scrollBy({
+            top: -200,
+            behavior: 'smooth'
+        });
+        this.log('Scrolling up');
+    }
+
+    scrollDown() {
+        // Smooth scroll down
+        window.scrollBy({
+            top: 200,
+            behavior: 'smooth'
+        });
+        this.log('Scrolling down');
+    }
+
+    provideHapticFeedback() {
+        // Provide haptic feedback if supported by device
+        if (navigator.vibrate) {
+            navigator.vibrate(50); // Short vibration for feedback
+        }
+    }
+
+    showSwipeConfirmation(direction) {
+        // Show brief visual confirmation of swipe action
+        const confirmation = document.createElement('div');
+        confirmation.className = 'swipe-confirmation';
+        confirmation.textContent = `Swipe ${direction.toUpperCase()} detected`;
+        
+        confirmation.style.cssText = `
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(30, 64, 175, 0.9);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-weight: 500;
+            z-index: 9999;
+            font-size: 14px;
+            transition: all 0.3s ease-in-out;
+        `;
+        
+        document.body.appendChild(confirmation);
+        
+        // Remove confirmation after 2 seconds
+        setTimeout(() => {
+            confirmation.style.opacity = '0';
+            setTimeout(() => {
+                if (confirmation.parentNode) {
+                    confirmation.parentNode.removeChild(confirmation);
+                }
+            }, 300);
+        }, 2000);
+    }
+
+    showGestureFeedback() {
+        // Subtle visual feedback during gesture
+        document.body.classList.add('gesture-active');
+    }
+
+    clearGestureFeedback() {
+        // Remove visual feedback
+        document.body.classList.remove('gesture-active');
+    }
+
+    resetGestureData() {
+        this.touchStartX = null;
+        this.touchStartY = null;
+        this.touchCurrentX = null;
+        this.touchCurrentY = null;
+        this.gestureStartTime = null;
+        this.isGestureActive = false;
+    }
+
+    addGestureCSS() {
+        // Add CSS for gesture feedback
+        const style = document.createElement('style');
+        style.textContent = `
+            .gesture-active {
+                overflow: hidden;
+                touch-action: none;
+            }
+            
+            .swipe-confirmation {
+                pointer-events: none;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            }
+            
+            /* Enhanced touch targets */
+            .touch-target {
+                min-height: 44px;
+                min-width: 44px;
+                touch-action: manipulation;
+            }
+            
+            /* Improve form interaction */
+            input, select, textarea {
+                touch-action: manipulation;
+                -webkit-appearance: none;
+                border-radius: 8px;
+            }
+            
+            /* QR Scanner touch area enhancement */
+            #qr-reader {
+                touch-action: manipulation;
+            }
+        `;
+        document.head.appendChild(style);
+    }
+
+    log(message) {
+        console.log(`[MobileGesture] ${message}`);
+    }
+}
+
+// Initialize mobile gesture handler when the app starts
+document.addEventListener('DOMContentLoaded', () => {
+    if (typeof MobileGestureHandler !== 'undefined') {
+        window.mobileGestureHandler = new MobileGestureHandler();
+    }
 });
 
 // Service Worker for offline functionality
