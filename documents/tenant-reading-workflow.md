@@ -295,21 +295,39 @@ async function refreshComprehensiveCache() {
 }
 ```
 
-### **Offline Storage Structure**
+### **Offline Storage Structure (Phase 11: Enhanced with Tenant & Property Data)**
 ```javascript
 // localStorage key: 'qr_meter_readings_offline'
 [
     {
-        propertyCode: "GCA",
-        unitNo: "101",
-        currentReading: 10510,
+        propertyCode: "GC A",
+        unitNo: "102",
+        currentReading: 27732,
         remarks: "Monthly reading",
         locationData: {...},
-        timestamp: "2025-09-25T14:30:00Z",
-        syncId: "unique-id-1" // Prevents duplicates
+        tenantName: "JOAN SARMIENTO &/OR BIEN MICHAEL SARMIENTO RAMOS", // Phase 11: Added
+        propertyName: "Garapan Courtyard A", // Phase 11: Added
+        timestamp: "2025-09-30T03:43:27.683Z",
+        syncId: "sync_1759203807683_d1z2ovve2", // Prevents duplicates
+        validationMetadata: {
+            validationTimestamp: "2025-09-30T03:43:27.683Z",
+            validationChecks: [
+                { rule: "requiredFields", passed: true },
+                { rule: "numericValidation", passed: true },
+                { rule: "businessRules", passed: true }
+            ],
+            deviceInfo: {...},
+            locationData: null
+        }
     }
 ]
 ```
+
+**Phase 11 Enhancements**:
+- **tenantName**: Retrieved from `currentTenantData` during QR scan
+- **propertyName**: Retrieved from `currentTenantData` for display in Recent QR Readings
+- **Complete Data**: Offline readings now have all information needed for display
+- **Display Ready**: Can be shown in Recent QR Readings table without additional lookups
 
 ### **Smart Notifications**
 - **Offline Notification**: "Connection Lost" + "Reading will be saved offline"
