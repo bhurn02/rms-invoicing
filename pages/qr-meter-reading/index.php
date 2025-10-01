@@ -14,7 +14,7 @@ require_once 'auth/auth.php';
 requireQRMeterReadingAccess();
 
 // Include configuration for environment detection
-require_once 'config/config.local.php';
+require_once 'config/config.php';
 
 // Get current user information
 $currentUser = getCurrentUsername();

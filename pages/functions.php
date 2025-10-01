@@ -26,7 +26,7 @@ function cn() {
 }
 
 function ftp() {
-	$host = '172.16.33.13';
+	$host = '172.16.57.10';
 	$usr = 'ftp_user';
 	$pwd = '0ftpuse123';
 	$path = 'C:\\system\\rms\\pages\\ftp\\';
