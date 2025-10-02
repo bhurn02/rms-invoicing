@@ -50,15 +50,24 @@
             background: #f8fafc;
             border-radius: 8px;
             padding: 1.5rem;
-            text-align: center;
             border: 2px solid transparent;
             transition: all 0.3s ease;
             display: flex;
             flex-direction: column;
+            text-align: left;
         }
         
         .help-item .btn {
             margin-top: auto;
+            min-height: 48px !important;
+            height: 48px !important;
+            font-size: 1rem !important;
+            font-weight: 500 !important;
+            padding: 12px 16px !important;
+            line-height: 1.2 !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
         }
         .help-item:hover {
             border-color: #1e40af;
@@ -411,53 +420,74 @@
             <div class="help-grid">
                 <!-- User Manual -->
                 <div class="help-item">
-                    <i class="bi bi-book help-item-icon text-primary"></i>
-                    <h4 class="mb-3">Complete User Manual</h4>
-                    <p class="mb-3">Comprehensive documentation covering all features and functionality of the QR Meter Reading System.</p>
-                    <ul class="list-unstyled text-start mb-4">
-                        <li><i class="bi bi-check text-success me-2"></i>System overview and features</li>
-                        <li><i class="bi bi-check text-success me-2"></i>Step-by-step instructions</li>
-                        <li><i class="bi bi-check text-success me-2"></i>QR scanning workflow</li>
-                        <li><i class="bi bi-check text-success me-2"></i>Offline mode & sync features</li>
-                        <li><i class="bi bi-check text-success me-2"></i>QR generator usage</li>
-                        <li><i class="bi bi-check text-success me-2"></i>Frequently asked questions</li>
-                    </ul>
-                    <a href="index.html" class="btn btn-primary btn-lg">
+                    <div class="text-center mb-4">
+                        <i class="bi bi-book help-item-icon text-primary"></i>
+                        <h4 class="mb-3">Complete User Manual</h4>
+                    </div>
+                    <p class="mb-4 text-muted">Comprehensive documentation covering all features and functionality of the QR Meter Reading System.</p>
+                    
+                    <div class="mb-4">
+                        <h6 class="text-dark fw-semibold mb-3">What's Included:</h6>
+                        <ul class="list-unstyled">
+                            <li class="mb-2"><i class="bi bi-check text-success me-2"></i>System overview and features</li>
+                            <li class="mb-2"><i class="bi bi-check text-success me-2"></i>Step-by-step instructions</li>
+                            <li class="mb-2"><i class="bi bi-check text-success me-2"></i>QR scanning workflow</li>
+                            <li class="mb-2"><i class="bi bi-check text-success me-2"></i>Offline mode & sync features</li>
+                            <li class="mb-2"><i class="bi bi-check text-success me-2"></i>QR generator usage</li>
+                            <li class="mb-2"><i class="bi bi-check text-success me-2"></i>Frequently asked questions</li>
+                        </ul>
+                    </div>
+                    
+                    <a href="index.html" class="btn btn-primary btn-lg w-100 text-white">
                         <i class="bi bi-book me-2"></i>Read Manual
                     </a>
                 </div>
                 
                 <!-- Quick Reference -->
                 <div class="help-item">
-                    <i class="bi bi-lightning-charge help-item-icon text-success"></i>
-                    <h4 class="mb-3">Quick Reference Guide</h4>
-                    <p class="mb-3">Fast access to essential information for field technicians who need quick answers.</p>
-                    <ul class="list-unstyled text-start mb-4">
-                        <li><i class="bi bi-check text-success me-2"></i>5-step quick start process</li>
-                        <li><i class="bi bi-check text-success me-2"></i>QR code format reference</li>
-                        <li><i class="bi bi-check text-success me-2"></i>Common troubleshooting</li>
-                        <li><i class="bi bi-check text-success me-2"></i>Pro tips and best practices</li>
-                        <li><i class="bi bi-check text-success me-2"></i>Emergency contact information</li>
-                    </ul>
-                    <a href="quick-reference.html" class="btn btn-success btn-lg">
+                    <div class="text-center mb-4">
+                        <i class="bi bi-lightning-charge help-item-icon text-primary"></i>
+                        <h4 class="mb-3">Quick Reference Guide</h4>
+                    </div>
+                    <p class="mb-4 text-muted">Fast access to essential information for field technicians who need quick answers.</p>
+                    
+                    <div class="mb-4">
+                        <h6 class="text-dark fw-semibold mb-3">Quick Access:</h6>
+                        <ul class="list-unstyled">
+                            <li class="mb-2"><i class="bi bi-check text-success me-2"></i>5-step quick start process</li>
+                            <li class="mb-2"><i class="bi bi-check text-success me-2"></i>QR code format reference</li>
+                            <li class="mb-2"><i class="bi bi-check text-success me-2"></i>Common troubleshooting</li>
+                            <li class="mb-2"><i class="bi bi-check text-success me-2"></i>Pro tips and best practices</li>
+                            <li class="mb-2"><i class="bi bi-check text-success me-2"></i>Emergency contact information</li>
+                        </ul>
+                    </div>
+                    
+                    <a href="quick-reference.html" class="btn btn-success btn-lg w-100 text-white">
                         <i class="bi bi-lightning-charge me-2"></i>Quick Start
                     </a>
                 </div>
                 
                 <!-- Troubleshooting -->
                 <div class="help-item">
-                    <i class="bi bi-tools help-item-icon text-warning"></i>
-                    <h4 class="mb-3">Troubleshooting Guide</h4>
-                    <p class="mb-3">Technical support documentation for resolving common issues and problems.</p>
-                    <ul class="list-unstyled text-start mb-4">
-                        <li><i class="bi bi-check text-success me-2"></i>Camera and scanning issues</li>
-                        <li><i class="bi bi-check text-success me-2"></i>Network connectivity problems</li>
-                        <li><i class="bi bi-check text-success me-2"></i>Offline sync troubleshooting</li>
-                        <li><i class="bi bi-check text-success me-2"></i>Access and permission issues</li>
-                        <li><i class="bi bi-check text-success me-2"></i>Error message explanations</li>
-                        <li><i class="bi bi-check text-success me-2"></i>Prevention and maintenance tips</li>
-                    </ul>
-                    <a href="troubleshooting.html" class="btn btn-warning btn-lg">
+                    <div class="text-center mb-4">
+                        <i class="bi bi-tools help-item-icon text-primary"></i>
+                        <h4 class="mb-3">Troubleshooting Guide</h4>
+                    </div>
+                    <p class="mb-4 text-muted">Technical support documentation for resolving common issues and problems.</p>
+                    
+                    <div class="mb-4">
+                        <h6 class="text-dark fw-semibold mb-3">Covers These Issues:</h6>
+                        <ul class="list-unstyled">
+                            <li class="mb-2"><i class="bi bi-check text-success me-2"></i>Camera and scanning issues</li>
+                            <li class="mb-2"><i class="bi bi-check text-success me-2"></i>Network connectivity problems</li>
+                            <li class="mb-2"><i class="bi bi-check text-success me-2"></i>Offline sync troubleshooting</li>
+                            <li class="mb-2"><i class="bi bi-check text-success me-2"></i>Access and permission issues</li>
+                            <li class="mb-2"><i class="bi bi-check text-success me-2"></i>Error message explanations</li>
+                            <li class="mb-2"><i class="bi bi-check text-success me-2"></i>Prevention and maintenance tips</li>
+                        </ul>
+                    </div>
+                    
+                    <a href="troubleshooting.html" class="btn btn-warning btn-lg w-100 text-white">
                         <i class="bi bi-tools me-2"></i>Fix Issues
                     </a>
                 </div>
