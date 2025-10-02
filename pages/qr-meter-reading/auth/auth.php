@@ -136,13 +136,29 @@ function hasPermission($action) {
 /**
  * Require authentication and QR Meter Reading access
  * This is the main function to use for QR Meter Reading pages
+ * @param string $redirectUrl Optional URL to redirect to after login
  */
-function requireQRMeterReadingAccess() {
+function requireQRMeterReadingAccess($redirectUrl = null) {
     // First check if user is authenticated
     if (!isAuthenticated() || isSessionExpired()) {
-        // Clear expired session
+        // Store the redirect URL in session BEFORE any cleanup
+        if ($redirectUrl) {
+            $_SESSION['qr_redirect_after_login'] = $redirectUrl;
+        } else {
+            // Fallback: try to get the current page URL from the calling script
+            $currentUrl = $_SERVER['REQUEST_URI'];
+            $_SESSION['qr_redirect_after_login'] = $currentUrl;
+        }
+        
+        // If session expired, clear ONLY old user data, preserve session
         if (isSessionExpired()) {
-            session_destroy();
+            // Unset old authentication data only
+            unset($_SESSION['qr_user_id']);
+            unset($_SESSION['qr_username']);
+            unset($_SESSION['qr_company_code']);
+            unset($_SESSION['qr_login_time']);
+            unset($_SESSION['qr_ip_address']);
+            // DO NOT call session_destroy() - preserve session and our redirect URL
         }
         
         // Redirect to login page
