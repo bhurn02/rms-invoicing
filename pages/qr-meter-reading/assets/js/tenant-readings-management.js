@@ -15,6 +15,10 @@ let selectedTenant = null;
 const API_BASE = 'api/readings';
 const ENDPOINTS = {
     list: `${API_BASE}.php`,
+    create: `${API_BASE}/manual-entry.php`,
+    read: `${API_BASE}.php`,
+    update: `${API_BASE}.php`,
+    delete: `${API_BASE}.php`,
     batchUpdate: `${API_BASE}/batch-update.php`,
     manualEntry: `${API_BASE}/manual-entry.php`,
     tenantSearch: `${API_BASE}/tenants.php`
@@ -51,11 +55,14 @@ function initializeEventListeners() {
     document.getElementById('tenantSearch').addEventListener('keypress', function(e) {
         if (e.key === 'Enter') searchTenants();
     });
-    document.getElementById('btnSaveManualEntry').addEventListener('click', saveManualEntry);
+    document.getElementById('btnSaveManualEntry').addEventListener('click', saveManualEntryReading);
     
     // Batch operations modal
     document.getElementById('batchOperation').addEventListener('change', toggleBatchOperationFields);
-    document.getElementById('btnExecuteBatchOperation').addEventListener('click', executeBatchOperation);
+    document.getElementById('btnExecuteBatchOperation').addEventListener('click', function() {
+        const operation = document.getElementById('batchOperation').value;
+        executeBatchOperation(operation);
+    });
     
     // Edit reading modal
     document.getElementById('btnSaveEditReading').addEventListener('click', saveEditReading);
@@ -126,8 +133,8 @@ async function loadProperties() {
             
             data.data.properties.forEach(property => {
                 const option = document.createElement('option');
-                option.value = property.property_id;
-                option.textContent = property.property_name;
+                option.value = property.real_property_code;
+                option.textContent = property.real_property_name;
                 propertySelect.appendChild(option);
             });
         }
@@ -146,14 +153,14 @@ async function loadUnitsForProperty(propertyId) {
         
         if (!propertyId) return;
         
-        const response = await fetch(`${ENDPOINTS.tenantSearch}?property_id=${propertyId}`);
+        const response = await fetch(`${ENDPOINTS.tenantSearch}?property=${propertyId}`);
         const data = await response.json();
         
         if (data.success) {
             data.data.units.forEach(unit => {
                 const option = document.createElement('option');
-                option.value = unit.unit_id;
-                option.textContent = unit.unit_name;
+                option.value = unit.unit_no.trim();
+                option.textContent = `${unit.unit_no.trim()} - ${unit.real_property_name}`;
                 unitSelect.appendChild(option);
             });
         }
@@ -271,19 +278,19 @@ function renderReadingSource(reading) {
     
     switch(source) {
         case 'Legacy':
-            badgeClass = 'bg-secondary text-white';
+            badgeClass = 'badge bg-secondary';
             iconClass = 'fas fa-history';
             break;
         case 'QR Scanner':
-            badgeClass = 'bg-primary text-white';
+            badgeClass = 'badge bg-primary';
             iconClass = 'fas fa-qrcode';
             break;
         case 'Manual Entry':
-            badgeClass = 'bg-info text-white';
+            badgeClass = 'badge bg-info';
             iconClass = 'fas fa-edit';
             break;
         default:
-            badgeClass = 'bg-light text-dark';
+            badgeClass = 'badge bg-light text-dark';
             iconClass = 'fas fa-question';
             break;
     }
@@ -293,11 +300,11 @@ function renderReadingSource(reading) {
 
 function renderStatusBadge(reading) {
     if (reading.is_invoiced) {
-        return '<span class="badge badge-success">Invoiced</span>';
+        return '<span class="badge bg-success">Invoiced</span>';
     } else if (reading.is_offline) {
-        return '<span class="badge badge-warning">Offline</span>';
+        return '<span class="badge bg-warning">Offline</span>';
     } else {
-        return '<span class="badge badge-info">Active</span>';
+        return '<span class="badge bg-info">Active</span>';
     }
 }
 
@@ -944,6 +951,340 @@ function showSuccess(message) {
         title: 'Success!',
         text: message,
         icon: 'success',
+        confirmButtonText: 'OK'
+    });
+}
+
+/**
+ * Show Manual Entry Modal
+ */
+function showManualEntryModal() {
+    // Clear form
+    document.getElementById('manualEntryForm').reset();
+    document.getElementById('selectedTenantInfo').innerHTML = '';
+    selectedTenant = null;
+    
+    // Show modal
+    const modal = new bootstrap.Modal(document.getElementById('manualEntryModal'));
+    modal.show();
+}
+
+/**
+ * Show Batch Operations Modal
+ */
+function showBatchOperationsModal() {
+    if (selectedReadings.size === 0) {
+        showError('Please select readings first');
+        return;
+    }
+    
+    // Show modal
+    const modal = new bootstrap.Modal(document.getElementById('batchOperationsModal'));
+    modal.show();
+}
+
+/**
+ * Search tenants for manual entry
+ */
+async function searchTenants() {
+    const searchTerm = document.getElementById('tenantSearch').value.trim();
+    
+    if (searchTerm.length < 2) {
+        showError('Please enter at least 2 characters to search');
+        return;
+    }
+    
+    try {
+        const response = await fetch(`${ENDPOINTS.tenantSearch}?search=${encodeURIComponent(searchTerm)}`);
+        const data = await response.json();
+        
+        if (data.success) {
+            displayTenantSearchResults(data.data);
+        } else {
+            throw new Error(data.message);
+        }
+    } catch (error) {
+        console.error('Error searching tenants:', error);
+        showError('Failed to search tenants: ' + error.message);
+    }
+}
+
+/**
+ * Display tenant search results
+ */
+function displayTenantSearchResults(tenants) {
+    const resultsContainer = document.getElementById('tenantSearchResults');
+    
+    if (tenants.length === 0) {
+        resultsContainer.innerHTML = '<div class="alert alert-warning">No tenants found</div>';
+        return;
+    }
+    
+    let html = '<div class="list-group">';
+    tenants.forEach(tenant => {
+        html += `
+            <button type="button" class="list-group-item list-group-item-action" 
+                    onclick="selectTenant(${tenant.tenant_code}, '${escapeHtml(tenant.tenant_name)}', '${escapeHtml(tenant.property_name)}', '${escapeHtml(tenant.unit_no)}')">
+                <strong>${escapeHtml(tenant.tenant_name)}</strong><br>
+                <small>Property: ${escapeHtml(tenant.property_name)} | Unit: ${escapeHtml(tenant.unit_no)}</small>
+            </button>
+        `;
+    });
+    html += '</div>';
+    
+    resultsContainer.innerHTML = html;
+}
+
+/**
+ * Select tenant for manual entry
+ */
+function selectTenant(tenantCode, tenantName, propertyName, unitNo) {
+    selectedTenant = {
+        tenant_code: tenantCode,
+        tenant_name: tenantName,
+        property_name: propertyName,
+        unit_no: unitNo
+    };
+    
+    document.getElementById('selectedTenantInfo').innerHTML = `
+        <div class="alert alert-success">
+            <strong>Selected Tenant:</strong><br>
+            ${escapeHtml(tenantName)}<br>
+            <small>Property: ${escapeHtml(propertyName)} | Unit: ${escapeHtml(unitNo)}</small>
+        </div>
+    `;
+    
+    document.getElementById('tenantSearchResults').innerHTML = '';
+}
+
+/**
+ * Save Manual Entry Reading
+ */
+async function saveManualEntryReading() {
+    if (!selectedTenant) {
+        showError('Please select a tenant first');
+        return;
+    }
+    
+    const form = document.getElementById('manualEntryForm');
+    const formData = new FormData(form);
+    
+    // Validate required fields
+    if (!formData.get('current_reading') || !formData.get('date_from') || !formData.get('date_to')) {
+        showError('Please fill in all required fields');
+        return;
+    }
+    
+    try {
+        const manualEntryData = {
+            tenant_code: selectedTenant.tenant_code,
+            date_from: formData.get('date_from'),
+            date_to: formData.get('date_to'),
+            billing_date_from: formData.get('billing_date_from'),
+            billing_date_to: formData.get('billing_date_to'),
+            current_reading: parseFloat(formData.get('current_reading')),
+            remarks: formData.get('remarks') || ''
+        };
+        
+        const response = await fetch(ENDPOINTS.manualEntry, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(manualEntryData)
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            Swal.fire({
+                title: 'Success!',
+                text: 'Manual reading saved successfully',
+                icon: 'success',
+                confirmButtonText: 'OK'
+            });
+            
+            // Close modal and refresh data
+            const modal = bootstrap.Modal.getInstance(document.getElementById('manualEntryModal'));
+            modal.hide();
+            clearSelection();
+            loadReadings(currentPage);
+        } else {
+            throw new Error(data.message);
+        }
+    } catch (error) {
+        console.error('Error saving manual reading:', error);
+        showError('Error saving manual reading: ' + error.message);
+    }
+}
+
+/**
+ * Save Edit Reading
+ */
+async function saveEditReading() {
+    try {
+        const readingId = document.getElementById('editReadingId').value;
+        const editData = {
+            reading_id: readingId,
+            date_from: document.getElementById('editDateFrom').value,
+            date_to: document.getElementById('editDateTo').value,
+            billing_date_from: document.getElementById('editBillingDateFrom').value,
+            billing_date_to: document.getElementById('editBillingDateTo').value,
+            current_reading: parseFloat(document.getElementById('editCurrentReading').value),
+            prev_reading: parseFloat(document.getElementById('editPreviousReading').value)
+        };
+        
+        const response = await fetch(`${ENDPOINTS.list}?id=${readingId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(editData)
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            Swal.fire({
+                title: 'Success!',
+                text: 'Reading updated successfully',
+                icon: 'success',
+                confirmButtonText: 'OK'
+            });
+            
+            // Close modal and refresh data
+            const modal = bootstrap.Modal.getInstance(document.getElementById('editReadingModal'));
+            modal.hide();
+            loadReadings(currentPage);
+        } else {
+            throw new Error(data.message);
+        }
+    } catch (error) {
+        console.error('Error saving edited reading:', error);
+        showError('Failed to update reading: ' + error.message);
+    }
+}
+
+/**
+ * Execute Batch Operations
+ */
+async function executeBatchOperation(operation) {
+    if (selectedReadings.size === 0) {
+        showError('Please select readings first');
+        return;
+    }
+    
+    let confirmMessage = `Are you sure you want to ${operation} ${selectedReadings.size} reading(s)?`;
+    if (operation === 'delete') {
+        confirmMessage = `Are you sure you want to DELETE ${selectedReadings.size} reading(s)? This action cannot be undone.`;
+    }
+    
+    const result = await Swal.fire({
+        title: 'Confirm Action',
+        text: confirmMessage,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: `Yes, ${operation}`,
+        cancelButtonText: 'Cancel',
+        confirmButtonColor: operation === 'delete' ? '#dc3545' : '#0d6efd'
+    });
+    
+    if (!result.isConfirmed) return;
+    
+    const readingIds = Array.from(selectedReadings);
+    const operationData = {
+        operation: operation,
+        reading_ids: readingIds
+    };
+    
+    try {
+        if (operation === 'updating_date') {
+            // Handle date correction
+            operationData.new_date_from = document.getElementById('batchDateFrom')?.value;
+            operationData.new_date_to = document.getElementById('batchDateTo')?.value;
+            operationData.new_billing_date_from = document.getElementById('batchBillingDateFrom')?.value;
+            operationData.new_billing_date_to = document.getElementById('batchBillingDateTo')?.value;
+        }
+        
+        const response = await fetch(ENDPOINTS.batchUpdate, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(operationData)
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            Swal.fire({
+                title: 'Success!',
+                text: `${operation} completed successfully`,
+                icon: 'success',
+                confirmButtonText: 'OK'
+            });
+            
+            // Close modal and refresh data
+            const modal = bootstrap.Modal.getInstance(document.getElementById('batchOperationsModal'));
+            modal.hide();
+            clearSelection();
+            loadReadings(currentPage);
+        } else {
+            throw new Error(data.message);
+        }
+    } catch (error) {
+        console.error(`Error ${operation}:`, error);
+        showError(`Failed to ${operation}: ${error.message}`);
+    }
+}
+
+/**
+ * Calculate edit consumption
+ */
+function calculateEditConsumption() {
+    const currentReading = parseFloat(document.getElementById('editCurrentReading').value) || 0;
+    const previousReading = parseFloat(document.getElementById('editPreviousReading').value) || 0;
+    const consumption = currentReading - previousReading;
+    
+    document.getElementById('editCalculatedConsumption').textContent = consumption.toFixed(2);
+    
+    // Add event listeners to update calculation automatically
+    document.getElementById('editCurrentReading').addEventListener('input', calculateEditConsumption);
+    document.getElementById('editPreviousReading').addEventListener('input', calculateEditConsumption);
+}
+
+/**
+ * Show success message
+ */
+function showSuccess(message) {
+    Swal.fire({
+        title: 'Success!',
+        text: message,
+        icon: 'success',
+        confirmButtonText: 'OK'
+    });
+}
+
+/**
+ * Show warning message
+ */
+function showWarning(message) {
+    Swal.fire({
+        title: 'Warning!',
+        text: message,
+        icon: 'warning',
+        confirmButtonText: 'OK'
+    });
+}
+
+/**
+ * Show info message
+ */
+function showInfo(message) {
+    Swal.fire({
+        title: 'Info',
+        text: message,
+        icon: 'info',
         confirmButtonText: 'OK'
     });
 }

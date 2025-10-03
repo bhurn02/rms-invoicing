@@ -3,17 +3,20 @@
  * Provides offline functionality and caching for the PWA
  */
 
-const CACHE_NAME = 'qr-meter-reading-v1.0.0';
-const STATIC_CACHE = 'qr-meter-reading-static-v1.0.0';
-const DYNAMIC_CACHE = 'qr-meter-reading-dynamic-v1.0.0';
+const CACHE_NAME = 'qr-meter-reading-v1.2.0';
+const STATIC_CACHE = 'qr-meter-reading-static-v1.2.0';
+const DYNAMIC_CACHE = 'qr-meter-reading-dynamic-v1.2.0';
 
 // Files to cache for offline functionality
 const STATIC_FILES = [
     '/rms/qr-meter-reading/',
     '/rms/qr-meter-reading/index.php',
+    '/rms/qr-meter-reading/tenant-readings-management.php',
     '/rms/qr-meter-reading/assets/css/custom-theme.css',
     '/rms/qr-meter-reading/assets/css/qr-scanner.css',
+    '/rms/qr-meter-reading/assets/css/tenant-readings-management.css',
     '/rms/qr-meter-reading/assets/js/app.js',
+    '/rms/qr-meter-reading/assets/js/tenant-readings-management.js',
     '/rms/qr-meter-reading/manifest.json'
 ];
 

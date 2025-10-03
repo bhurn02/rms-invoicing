@@ -68,7 +68,7 @@ $pageTitle = 'Tenant Readings Management';
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="qr-scanner.php">
+                        <a class="nav-link" href="index.php">
                             <i class="fas fa-qrcode me-1"></i>QR Scanner
                         </a>
                     </li>
@@ -109,10 +109,10 @@ $pageTitle = 'Tenant Readings Management';
                         <p class="text-muted mb-0">Manage tenant meter readings with full CRUD operations</p>
                     </div>
                     <div class="d-flex gap-2">
-                        <button type="button" class="btn btn-success" id="btnManualEntry">
+                        <button type="button" class="btn btn-outline-success" id="btnManualEntry">
                             <i class="fas fa-plus me-1"></i>Manual Entry
                         </button>
-                        <button type="button" class="btn btn-primary" id="btnBatchOperations">
+                        <button type="button" class="btn btn-outline-primary" id="btnBatchOperations">
                             <i class="fas fa-tasks me-1"></i>Batch Operations
                         </button>
                     </div>
@@ -320,7 +320,7 @@ $pageTitle = 'Tenant Readings Management';
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
                     <button type="button" class="btn btn-primary" id="btnSaveManualEntry">
                         <i class="fas fa-save me-1"></i>Save Reading
                     </button>
@@ -387,7 +387,7 @@ $pageTitle = 'Tenant Readings Management';
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
                     <button type="button" class="btn btn-danger" id="btnExecuteBatchOperation">
                         <i class="fas fa-play me-1"></i>Execute Operation
                     </button>
@@ -459,7 +459,7 @@ $pageTitle = 'Tenant Readings Management';
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
                     <button type="button" class="btn btn-primary" id="btnSaveEditReading">
                         <i class="fas fa-save me-1"></i>Save Changes
                     </button>
