@@ -1,5 +1,10 @@
-# Here's how to list local branches sorted by recent activity (most recent on top):
+# Git Command Template
 
+## 1. Branch Listing Commands
+
+### List Local Branches (Sorted by Recent Activity)
+
+```bash
 # Just date and time without seconds
 git for-each-ref --sort=-committerdate refs/heads/ --format='%(committerdate:format:%Y-%m-%d %H:%M) %(refname:short)'
 
@@ -18,8 +23,20 @@ git for-each-ref --sort=-committerdate refs/remotes/ --format='%(committerdate:f
 # Show both local and remote branches
 git for-each-ref --sort=-committerdate refs/heads/ refs/remotes/ --format='%(committerdate:format:%Y-%m-%d %H:%M:%S) %(refname:short) %(objectname:short) %(authorname)'
 
+# Show all commits across all branches (more comprehensive view)
+git log --all --decorate --date=format:'%Y-%m-%d %H:%M:%S' --pretty=format:'%C(green)%ad%C(reset) %C(blue)%an%C(reset) %C(cyan)%D%C(reset) %C(yellow)%h%C(reset) %C(magenta)[%S]%C(reset) %s'
 
-# Here's the complete code sequence with hardcoded datetime and backup tag for merging a branch into main:
+# Here's the command to get September 2025 commits and save them to an MD file:
+echo "# September 2025 Git Commits" > 2025-09-commits.md
+echo "" >> 2025-09-commits.md
+git log --all --decorate --date=format:'%Y-%m-%d %H:%M:%S' --pretty=format:'%C(green)%ad%C(reset) %C(blue)%an%C(reset) %C(cyan)%D%C(reset) %C(yellow)%h%C(reset) %C(magenta)[%S]%C(reset) %s' >> 2025-09-commits.md
+```
+
+## 2. Branch Merging Sequence
+
+### Complete Merge Process with Backup Tag
+
+```bash
 # 1. Switch to main branch
 git checkout main
 
@@ -48,17 +65,24 @@ git commit -m "docs: Restore TLA performance optimization documentation to memor
 git push origin main
 
 
-# Here's how to list only the commits that are specific to your current branch:
+### List Commits Specific to Current Branch
 
+```bash
 # Just date and time without seconds
 git log main..HEAD --pretty=format:"%ad %h %s" --date=format:"%Y-%m-%d %H:%M"
 
 # With commit hash and author
 git log main..HEAD --pretty=format:"%h %ad %an %s" --date=format:"%Y-%m-%d %H:%M"
+```
 
+## 4. Reset Commands
 
+### Discard Changes and Reset
+
+```bash
 # Hard reset - discards all changes and resets to last commit
 git reset --hard HEAD
 
 # Restore all files in working directory
 git restore .
+```

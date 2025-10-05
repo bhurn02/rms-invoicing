@@ -175,6 +175,7 @@ async function loadUnitsForProperty(propertyId) {
 async function loadReadings(page = 1) {
     try {
         showLoading();
+        const progressNotification = showProgress(`Loading readings...`);
         
         const params = new URLSearchParams({
             page: page,
@@ -184,6 +185,10 @@ async function loadReadings(page = 1) {
         
         const response = await fetch(`${ENDPOINTS.list}?${params}`);
         const data = await response.json();
+        
+        // Hide notifications
+        hideLoading();
+        hideNotification('progress-notification');
         
         if (data.success) {
             allReadings = data.data;
@@ -195,14 +200,17 @@ async function loadReadings(page = 1) {
             
             if (allReadings.length === 0) {
                 showNoDataMessage();
+                showWarning('No Readings Found', 'Try adjusting your search filters');
             } else {
                 hideNoDataMessage();
+                showSuccess('Readings Loaded!', `Found ${allReadings.length} readings`);
             }
         } else {
             throw new Error(data.message);
         }
     } catch (error) {
         console.error('Error loading readings:', error);
+        hideNotification('progress-notification');
         showError('Failed to load readings: ' + error.message);
     } finally {
         hideLoading();
@@ -242,12 +250,12 @@ function renderReadingsTable() {
                     </button>
                     <button type="button" class="btn btn-sm btn-outline-warning" 
                             onclick="editReading(${reading.reading_id})" title="Edit"
-                            ${reading.is_invoiced ? 'disabled' : ''}>
+                            ${reading.is_invoiced == '1' ? 'disabled' : ''}>
                         <i class="fas fa-edit"></i>
                     </button>
                     <button type="button" class="btn btn-sm btn-outline-danger" 
                             onclick="deleteReading(${reading.reading_id})" title="Delete"
-                            ${reading.is_invoiced ? 'disabled' : ''}>
+                            ${reading.is_invoiced == '1' ? 'disabled' : ''}>
                         <i class="fas fa-trash"></i>
                     </button>
                 </div>
@@ -299,10 +307,9 @@ function renderReadingSource(reading) {
 }
 
 function renderStatusBadge(reading) {
-    if (reading.is_invoiced) {
+    // is_invoiced returns "1" or "0" as strings from API
+    if (reading.is_invoiced === 1 || reading.is_invoiced === "1") {
         return '<span class="badge bg-success">Invoiced</span>';
-    } else if (reading.is_offline) {
-        return '<span class="badge bg-warning">Offline</span>';
     } else {
         return '<span class="badge bg-info">Active</span>';
     }
@@ -575,7 +582,7 @@ async function saveManualEntry() {
         const data = await response.json();
         
         if (data.success) {
-            showSuccess('Reading created successfully');
+            showSuccess('Reading Created Successfully!', 'Manual entry has been saved to the system');
             bootstrap.Modal.getInstance(document.getElementById('manualEntryModal')).hide();
             loadReadings(currentPage);
         } else {
@@ -702,7 +709,7 @@ async function executeBatchOperation() {
         const data = await response.json();
         
         if (data.success) {
-            showSuccess(`Batch operation completed. Success: ${data.data.success_count}, Errors: ${data.data.error_count}`);
+            showSuccess('Batch Operation Completed!', `Success: ${data.data.success_count}, Errors: ${data.data.error_count}`);
             bootstrap.Modal.getInstance(document.getElementById('batchOperationsModal')).hide();
             clearSelection();
             loadReadings(currentPage);
@@ -765,18 +772,24 @@ async function editReading(readingId) {
         if (data.success) {
             const reading = data.data;
             
-            // Check if reading is invoiced
-            if (reading.is_invoiced) {
-                showError('Cannot edit invoiced readings');
+            // Check if reading is invoiced (explicit check for "1")
+            if (reading.is_invoiced === '1' || reading.is_invoiced === 1) {
+                Swal.fire({
+                    title: 'Cannot Edit',
+                    text: 'This reading has been invoiced and cannot be edited.',
+                    icon: 'warning',
+                    confirmButtonText: 'OK',
+                    confirmButtonColor: '#6c757d'
+                });
                 return;
             }
             
             // Populate edit form
             document.getElementById('editReadingId').value = reading.reading_id;
-            document.getElementById('editDateFrom').value = reading.date_from;
-            document.getElementById('editDateTo').value = reading.date_to;
-            document.getElementById('editBillingDateFrom').value = reading.billing_date_from;
-            document.getElementById('editBillingDateTo').value = reading.billing_date_to;
+            document.getElementById('editDateFrom').value = formatDateForInput(reading.date_from);
+            document.getElementById('editDateTo').value = formatDateForInput(reading.date_to);
+            document.getElementById('editBillingDateFrom').value = formatDateForInput(reading.billing_date_from);
+            document.getElementById('editBillingDateTo').value = formatDateForInput(reading.billing_date_to);
             document.getElementById('editCurrentReading').value = reading.current_reading;
             document.getElementById('editPreviousReading').value = reading.prev_reading;
             
@@ -837,7 +850,7 @@ async function saveEditReading() {
         const data = await response.json();
         
         if (data.success) {
-            showSuccess('Reading updated successfully');
+            showSuccess('Reading Updated Successfully!', 'Changes have been saved to the system');
             bootstrap.Modal.getInstance(document.getElementById('editReadingModal')).hide();
             loadReadings(currentPage);
         } else {
@@ -878,14 +891,38 @@ function validateEditReadingForm(formData) {
  */
 async function deleteReading(readingId) {
     try {
-        const confirmed = await Swal.fire({
-            title: 'Confirm Delete',
-            text: 'Are you sure you want to delete this reading? This action cannot be undone.',
+        // First check if reading is invoiced
+        const getReadingResponse = await fetch(`${ENDPOINTS.list}?id=${readingId}`);
+        const getReadingData = await getReadingResponse.json();
+        
+        if (getReadingData.success) {
+            const reading = getReadingData.data;
+            
+            // Check if reading is invoiced (explicit check for "1")
+            if (reading.is_invoiced === '1' || reading.is_invoiced === 1) {
+                Swal.fire({
+                    title: 'Cannot Delete',
+                    text: 'This reading has been invoiced and cannot be deleted.',
             icon: 'warning',
+                    confirmButtonText: 'OK',
+                    confirmButtonColor: '#6c757d'
+                });
+                return;
+            }
+        }
+        
+        const confirmed = await Swal.fire({
+            title: '🚨 Delete Reading',
+            text: 'Are you sure you want to delete this reading? This is a critical action and cannot be undone.',
+            icon: 'error',
             showCancelButton: true,
-            confirmButtonColor: '#d33',
-            cancelButtonColor: '#3085d6',
-            confirmButtonText: 'Yes, delete it!'
+            confirmButtonColor: '#dc3545',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Yes, Delete',
+            cancelButtonText: 'Cancel',
+            reverseButtons: true,
+            allowOutsideClick: false,
+            allowEscapeKey: false
         });
         
         if (!confirmed.isConfirmed) {
@@ -899,7 +936,7 @@ async function deleteReading(readingId) {
         const data = await response.json();
         
         if (data.success) {
-            showSuccess('Reading deleted successfully');
+            showSuccess('Reading Deleted Successfully!', 'Record has been removed from the system');
             loadReadings(currentPage);
         } else {
             throw new Error(data.message);
@@ -981,80 +1018,6 @@ function showBatchOperationsModal() {
     // Show modal
     const modal = new bootstrap.Modal(document.getElementById('batchOperationsModal'));
     modal.show();
-}
-
-/**
- * Search tenants for manual entry
- */
-async function searchTenants() {
-    const searchTerm = document.getElementById('tenantSearch').value.trim();
-    
-    if (searchTerm.length < 2) {
-        showError('Please enter at least 2 characters to search');
-        return;
-    }
-    
-    try {
-        const response = await fetch(`${ENDPOINTS.tenantSearch}?search=${encodeURIComponent(searchTerm)}`);
-        const data = await response.json();
-        
-        if (data.success) {
-            displayTenantSearchResults(data.data);
-        } else {
-            throw new Error(data.message);
-        }
-    } catch (error) {
-        console.error('Error searching tenants:', error);
-        showError('Failed to search tenants: ' + error.message);
-    }
-}
-
-/**
- * Display tenant search results
- */
-function displayTenantSearchResults(tenants) {
-    const resultsContainer = document.getElementById('tenantSearchResults');
-    
-    if (tenants.length === 0) {
-        resultsContainer.innerHTML = '<div class="alert alert-warning">No tenants found</div>';
-        return;
-    }
-    
-    let html = '<div class="list-group">';
-    tenants.forEach(tenant => {
-        html += `
-            <button type="button" class="list-group-item list-group-item-action" 
-                    onclick="selectTenant(${tenant.tenant_code}, '${escapeHtml(tenant.tenant_name)}', '${escapeHtml(tenant.property_name)}', '${escapeHtml(tenant.unit_no)}')">
-                <strong>${escapeHtml(tenant.tenant_name)}</strong><br>
-                <small>Property: ${escapeHtml(tenant.property_name)} | Unit: ${escapeHtml(tenant.unit_no)}</small>
-            </button>
-        `;
-    });
-    html += '</div>';
-    
-    resultsContainer.innerHTML = html;
-}
-
-/**
- * Select tenant for manual entry
- */
-function selectTenant(tenantCode, tenantName, propertyName, unitNo) {
-    selectedTenant = {
-        tenant_code: tenantCode,
-        tenant_name: tenantName,
-        property_name: propertyName,
-        unit_no: unitNo
-    };
-    
-    document.getElementById('selectedTenantInfo').innerHTML = `
-        <div class="alert alert-success">
-            <strong>Selected Tenant:</strong><br>
-            ${escapeHtml(tenantName)}<br>
-            <small>Property: ${escapeHtml(propertyName)} | Unit: ${escapeHtml(unitNo)}</small>
-        </div>
-    `;
-    
-    document.getElementById('tenantSearchResults').innerHTML = '';
 }
 
 /**
@@ -1165,8 +1128,23 @@ async function saveEditReading() {
     }
 }
 
+
 /**
- * Execute Batch Operations
+ * Toggle batch operation fields based on selected operation
+ */
+function toggleBatchOperationFields() {
+    const operation = document.getElementById('batchOperation').value;
+    const dateFields = document.querySelector('#batchOperationsModal .date-fields');
+    
+    if (operation === 'updating_date' && dateFields) {
+        dateFields.style.display = 'block';
+    } else if (dateFields) {
+        dateFields.style.display = 'none';
+    }
+}
+
+/**
+ * Execute batch operations
  */
 async function executeBatchOperation(operation) {
     if (selectedReadings.size === 0) {
@@ -1190,6 +1168,9 @@ async function executeBatchOperation(operation) {
     });
     
     if (!result.isConfirmed) return;
+    
+    // Show progress notification
+    const progressNotification = showProgress(`Processing ${selectedReadings.size} readings...`);
     
     const readingIds = Array.from(selectedReadings);
     const operationData = {
@@ -1216,13 +1197,11 @@ async function executeBatchOperation(operation) {
         
         const data = await response.json();
         
+        // Hide progress notification
+        hideNotification('progress-notification');
+        
         if (data.success) {
-            Swal.fire({
-                title: 'Success!',
-                text: `${operation} completed successfully`,
-                icon: 'success',
-                confirmButtonText: 'OK'
-            });
+            showSuccess('Batch Operation Completed!', `${operation} completed successfully`);
             
             // Close modal and refresh data
             const modal = bootstrap.Modal.getInstance(document.getElementById('batchOperationsModal'));
@@ -1234,63 +1213,178 @@ async function executeBatchOperation(operation) {
         }
     } catch (error) {
         console.error(`Error ${operation}:`, error);
+        hideNotification('progress-notification');
         showError(`Failed to ${operation}: ${error.message}`);
     }
 }
 
 /**
- * Calculate edit consumption
+ * Show animated success notification (using QR scanner's beautiful design)
  */
-function calculateEditConsumption() {
-    const currentReading = parseFloat(document.getElementById('editCurrentReading').value) || 0;
-    const previousReading = parseFloat(document.getElementById('editPreviousReading').value) || 0;
-    const consumption = currentReading - previousReading;
+function showSuccess(title, subtitle = '') {
+    // Remove any existing success notification
+    const existingNotification = document.getElementById('success-notification');
+    if (existingNotification) {
+        existingNotification.remove();
+    }
+
+    const notification = document.createElement('div');
+    notification.id = 'success-notification';
+    notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: linear-gradient(135deg, #4caf50, #45a049);
+        color: white;
+        padding: 16px 24px;
+        border-radius: 8px;
+        box-shadow: 0 4px 20px rgba(76, 175, 80, 0.3);
+        z-index: 10000;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        font-size: 14px;
+        font-weight: 500;
+        text-align: center;
+        max-width: 400px;
+        animation: slideDownBadge 0.3s ease-out;
+    `;
     
-    document.getElementById('editCalculatedConsumption').textContent = consumption.toFixed(2);
+    notification.innerHTML = `
+        <div style="display: flex; flex-direction: column; align-items: center; gap: 4px;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <i class="bi bi-check-circle-fill" style="font-size: 16px;"></i>
+                <span style="font-weight: 600;">${title}</span>
+            </div>
+            ${subtitle ? `<div style="font-size: 12px; opacity: 0.9;">${subtitle}</div>` : ''}
+        </div>
+        <style>
+            @keyframes slideDownBadge {
+                from { transform: translateX(-50%) translateY(-20px); opacity: 0; }
+                to { transform: translateX(-50%) translateY(0); opacity: 1; }
+            }
+        </style>
+    `;
     
-    // Add event listeners to update calculation automatically
-    document.getElementById('editCurrentReading').addEventListener('input', calculateEditConsumption);
-    document.getElementById('editPreviousReading').addEventListener('input', calculateEditConsumption);
+    document.body.appendChild(notification);
+    
+    // Auto-hide after 4 seconds (longer than offline notification for success)
+    setTimeout(() => {
+        notification.style.opacity = '0';
+        setTimeout(() => {
+            if (notification.parentNode) {
+                notification.parentNode.removeChild(notification);
+            }
+        }, 300);
+    }, 4000);
 }
 
 /**
- * Show success message
+ * Show animated warning notification for invoice constraints
  */
-function showSuccess(message) {
-    Swal.fire({
-        title: 'Success!',
-        text: message,
-        icon: 'success',
-        confirmButtonText: 'OK'
-    });
+function showWarning(title, subtitle = '') {
+    const notification = document.createElement('div');
+    notification.id = 'warning-notification';
+    notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: linear-gradient(135deg, #ff9800, #f57c00);
+        color: white;
+        padding: 16px 24px;
+        border-radius: 8px;
+        box-shadow: 0 4px 20px rgba(255, 152, 0, 0.3);
+        z-index: 10000;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        font-size: 14px;
+        font-weight: 500;
+        text-align: center;
+        max-width: 400px;
+        animation: slideDownWarning 0.3s ease-out;
+    `;
+    
+    notification.innerHTML = `
+        <div style="display: flex; align-items: center; justify-content: center; gap: 8px;">
+            <i class="bi bi-exclamation-triangle-fill" style="font-size: 16px;"></i>
+            <span>${title}</span>
+        </div>
+        ${subtitle ? `<div style="font-size: 12px; opacity: 0.9; margin-top: 4px;">${subtitle}</div>` : ''}
+        <style>
+            @keyframes slideDownWarning {
+                from { transform: translateX(-50%) translateY(-20px); opacity: 0; }
+                to { transform: translateX(-50%) translateY(0); opacity: 1; }
+            }
+        </style>
+    `;
+    
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        notification.style.opacity = '0';
+        setTimeout(() => {
+            if (notification.parentNode) {
+                notification.parentNode.removeChild(notification);
+            }
+        }, 300);
+    }, 5000); // Longer for warnings
 }
 
 /**
- * Show warning message
+ * Show animated progress notification for batch operations
  */
-function showWarning(message) {
-    Swal.fire({
-        title: 'Warning!',
-        text: message,
-        icon: 'warning',
-        confirmButtonText: 'OK'
-    });
+function showProgress(message) {
+    const notification = document.createElement('div');
+    notification.id = 'progress-notification';
+    notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: linear-gradient(135deg, #2196f3, #1976d2);
+        color: white;
+        padding: 16px 24px;
+        border-radius: 8px;
+        box-shadow: 0 4px 20px rgba(33, 150, 243, 0.3);
+        z-index: 10000;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        font-size: 14px;
+        font-weight: 500;
+        text-align: center;
+        max-width: 400px;
+        animation: slideDownProgress 0.3s ease-out;
+    `;
+    
+    notification.innerHTML = `
+        <div style="display: flex; align-items: center; justify-content: center; gap: 8px;">
+            <div class="spinner-border spinner-border-sm" role="status" style="width: 16px; height: 16px;">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <span>${message}</span>
+        </div>
+        <style>
+            @keyframes slideDownProgress {
+                from { transform: translateX(-50%) translateY(-20px); opacity: 0; }
+                to { transform: translateX(-50%) translateY(0); opacity: 1; }
+            }
+        </style>
+    `;
+    
+    document.body.appendChild(notification);
+    return notification; // Return so we can hide it manually
 }
 
 /**
- * Show info message
+ * Hide notification by ID
  */
-function showInfo(message) {
-    Swal.fire({
-        title: 'Info',
-        text: message,
-        icon: 'info',
-        confirmButtonText: 'OK'
-    });
+function hideNotification(id) {
+    const notification = document.getElementById(id);
+    if (notification) {
+        notification.remove();
+    }
 }
 
 /**
- * Show error message
+ * Show error message (keep SweetAlert for errors that need acknowledgment)
  */
 function showError(message) {
     Swal.fire({
@@ -1308,6 +1402,19 @@ function formatDate(dateString) {
     if (!dateString) return '';
     const date = new Date(dateString);
     return date.toLocaleDateString();
+}
+
+/**
+ * Format API datetime (or date) string to yyyy-mm-dd for input[type="date"]
+ */
+function formatDateForInput(dateString) {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) return '';
+    const y = date.getFullYear();
+    const m = String(date.getMonth() + 1).padStart(2, '0');
+    const d = String(date.getDate()).padStart(2, '0');
+    return `${y}-${m}-${d}`;
 }
 
 /**

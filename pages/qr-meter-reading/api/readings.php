@@ -88,13 +88,13 @@ function handleGetReadings($pdo, $currentUserId) {
     $dateTo = $_GET['date_to'] ?? null;
     $search = $_GET['search'] ?? null;
     $source = $_GET['source'] ?? null;
-    $sortBy = $_GET['sort_by'] ?? 'reading_date';
+    $sortBy = $_GET['sort_by'] ?? 'date_created';
     $sortOrder = $_GET['sort_order'] ?? 'DESC';
     
     // Validate sort parameters
-    $allowedSortFields = ['reading_date', 'tenant_name', 'property_name', 'current_reading', 'created_at'];
+    $allowedSortFields = ['date_created', 'reading_date', 'tenant_name', 'property_name', 'current_reading'];
     if (!in_array($sortBy, $allowedSortFields)) {
-        $sortBy = 'reading_date';
+        $sortBy = 'date_created';
     }
     if (!in_array(strtoupper($sortOrder), ['ASC', 'DESC'])) {
         $sortOrder = 'DESC';

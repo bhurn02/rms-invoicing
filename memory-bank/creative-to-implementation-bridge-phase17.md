@@ -8,7 +8,7 @@
 
 ## 🎯 BRIDGE OVERVIEW
 
-This document ensures that all design decisions made in Creative Mode for Phase 17 are properly transferred to Implementation Mode, maintaining the isolation-focused approach while ensuring continuity.
+This document ensures that all design decisions made in Creative Mode for Phase 17 are properly transferred to Implementation Mode, maintaining the isolation-focused approach while ensuring continuity. **Updated October 02, 2025** with major implementation fixes and RESTful API structure completion.
 
 ## 📋 CREATIVE MODE OUTPUTS
 
@@ -197,9 +197,15 @@ When switching to Implementation Mode:
 - **Search Component**: `GlobalSearch` with real-time search
 
 ### **Backend Architecture**
-- **API Endpoints**: RESTful endpoints for all CRUD operations
+- **RESTful API Endpoints**: Consolidated CRUD operations following RESTful conventions
+  - `GET /api/readings.php` - List readings with filters (with `id` parameter for single)
+  - `PUT /api/readings.php?id={id}` - Update reading (with `id` parameter)
+  - `DELETE /api/readings.php?id={id}` - Delete reading (with `id` parameter)
+  - `POST /api/readings/batch-update.php` - Batch update multiple readings
+  - `POST /api/readings/manual-entry.php` - Manually create a new reading
+  - `GET /api/readings/tenants.php` - Search tenants for manual entry (renamed from tenant-search.php)
 - **Validation**: Hybrid validation with client-side and server-side checks
-- **Database**: Efficient queries with proper indexing
+- **Database**: Efficient queries with proper indexing using actual schema fields from ERD
 - **Caching**: Smart caching for validation results
 - **Audit Trail**: Complete tracking of all operations
 

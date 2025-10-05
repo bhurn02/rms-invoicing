@@ -163,30 +163,57 @@ The Manual Entry system enables users to create tenant meter readings without QR
 └─────────────────────────────────────────────────────────────┘
 ```
 
-### **Tenant Selection Interface**
+### **Enhanced Tenant Selection Interface (Phase 17.3.2 Required)**
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │ Tenant Selection                                            │
 ├─────────────────────────────────────────────────────────────┤
-│ Search: [Type tenant name or code...]                      │
+│ Search Criteria: [Tenant Name ▼] [Search...]               │
+│ Options: [Tenant Code] [Property Code] [Unit No]           │
 │                                                             │
 │ Filters: [Property ▼] [Status ▼] [Unit Type ▼]            │
 │                                                             │
 │ Results (5 found):                                         │
 │ ┌─────────────────────────────────────────────────────────┐ │
-│ │ ☑ John Doe (GCA-101)                                  │ │
-│ │    Garapan Courtyard A - Unit 101                      │ │
-│ │    Active since 2025-01-01                             │ │
-│ │    Last Reading: 12300 (2025-08-31)                    │ │
+│ │ ☑ T000001 John Doe                                    │ │
+│ │    Property: GCA - Garapan Courtyard A                │ │
+│ │    Unit: 101 | Status: Active | Since: 2025-01-01    │ │
+│ │    Last Reading: 12300 (2025-08-31)                   │ │
+│ │    [Click Tenant Code to Select]                      │ │
 │ └─────────────────────────────────────────────────────────┘ │
 │ ┌─────────────────────────────────────────────────────────┐ │
-│ │ ☐ Jane Smith (GCA-102)                                 │ │
-│ │    Garapan Courtyard A - Unit 102                      │ │
-│ │    Active since 2025-02-01                             │ │
-│ │    Last Reading: 12200 (2025-08-31)                    │ │
+│ │ ☐ T000002 Jane Smith                                   │ │
+│ │    Property: GCA - Garapan Courtyard A                │ │
+│ │    Unit: 102 | Status: Active | Since: 2025-02-01    │ │
+│ │    Last Reading: 12200 (2025-08-31)                   │ │
+│ │    [Click Tenant Code to Select]                      │ │
+│ └─────────────────────────────────────────────────────────┘ │
+│ ┌─────────────────────────────────────────────────────────┐ │
+│ │ ☐ T000003 Bob Johnson                                  │ │
+│ │    Property: GCA - Garapan Courtyard A                │ │
+│ │    Unit: 103 | Status: Terminated | Since: 2025-03-01 │ │
+│ │    Last Reading: 11900 (2025-08-31)                   │ │
+│ │    [Click Tenant Code to Select]                      │ │
 │ └─────────────────────────────────────────────────────────┘ │
 │                                                             │
 │ [Select Tenant] [Cancel]                                   │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### **Current Implementation Issue (Phase 17.3.2 Fix Required)**
+```
+┌─────────────────────────────────────────────────────────────┐
+│ ❌ CURRENT PROBLEM: Only shows single result               │
+├─────────────────────────────────────────────────────────────┤
+│ Search: [DIEGO C. AZUELA]                                  │
+│                                                             │
+│ Result: DIEGO C. AZUELA                                    │
+│ ❌ No way to handle multiple "DIEGO C. AZUELA" results     │
+│ ❌ No tenant code, property, unit info displayed           │
+│ ❌ No clickable selection from multiple matches            │
+│ ❌ No search criteria options (name/code/property)         │
+│                                                             │
+│ [Select] [Cancel]                                          │
 └─────────────────────────────────────────────────────────────┘
 ```
 
@@ -224,6 +251,25 @@ The Manual Entry system enables users to create tenant meter readings without QR
 3. **Fuzzy Matching**: Handle typos and partial matches
 4. **Recent Tenants**: Show recently accessed tenants
 5. **Active Filter**: Only show active tenants by default
+
+### **🚨 CRITICAL ISSUE IDENTIFIED - TENANT LOOKUP ENHANCEMENT REQUIRED**
+**Issue**: Current implementation lacks proper multi-result handling and selection interface
+
+#### **Current Problems**:
+- **❌ Single Result Limitation**: Can only display one tenant result without selection mechanism
+- **❌ No Multi-Result Handling**: Cannot handle multiple tenant matches from search
+- **❌ Missing Tenant Selection Modal**: No dedicated modal for selecting from multiple matches
+- **❌ Incomplete Search Criteria**: Missing search by tenant code, property code options
+- **❌ Limited Result Display**: Missing tenant code, property code, unit no, termination status
+- **❌ No Clickable Selection**: No way to click and select from multiple tenant results
+
+#### **Required Enhancement - Phase 17.3.2**:
+1. **Tenant Selection Modal**: Dedicated modal with comprehensive search interface
+2. **Search Criteria Dropdown**: Options for tenant name, tenant code, property code
+3. **Multi-Result Display**: Show tenant code, tenant name, property code, unit no, termination status
+4. **Clickable Selection**: Allow user to click tenant code to select from multiple matches
+5. **Enhanced Search Interface**: Proper search field with dropdown options and filters
+6. **Result Validation**: Handle edge cases for no results, multiple matches, terminated tenants
 
 ### **Selection Process**
 1. **Search Input**: User types search criteria
@@ -263,18 +309,37 @@ The Manual Entry system enables users to create tenant meter readings without QR
 17. Modal closes and interface updates
 ```
 
-### **Tenant Selection Flow**
+### **Enhanced Tenant Selection Flow (Phase 17.3.2 Required)**
 ```
 1. User clicks "Search Tenant" field
-2. System shows search input and recent tenants
-3. User types search criteria
-4. System searches tenants in real-time
-5. System displays matching results
-6. User reviews tenant details
-7. User selects appropriate tenant
-8. System validates tenant selection
-9. System populates form with tenant data
-10. User proceeds with reading entry
+2. System opens Tenant Selection Modal with search criteria dropdown
+3. User selects search criteria (Tenant Name, Tenant Code, Property Code)
+4. User types search criteria in enhanced search field
+5. System searches tenants in real-time with multiple criteria
+6. System displays ALL matching results with comprehensive details:
+   - Tenant Code, Tenant Name, Property Code, Unit No
+   - Property Name, Status (Active/Terminated), Move-in Date
+   - Last Reading Value and Date
+7. User reviews multiple tenant matches (if any)
+8. User clicks on tenant code or row to select from multiple matches
+9. System validates tenant selection and highlights selected tenant
+10. System populates form with complete tenant data
+11. User proceeds with reading entry
+```
+
+### **Current Problematic Flow (Phase 17.3.2 Fix Required)**
+```
+❌ CURRENT IMPLEMENTATION ISSUES:
+1. User clicks "Search Tenant" field
+2. System shows basic search input (no criteria options)
+3. User types search criteria (limited to name only)
+4. System searches tenants but only returns single result
+5. ❌ PROBLEM: If multiple "DIEGO C. AZUELA" exist, only shows one
+6. ❌ PROBLEM: No way to select from multiple matches
+7. ❌ PROBLEM: Missing tenant code, property, unit information
+8. ❌ PROBLEM: No search by tenant code or property code
+9. User forced to accept single result or cancel
+10. ❌ PROBLEM: Cannot proceed with manual entry if wrong tenant selected
 ```
 
 ### **Error Handling Flow**
@@ -304,11 +369,18 @@ The Manual Entry system enables users to create tenant meter readings without QR
 - **Loading State**: Loading indicators and progress feedback
 
 ### **API Integration**
-- **Tenant Search**: `GET /api/tenants/search.php`
+- **Tenant Search**: `GET /api/tenants/search.php` (Enhanced for Phase 17.3.2)
 - **Tenant Details**: `GET /api/tenants/{id}.php`
 - **Reading Creation**: `POST /api/readings.php` (with manual entry flag)
 - **Validation**: `POST /api/readings/validate.php`
 - **Manual Entry**: `POST /api/readings/manual.php` (dedicated endpoint)
+
+### **🚨 Phase 17.3.2 API Enhancement Requirements**
+- **Enhanced Tenant Search**: `GET /api/readings/tenants.php` (already renamed from tenant-search.php)
+  - Support multiple search criteria (name, code, property)
+  - Return comprehensive tenant information
+  - Handle multiple result scenarios
+  - Include termination status and property details
 
 ## 🎨 CREATIVE CHECKPOINT: ACCESSIBILITY & UX STANDARDS
 
@@ -339,11 +411,24 @@ The Manual Entry system enables users to create tenant meter readings without QR
 5. **Progress Indicators**: Clear feedback during operations
 
 **Implementation Priority**:
-1. **Phase 1**: Manual entry modal and basic form
-2. **Phase 2**: Tenant selection and search functionality
+1. **Phase 17.3.1**: Manual entry modal and basic form ✅ **COMPLETED**
+2. **Phase 17.3.2**: Enhanced tenant selection and multi-result handling ❌ **CRITICAL ISSUE IDENTIFIED**
 3. **Phase 3**: Real-time validation and error handling
 4. **Phase 4**: Mobile optimization and touch interface
 5. **Phase 5**: Accessibility and UX optimization
+
+### **🚨 Phase 17.3.2 Critical Requirements**
+**Status**: ❌ **MISSING** - Required for Phase 17.3 completion
+
+**Must Implement**:
+1. **Tenant Selection Modal**: Dedicated modal with comprehensive search interface
+2. **Search Criteria Dropdown**: Options for tenant name, tenant code, property code
+3. **Multi-Result Display**: Show tenant code, tenant name, property code, unit no, termination status
+4. **Clickable Selection**: Allow user to click tenant code to select from multiple matches
+5. **Enhanced Search Interface**: Proper search field with dropdown options and filters
+6. **Result Validation**: Handle edge cases for no results, multiple matches, terminated tenants
+
+**Current Problem**: Only shows single tenant result without selection mechanism for multiple matches
 
 **Success Metrics**:
 - **Efficiency**: 60% reduction in time for manual entry
