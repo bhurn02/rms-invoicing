@@ -1,0 +1,75 @@
+/**
+ * RMS QR Meter Reading System - Tenant Readings Management CSS
+ * Phase 17: FIXES - Readability, Button Sizes, Layout Issues
+ */
+
+/* ===== IMPORT WORKING THEME VARIABLES ===== */
+@import url('custom-theme.css');
+
+/* ===== READABILITY FIXES ===== */
+
+/* Fix all dropdown values */
+.form-select, .form-select option {
+    color: #374151 !important;  /* Dark gray for readability */
+    background-color: white !important;
+}
+
+.form-select:focus {
+    color: #374151 !important;
+    background-color: white !important;
+}
+
+/* Fix form labels */
+.form-label {
+    color: #374151 !important;
+    font-weight: 600 !important;
+    font-size: var(--text-sm) !important;
+}
+
+/* Fix input values */
+.form-control {
+    color: #374151 !important;
+    background-color: white !important;
+}
+
+.form-control::placeholder {
+    color: #9ca3af !important;  /* Medium gray for placeholders */
+}
+
+/* Fix table text */
+.table thead th {
+    color: #374151 !important;
+}
+
+.table tbody td {
+    color: #374151 !important;
+}
+
+/* Fix status badge text */
+.badge {
+    color: white !important;  /* Ensure badge text is white */
+}
+
+/* Fix modal text */
+.modal-body .form-label,
+.modal-body .form-control,
+.modal-body .form-select,
+.modal-body .form-select option {
+    color: #374151 !important;
+    background-color: white !important;
+}
+
+/* Fix alert text */
+.alert-info {
+    color: #374151 !important;
+}
+
+/* ===== SPECIFIC ISSUES FIX ===== */
+
+
+/* ISSUE 4: Context menu fix ONLY */
+.navbar-nav .dropdown-menu {
+    right: 0 !important;
+    left: auto !important;
+    margin-right: 0.5rem !important;
+}

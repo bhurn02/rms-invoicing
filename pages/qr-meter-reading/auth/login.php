@@ -10,7 +10,19 @@ require_once __DIR__ . '/auth.php';
 
 // Redirect if already logged in
 if (isset($_SESSION['qr_user_id']) && !empty($_SESSION['qr_user_id'])) {
-    header('Location: ../index.php');
+    // Redirect to original page or main interface
+    $redirectUrl = isset($_SESSION['qr_redirect_after_login']) ? $_SESSION['qr_redirect_after_login'] : '../index.php';
+    
+    // Clear the redirect URL from session
+    unset($_SESSION['qr_redirect_after_login']);
+    
+    // Convert absolute path to relative path from auth directory
+    if (strpos($redirectUrl, '/pages/qr-meter-reading/') === 0) {
+        $redirectUrl = '..' . substr($redirectUrl, strlen('/pages/qr-meter-reading'));
+    }
+    
+    // Redirect to the original page
+    header('Location: ' . $redirectUrl);
     exit();
 }
 
@@ -54,8 +66,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 // Check if user has QR Meter Reading access
                 require_once __DIR__ . '/permission-check.php';
                 if (hasQRMeterReadingAccess($username)) {
-                    // User has access - redirect to main interface
-                    header('Location: ../index.php');
+                    // User has access - redirect to original page or main interface
+                    $redirectUrl = isset($_SESSION['qr_redirect_after_login']) ? $_SESSION['qr_redirect_after_login'] : '../index.php';
+                    
+                    // Clear the redirect URL from session
+                    unset($_SESSION['qr_redirect_after_login']);
+                    
+                    // Convert absolute path to relative path from auth directory
+                    if (strpos($redirectUrl, '/pages/qr-meter-reading/') === 0) {
+                        $redirectUrl = '..' . substr($redirectUrl, strlen('/pages/qr-meter-reading'));
+                    }
+                    
+                    // Redirect to the original page
+                    header('Location: ' . $redirectUrl);
                     exit();
                 } else {
                     // User doesn't have access - redirect to access denied

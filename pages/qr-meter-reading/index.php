@@ -11,7 +11,7 @@ header("Pragma: no-cache");
 
 // Require authentication and QR Meter Reading access
 require_once 'auth/auth.php';
-requireQRMeterReadingAccess();
+requireQRMeterReadingAccess($_SERVER['REQUEST_URI']);
 
 // Include configuration for environment detection
 require_once 'config/config.php';
