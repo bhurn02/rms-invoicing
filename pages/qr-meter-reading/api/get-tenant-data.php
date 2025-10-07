@@ -78,15 +78,15 @@ try {
         echo json_encode([
             'success' => true,
             'data' => [
-                'tenantCode' => $tenant['tenant_code'],
-                'tenantName' => $tenant['tenant_name'],
-                'realPropertyName' => $tenant['real_property_name'],
-                'unitNo' => $tenant['unit_no'],
-                'meterNumber' => $tenant['meter_number'],
-                'unitType' => $tenant['unit_type'],
+                'tenantCode' => trim($tenant['tenant_code']),
+                'tenantName' => trim($tenant['tenant_name']),
+                'realPropertyName' => trim($tenant['real_property_name']),
+                'unitNo' => trim($tenant['unit_no']),
+                'meterNumber' => trim($tenant['meter_number']),
+                'unitType' => trim($tenant['unit_type']),
                 'actualMoveInDate' => $tenant['actual_move_in_date'],
                 'contractExpiryDate' => $tenant['contract_expiry_date'],
-                'terminated' => $tenant['terminated']
+                'terminated' => trim($tenant['terminated'])
             ],
             'source' => 'active_tenant',
             'timestamp' => date('Y-m-d H:i:s')
@@ -121,10 +121,10 @@ try {
         echo json_encode([
             'success' => true,
             'data' => [
-                'tenantCode' => $lastTenant['tenant_code'],
-                'tenantName' => $lastTenant['tenant_name'],
-                'realPropertyName' => $lastTenant['real_property_name'],
-                'unitNo' => $lastTenant['unit_no'],
+                'tenantCode' => trim($lastTenant['tenant_code']),
+                'tenantName' => trim($lastTenant['tenant_name']),
+                'realPropertyName' => trim($lastTenant['real_property_name']),
+                'unitNo' => trim($lastTenant['unit_no']),
                 'meterNumber' => null,
                 'unitType' => null,
                 'actualMoveInDate' => null,
@@ -163,10 +163,10 @@ try {
             'data' => [
                 'tenantCode' => 'DEFAULT',
                 'tenantName' => 'Default Tenant',
-                'realPropertyName' => $property['real_property_name'],
-                'unitNo' => $unitNo,
-                'meterNumber' => $property['meter_number'],
-                'unitType' => $property['unit_type'],
+                'realPropertyName' => trim($property['real_property_name']),
+                'unitNo' => trim($unitNo),
+                'meterNumber' => trim($property['meter_number']),
+                'unitType' => trim($property['unit_type']),
                 'actualMoveInDate' => null,
                 'contractExpiryDate' => null,
                 'terminated' => 'N'

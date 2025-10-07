@@ -83,7 +83,7 @@ try {
                 'dateTo' => $reading['reading_date_to'],
                 'billingDateFrom' => $reading['billing_from'],
                 'billingDateTo' => $reading['billing_to'],
-                'remarks' => $reading['remarks'],
+                'remarks' => trim($reading['remarks']),
                 'dateCreated' => $reading['date_created']
             ],
             'source' => 'vw_LatestTenantReadings',
@@ -133,7 +133,7 @@ try {
                 'dateTo' => $reading['date_to'],
                 'billingDateFrom' => $reading['billing_date_from'],
                 'billingDateTo' => $reading['billing_date_to'],
-                'remarks' => $reading['remarks'],
+                'remarks' => trim($reading['remarks']),
                 'dateCreated' => $reading['date_created']
             ],
             'source' => 't_tenant_reading',

@@ -145,9 +145,9 @@ try {
             'message' => 'Reading created successfully',
             'data' => [
                 'reading_id' => $readingId,
-                'tenant_name' => $tenant['tenant_name'],
-                'property_name' => $tenant['real_property_name'],
-                'unit_no' => $tenant['unit_no'],
+                'tenant_name' => trim($tenant['tenant_name']),
+                'property_name' => trim($tenant['real_property_name']),
+                'unit_no' => trim($tenant['unit_no']),
                 'usage' => $currentReading - $prevReading,
                 'date_from' => $input['date_from'],
                 'date_to' => $input['date_to']

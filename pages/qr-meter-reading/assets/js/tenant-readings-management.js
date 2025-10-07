@@ -26,57 +26,75 @@ const ENDPOINTS = {
 
 // Initialize when DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
-    initializeEventListeners();
-    loadInitialData();
-    setupDateDefaults();
+    // Add a small delay to ensure all elements are fully rendered
+    setTimeout(() => {
+        initializeEventListeners();
+        loadInitialData();
+        setupDateDefaults();
+    }, 100);
 });
 
 /**
  * Initialize all event listeners
  */
 function initializeEventListeners() {
+    // Helper function to safely add event listeners
+    function safeAddEventListener(elementId, event, handler) {
+        const element = document.getElementById(elementId);
+        if (element) {
+            element.addEventListener(event, handler);
+        } else {
+            console.warn(`Element with ID '${elementId}' not found for event listener`);
+        }
+    }
+    
     // Filter controls
-    document.getElementById('btnApplyFilters').addEventListener('click', applyFilters);
-    document.getElementById('filterSearch').addEventListener('keypress', function(e) {
+    safeAddEventListener('btnApplyFilters', 'click', applyFilters);
+    safeAddEventListener('filterSearch', 'keypress', function(e) {
         if (e.key === 'Enter') applyFilters();
     });
     
     // Selection controls
-    document.getElementById('selectAllCheckbox').addEventListener('change', toggleSelectAll);
-    document.getElementById('btnSelectAll').addEventListener('click', selectAllReadings);
-    document.getElementById('btnClearSelection').addEventListener('click', clearSelection);
+    safeAddEventListener('selectAllCheckbox', 'change', toggleSelectAll);
+    safeAddEventListener('btnSelectAll', 'click', selectAllReadings);
+    safeAddEventListener('btnClearSelection', 'click', clearSelection);
     
     // Action buttons
-    document.getElementById('btnManualEntry').addEventListener('click', showManualEntryModal);
-    document.getElementById('btnBatchOperations').addEventListener('click', showBatchOperationsModal);
+    safeAddEventListener('btnManualEntry', 'click', showManualEntryModal);
+    safeAddEventListener('btnBatchOperations', 'click', showBatchOperationsModal);
     
     // Manual entry modal
-    document.getElementById('btnTenantSearch').addEventListener('click', searchTenants);
-    document.getElementById('tenantSearch').addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') searchTenants();
-    });
-    document.getElementById('btnSaveManualEntry').addEventListener('click', saveManualEntryReading);
+    safeAddEventListener('btnSaveManualEntry', 'click', saveManualEntryReading);
     
     // Batch operations modal
-    document.getElementById('batchOperation').addEventListener('change', toggleBatchOperationFields);
-    document.getElementById('btnExecuteBatchOperation').addEventListener('click', function() {
+    safeAddEventListener('batchOperation', 'change', toggleBatchOperationFields);
+    safeAddEventListener('btnExecuteBatchOperation', 'click', function() {
         const operation = document.getElementById('batchOperation').value;
         executeBatchOperation(operation);
     });
     
     // Edit reading modal
-    document.getElementById('btnSaveEditReading').addEventListener('click', saveEditReading);
+    safeAddEventListener('btnSaveEditReading', 'click', saveEditReading);
     
     // Reading value calculations
-    document.getElementById('currentReading').addEventListener('input', calculateConsumption);
-    document.getElementById('previousReading').addEventListener('input', calculateConsumption);
-    document.getElementById('editCurrentReading').addEventListener('input', calculateEditConsumption);
-    document.getElementById('editPreviousReading').addEventListener('input', calculateEditConsumption);
+    safeAddEventListener('currentReading', 'input', calculateConsumption);
+    safeAddEventListener('previousReading', 'input', calculateConsumption);
+    safeAddEventListener('editCurrentReading', 'input', calculateEditConsumption);
+    safeAddEventListener('editPreviousReading', 'input', calculateEditConsumption);
     
-    // Property filter change
-    document.getElementById('filterProperty').addEventListener('change', function() {
+    // Property filter change - with bidirectional filtering
+    safeAddEventListener('filterProperty', 'change', function() {
+        updateMainUnitFilterBasedOnProperty();
         loadUnitsForProperty(this.value);
     });
+    
+    // Unit filter change - with bidirectional filtering
+    safeAddEventListener('filterUnit', 'change', function() {
+        updateMainPropertyFilterBasedOnUnit();
+    });
+    
+    // Initialize tenant selection modal
+    initializeTenantSelectionModal();
 }
 
 /**
@@ -88,6 +106,12 @@ async function loadInitialData() {
         
         // Load properties for filter
         await loadProperties();
+        
+        // Load shared units cache for both main filters and tenant modal
+        await loadSharedUnitsCache();
+        
+        // Populate unit dropdown with all units by default
+        await loadUnitsForProperty('');
         
         // Load initial readings
         await loadReadings();
@@ -144,28 +168,74 @@ async function loadProperties() {
 }
 
 /**
- * Load units for selected property
+ * Load units for selected property using shared cache
  */
 async function loadUnitsForProperty(propertyId) {
     try {
         const unitSelect = document.getElementById('filterUnit');
         unitSelect.innerHTML = '<option value="">All Units</option>';
         
-        if (!propertyId) return;
+        // Load shared cache if empty
+        if (allUnitsCache.length === 0) {
+            await loadSharedUnitsCache();
+        }
         
-        const response = await fetch(`${ENDPOINTS.tenantSearch}?property=${propertyId}`);
-        const data = await response.json();
-        
-        if (data.success) {
-            data.data.units.forEach(unit => {
+        if (!propertyId) {
+            // If no property selected, populate with all units
+            allUnitsCache.forEach(unit => {
                 const option = document.createElement('option');
                 option.value = unit.unit_no.trim();
                 option.textContent = `${unit.unit_no.trim()} - ${unit.real_property_name}`;
+                option.dataset.propertyCode = unit.real_property_code;
+                option.dataset.unitNo = unit.unit_no.trim();
                 unitSelect.appendChild(option);
             });
+            return;
         }
+        
+        // Use cached units filtered by property
+        const filteredUnits = unitsByPropertyCache[propertyId] || [];
+        filteredUnits.forEach(unit => {
+            const option = document.createElement('option');
+            option.value = unit.unit_no.trim();
+            option.textContent = `${unit.unit_no.trim()} - ${unit.real_property_name}`;
+            option.dataset.propertyCode = unit.real_property_code;
+            option.dataset.unitNo = unit.unit_no.trim();
+            unitSelect.appendChild(option);
+        });
     } catch (error) {
         console.error('Error loading units:', error);
+    }
+}
+
+/**
+ * Update main unit filter based on selected property
+ */
+function updateMainUnitFilterBasedOnProperty() {
+    const propertyFilter = document.getElementById('filterProperty').value;
+    const unitFilter = document.getElementById('filterUnit');
+    
+    // Clear current unit selection when property changes
+    unitFilter.value = '';
+}
+
+/**
+ * Update main property filter based on selected unit
+ */
+function updateMainPropertyFilterBasedOnUnit() {
+    const unitFilter = document.getElementById('filterUnit');
+    const propertyFilter = document.getElementById('filterProperty');
+    const selectedUnitValue = unitFilter.value;
+    
+    if (selectedUnitValue) {
+        // Find the selected option to get its data-property-code attribute
+        const selectedOption = unitFilter.options[unitFilter.selectedIndex];
+        const propertyCode = selectedOption.dataset.propertyCode;
+        
+        // Auto-select the corresponding property using the data-property-code
+        if (propertyCode && propertyFilter.value !== propertyCode) {
+            propertyFilter.value = propertyCode;
+        }
     }
 }
 
@@ -173,9 +243,11 @@ async function loadUnitsForProperty(propertyId) {
  * Load readings with current filters
  */
 async function loadReadings(page = 1) {
+    let progressNotification = null;
+    
     try {
         showLoading();
-        const progressNotification = showProgress(`Loading readings...`);
+        progressNotification = showProgress(`Loading readings...`);
         
         const params = new URLSearchParams({
             page: page,
@@ -186,9 +258,11 @@ async function loadReadings(page = 1) {
         const response = await fetch(`${ENDPOINTS.list}?${params}`);
         const data = await response.json();
         
-        // Hide notifications
+        // Hide loading and progress notification
         hideLoading();
-        hideNotification('progress-notification');
+        if (progressNotification) {
+            hideNotification(progressNotification);
+        }
         
         if (data.success) {
             allReadings = data.data;
@@ -210,7 +284,9 @@ async function loadReadings(page = 1) {
         }
     } catch (error) {
         console.error('Error loading readings:', error);
-        hideNotification('progress-notification');
+        if (progressNotification) {
+            hideNotification(progressNotification);
+        }
         showError('Failed to load readings: ' + error.message);
     } finally {
         hideLoading();
@@ -355,7 +431,7 @@ function applyFilters() {
     currentFilters = {
         search: document.getElementById('filterSearch').value,
         property: document.getElementById('filterProperty').value,
-        tenant: document.getElementById('filterUnit').value,
+        unit: document.getElementById('filterUnit').value,
         date_from: document.getElementById('filterDateFrom').value,
         date_to: document.getElementById('filterDateTo').value,
         source: document.getElementById('filterSource').value
@@ -998,8 +1074,34 @@ function showSuccess(message) {
 function showManualEntryModal() {
     // Clear form
     document.getElementById('manualEntryForm').reset();
-    document.getElementById('selectedTenantInfo').innerHTML = '';
+    const selectedTenantInfo = document.getElementById('selectedTenantInfo');
+    selectedTenantInfo.innerHTML = '';
+    selectedTenantInfo.style.display = 'block'; // Ensure it's visible
     selectedTenant = null;
+    
+    // Clear tenant search results
+    const tenantSearchResultsContainer = document.getElementById('tenantSearchResultsContainer');
+    if (tenantSearchResultsContainer) {
+        tenantSearchResultsContainer.innerHTML = '';
+    }
+    
+    // Reset global tenant search variables
+    tenantSearchResults = [];
+    selectedTenantFromModal = null;
+    
+    // Restore tenant search input visibility (in case it was hidden from previous selection)
+    const tenantSearchContainer = document.querySelector('.col-12:has(#tenantSearchDisplay)');
+    const tenantSearchDisplay = document.getElementById('tenantSearchDisplay');
+    
+    if (tenantSearchContainer) {
+        tenantSearchContainer.style.display = 'block';
+    }
+    
+    if (tenantSearchDisplay) {
+        tenantSearchDisplay.value = '';
+        // Update placeholder based on current search criteria
+        updateSearchPlaceholder();
+    }
     
     // Show modal
     const modal = new bootstrap.Modal(document.getElementById('manualEntryModal'));
@@ -1198,7 +1300,9 @@ async function executeBatchOperation(operation) {
         const data = await response.json();
         
         // Hide progress notification
-        hideNotification('progress-notification');
+        if (progressNotification) {
+            hideNotification(progressNotification);
+        }
         
         if (data.success) {
             showSuccess('Batch Operation Completed!', `${operation} completed successfully`);
@@ -1213,7 +1317,9 @@ async function executeBatchOperation(operation) {
         }
     } catch (error) {
         console.error(`Error ${operation}:`, error);
-        hideNotification('progress-notification');
+        if (progressNotification) {
+            hideNotification(progressNotification);
+        }
         showError(`Failed to ${operation}: ${error.message}`);
     }
 }
@@ -1329,59 +1435,6 @@ function showWarning(title, subtitle = '') {
     }, 5000); // Longer for warnings
 }
 
-/**
- * Show animated progress notification for batch operations
- */
-function showProgress(message) {
-    const notification = document.createElement('div');
-    notification.id = 'progress-notification';
-    notification.style.cssText = `
-        position: fixed;
-        top: 20px;
-        left: 50%;
-        transform: translateX(-50%);
-        background: linear-gradient(135deg, #2196f3, #1976d2);
-        color: white;
-        padding: 16px 24px;
-        border-radius: 8px;
-        box-shadow: 0 4px 20px rgba(33, 150, 243, 0.3);
-        z-index: 10000;
-        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-        font-size: 14px;
-        font-weight: 500;
-        text-align: center;
-        max-width: 400px;
-        animation: slideDownProgress 0.3s ease-out;
-    `;
-    
-    notification.innerHTML = `
-        <div style="display: flex; align-items: center; justify-content: center; gap: 8px;">
-            <div class="spinner-border spinner-border-sm" role="status" style="width: 16px; height: 16px;">
-                <span class="visually-hidden">Loading...</span>
-            </div>
-            <span>${message}</span>
-        </div>
-        <style>
-            @keyframes slideDownProgress {
-                from { transform: translateX(-50%) translateY(-20px); opacity: 0; }
-                to { transform: translateX(-50%) translateY(0); opacity: 1; }
-            }
-        </style>
-    `;
-    
-    document.body.appendChild(notification);
-    return notification; // Return so we can hide it manually
-}
-
-/**
- * Hide notification by ID
- */
-function hideNotification(id) {
-    const notification = document.getElementById(id);
-    if (notification) {
-        notification.remove();
-    }
-}
 
 /**
  * Show error message (keep SweetAlert for errors that need acknowledgment)
@@ -1401,7 +1454,13 @@ function showError(message) {
 function formatDate(dateString) {
     if (!dateString) return '';
     const date = new Date(dateString);
-    return date.toLocaleDateString();
+    if (isNaN(date.getTime())) return '';
+    
+    // Format as mm/dd/yyyy
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const year = date.getFullYear();
+    return `${month}/${day}/${year}`;
 }
 
 /**
@@ -1424,4 +1483,806 @@ function escapeHtml(text) {
     const div = document.createElement('div');
     div.textContent = text;
     return div.innerHTML;
+}
+
+// ===== PHASE 17.3.2: ENHANCED TENANT SELECTION MODAL =====
+
+// Global variables for tenant selection
+let tenantSearchResults = [];
+let selectedTenantFromModal = null;
+let tenantSearchCurrentPage = 1;
+let tenantSearchTotalPages = 1;
+// Shared cache for both main filters and tenant lookup modal
+let allUnitsCache = []; // Cache all units for dynamic filtering
+let unitsByPropertyCache = {}; // Cache units organized by property code
+
+/**
+ * Initialize tenant selection modal event listeners
+ */
+function initializeTenantSelectionModal() {
+    // Helper function to safely add event listeners
+    function safeAddEventListener(elementId, event, handler) {
+        const element = document.getElementById(elementId);
+        if (element) {
+            element.addEventListener(event, handler);
+        } else {
+            console.warn(`Element with ID '${elementId}' not found for tenant selection modal`);
+        }
+    }
+    
+    // Open tenant selection modal
+    safeAddEventListener('btnOpenTenantSelection', 'click', openTenantSelectionModal);
+    
+    // Search tenants in modal
+    safeAddEventListener('btnSearchTenants', 'click', searchTenantsInModal);
+    safeAddEventListener('tenantSearchInput', 'keypress', function(e) {
+        if (e.key === 'Enter') searchTenantsInModal();
+    });
+    
+    // Filter changes
+    safeAddEventListener('tenantPropertyFilter', 'change', function() {
+        updateUnitFilterBasedOnProperty();
+        searchTenantsInModal();
+    });
+    safeAddEventListener('tenantUnitFilter', 'change', function() {
+        updatePropertyFilterBasedOnUnit();
+        searchTenantsInModal();
+    });
+    safeAddEventListener('tenantStatusFilter', 'change', searchTenantsInModal);
+    
+    // Search criteria change - update placeholder
+    safeAddEventListener('tenantSearchCriteria', 'change', updateSearchPlaceholder);
+    
+    // Confirm tenant selection
+    safeAddEventListener('btnConfirmTenantSelection', 'click', confirmTenantSelection);
+    
+    // Load properties and units for filters
+    loadPropertiesForTenantFilter();
+    loadSharedUnitsCache().then(() => {
+        populateUnitFilter(allUnitsCache);
+    });
+}
+
+/**
+ * Open tenant selection modal
+ */
+function openTenantSelectionModal() {
+    const modal = new bootstrap.Modal(document.getElementById('tenantSelectionModal'));
+    modal.show();
+    
+    // Reset search state
+    tenantSearchResults = [];
+    selectedTenantFromModal = null;
+    tenantSearchCurrentPage = 1;
+    
+    // Reset UI
+    document.getElementById('tenantSearchInput').value = '';
+    document.getElementById('tenantSearchCriteria').value = 'tenant_name';
+    document.getElementById('tenantPropertyFilter').value = '';
+    document.getElementById('tenantStatusFilter').value = 'active';
+    document.getElementById('btnConfirmTenantSelection').disabled = true;
+    
+    // Reset results container
+    document.getElementById('tenantSearchResultsContainer').innerHTML = `
+        <div class="text-center py-5">
+            <i class="fas fa-search fa-3x text-muted mb-3"></i>
+            <h5 class="text-muted">Search for Tenants</h5>
+            <p class="text-muted">Enter search criteria above to find tenants for manual entry.</p>
+        </div>
+    `;
+    document.getElementById('tenantSearchPagination').style.display = 'none';
+}
+
+/**
+ * Search tenants in modal
+ */
+async function searchTenantsInModal() {
+    try {
+        const searchTerm = document.getElementById('tenantSearchInput').value.trim();
+        const searchCriteria = document.getElementById('tenantSearchCriteria').value;
+        const propertyFilter = document.getElementById('tenantPropertyFilter').value;
+        const unitFilterValue = document.getElementById('tenantUnitFilter').value;
+        const statusFilter = document.getElementById('tenantStatusFilter').value;
+        
+        // Show loading state
+        showTenantSearchLoading();
+        
+        // Build URL parameters
+        const params = new URLSearchParams();
+        if (searchTerm) {
+            params.append('search', searchTerm);
+            params.append('search_criteria', searchCriteria);
+        }
+        if (propertyFilter) params.append('real_property_code', propertyFilter);
+        if (unitFilterValue) {
+            // Extract unit number from the "Property Unit" format
+            const unitNo = unitFilterValue.split(' ').pop(); // Get last part (unit number)
+            params.append('unit_no', unitNo);
+        }
+        
+        // Handle status filter
+        if (statusFilter === '') {
+            // "All Tenants" - include both active and terminated
+            params.append('include_terminated', '1');
+        } else if (statusFilter === 'active' || statusFilter === 'terminated') {
+            // "Active Only" or "Terminated Only" - use status_filter parameter
+            params.append('status_filter', statusFilter);
+        }
+        
+        params.append('page', tenantSearchCurrentPage);
+        params.append('limit', 20);
+        
+        const response = await fetch(`${ENDPOINTS.tenantSearch}?${params.toString()}`);
+        const data = await response.json();
+        
+        if (data.success) {
+            tenantSearchResults = data.data.tenants;
+            tenantSearchTotalPages = data.data.pagination.total_pages;
+            
+            if (tenantSearchResults.length > 0) {
+                renderTenantSearchResultsModal(tenantSearchResults);
+                updateTenantSearchPagination();
+            } else {
+                showTenantSearchEmpty();
+            }
+        } else {
+            throw new Error(data.message);
+        }
+    } catch (error) {
+        console.error('Error searching tenants:', error);
+        showTenantSearchError('Failed to search tenants: ' + error.message);
+    }
+}
+
+/**
+ * Show loading state for tenant search
+ */
+function showTenantSearchLoading() {
+    document.getElementById('tenantSearchResultsContainer').innerHTML = `
+        <div class="tenant-search-loading">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <p>Searching tenants...</p>
+        </div>
+    `;
+    document.getElementById('tenantSearchPagination').style.display = 'none';
+}
+
+/**
+ * Show empty state for tenant search
+ */
+function showTenantSearchEmpty() {
+    document.getElementById('tenantSearchResultsContainer').innerHTML = `
+        <div class="tenant-search-empty">
+            <i class="fas fa-search"></i>
+            <h5>No tenants found</h5>
+            <p>Try adjusting your search criteria or filters.</p>
+        </div>
+    `;
+    document.getElementById('tenantSearchPagination').style.display = 'none';
+}
+
+/**
+ * Show error state for tenant search
+ */
+function showTenantSearchError(message) {
+    document.getElementById('tenantSearchResultsContainer').innerHTML = `
+        <div class="tenant-search-empty">
+            <i class="fas fa-exclamation-triangle text-warning"></i>
+            <h5>Search Error</h5>
+            <p>${escapeHtml(message)}</p>
+        </div>
+    `;
+    document.getElementById('tenantSearchPagination').style.display = 'none';
+}
+
+/**
+ * Render tenant search results in modal
+ */
+function renderTenantSearchResultsModal(tenants) {
+    const container = document.getElementById('tenantSearchResultsContainer');
+    container.innerHTML = '';
+    
+    tenants.forEach(tenant => {
+        const div = document.createElement('div');
+        div.className = 'tenant-search-result';
+        div.dataset.tenantCode = tenant.tenant_code;
+        
+        // Determine status
+        const isActive = tenant.is_terminated === '0' || tenant.is_terminated === 0;
+        const statusClass = isActive ? 'badge bg-success' : 'badge bg-danger';
+        const statusText = isActive ? 'Active' : 'Terminated';
+        
+        // Build tenant details with lease information
+        let tenantDetails = `
+            <strong>Property:</strong> ${escapeHtml(tenant.real_property_name)} (${escapeHtml(tenant.real_property_code)})<br>
+            <strong>Unit:</strong> ${escapeHtml(tenant.unit_no)}<br>
+            <strong>Meter:</strong> ${escapeHtml(tenant.meter_number || 'N/A')} - ${escapeHtml(tenant.unit_type || 'N/A')}<br>
+        `;
+        
+        // Add lease period and duration based on tenant status
+        if (isActive) {
+            // Active tenant: show lease start date and current duration
+            const currentDuration = calculateLeaseDuration(tenant.actual_move_in_date);
+            tenantDetails += `<strong>Lease Start Date:</strong> ${formatDate(tenant.actual_move_in_date)}<br><strong>Lease Duration:</strong> ${currentDuration}`;
+        } else if (tenant.date_terminated) {
+            // Terminated tenant: show lease period (start - end) and total duration
+            const leaseDuration = calculateLeaseDuration(tenant.actual_move_in_date, tenant.date_terminated);
+            tenantDetails += `<strong>Lease Period:</strong> ${formatDate(tenant.actual_move_in_date)} - ${formatDate(tenant.date_terminated)}<br><strong>Lease Duration:</strong> ${leaseDuration}`;
+        } else {
+            // Fallback for terminated without end date
+            tenantDetails += `<strong>Lease Start Date:</strong> ${formatDate(tenant.actual_move_in_date)}`;
+        }
+        
+        div.innerHTML = `
+            <div class="d-flex justify-content-between align-items-start">
+                <div class="flex-grow-1">
+                    <div class="tenant-code">${escapeHtml(tenant.tenant_code)}</div>
+                    <div class="tenant-name">${escapeHtml(tenant.tenant_name)}</div>
+                    <div class="tenant-details">
+                        ${tenantDetails}
+                    </div>
+                </div>
+                <div class="ms-3">
+                    <span class="status-badge ${statusClass}">${statusText}</span>
+                </div>
+            </div>
+        `;
+        
+        // Add click handler
+        div.addEventListener('click', () => selectTenantFromModal(tenant, div));
+        
+        container.appendChild(div);
+    });
+}
+
+/**
+ * Select tenant from modal
+ */
+function selectTenantFromModal(tenant, element) {
+    // Remove previous selection
+    document.querySelectorAll('.tenant-search-result').forEach(el => {
+        el.classList.remove('selected');
+    });
+    
+    // Add selection to clicked element
+    element.classList.add('selected');
+    selectedTenantFromModal = tenant;
+    
+    // Enable confirm button
+    document.getElementById('btnConfirmTenantSelection').disabled = false;
+}
+
+/**
+ * Fix modal accessibility issues by removing aria-hidden attributes
+ */
+function fixModalAccessibility() {
+    const modals = document.querySelectorAll('.modal');
+    modals.forEach(modal => {
+        if (modal.style.display !== 'none' && !modal.classList.contains('show')) {
+            modal.removeAttribute('aria-hidden');
+        }
+    });
+}
+
+/**
+ * Confirm tenant selection
+ */
+async function confirmTenantSelection() {
+    if (!selectedTenantFromModal) {
+        showError('Please select a tenant first');
+        return;
+    }
+    
+    // Close tenant selection modal first and fix aria-hidden issue
+    const tenantSelectionModalElement = document.getElementById('tenantSelectionModal');
+    const tenantSelectionModal = bootstrap.Modal.getInstance(tenantSelectionModalElement);
+    
+    if (tenantSelectionModal) {
+        // Remove aria-hidden before closing to prevent focus issues
+        tenantSelectionModalElement.removeAttribute('aria-hidden');
+        tenantSelectionModal.hide();
+    }
+    
+    // Wait for modal transition to complete before accessing elements
+    await new Promise(resolve => setTimeout(resolve, 500));
+    
+    // Ensure the manual entry modal is accessible
+    const manualEntryModalElement = document.getElementById('manualEntryModal');
+    if (manualEntryModalElement) {
+        manualEntryModalElement.removeAttribute('aria-hidden');
+    }
+    
+    // Fix any remaining modal accessibility issues
+    fixModalAccessibility();
+    
+    // Hide the tenant search input and show the selected tenant info
+    const tenantSearchContainer = document.querySelector('.col-12:has(#tenantSearchDisplay)');
+    const tenantSearchDisplay = document.getElementById('tenantSearchDisplay');
+    
+    if (tenantSearchContainer && tenantSearchDisplay) {
+        // Hide the search input
+        tenantSearchContainer.style.display = 'none';
+    }
+    
+    // Since tenantSearchDisplay works, the manual entry modal is accessible
+    // Let's directly access the selectedTenantInfo element the same way
+    const selectedTenantInfo = document.getElementById('selectedTenantInfo');
+    const selectedTenantResult = document.querySelector('.tenant-search-result.selected');
+    
+    if (!selectedTenantInfo) {
+        console.error('selectedTenantInfo element not found');
+        return;
+    }
+    
+    // Show the selected tenant info section
+    selectedTenantInfo.style.display = 'block';
+    
+    // Clear any existing content first to prevent duplicates
+    selectedTenantInfo.innerHTML = '';
+    
+    // Create a compact, modern tenant display
+    const isActive = selectedTenantFromModal.is_terminated === '0' || selectedTenantFromModal.is_terminated === 0;
+    const statusBadgeClass = isActive ? 'badge bg-success' : 'badge bg-danger';
+    const statusBadgeText = isActive ? 'Active' : 'Terminated';
+    
+    // Build lease information based on tenant status
+    let leaseInfo = '';
+    if (isActive) {
+        // Active tenant: show lease start date and current duration
+        const currentDuration = calculateLeaseDuration(selectedTenantFromModal.actual_move_in_date);
+        leaseInfo = `<small class="text-muted">Lease Start: ${formatDate(selectedTenantFromModal.actual_move_in_date)} • Duration: ${currentDuration}</small>`;
+    } else if (selectedTenantFromModal.date_terminated) {
+        // Terminated tenant: show lease period and total duration
+        const leaseDuration = calculateLeaseDuration(selectedTenantFromModal.actual_move_in_date, selectedTenantFromModal.date_terminated);
+        leaseInfo = `<small class="text-muted">Lease Period: ${formatDate(selectedTenantFromModal.actual_move_in_date)} - ${formatDate(selectedTenantFromModal.date_terminated)} • Duration: ${leaseDuration}</small>`;
+    } else {
+        // Fallback for terminated without end date
+        leaseInfo = `<small class="text-muted">Lease Start: ${formatDate(selectedTenantFromModal.actual_move_in_date)}</small>`;
+    }
+
+    selectedTenantInfo.innerHTML = `
+        <div class="selected-tenant-compact">
+            <div class="d-flex justify-content-between align-items-start mb-2">
+                <div class="tenant-info flex-grow-1">
+                    <h6 class="mb-1">
+                        <span class="text-primary fw-bold">${escapeHtml(selectedTenantFromModal.tenant_code)}</span>
+                        <span class="text-dark ms-2">${escapeHtml(selectedTenantFromModal.tenant_name)}</span>
+                    </h6>
+                    <small class="text-muted d-block mb-1">
+                        ${escapeHtml(selectedTenantFromModal.real_property_name)} • Unit ${escapeHtml(selectedTenantFromModal.unit_no)} • ${escapeHtml(selectedTenantFromModal.meter_number || 'N/A')}
+                    </small>
+                    ${leaseInfo}
+                </div>
+                <div class="d-flex align-items-center gap-2">
+                    <span class="${statusBadgeClass}">${statusBadgeText}</span>
+                    <button type="button" class="btn btn-outline-primary btn-sm" id="btnChangeTenant">
+                        <i class="fas fa-edit me-1"></i>Change
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    // Add event listener for the Change button
+    const changeButton = selectedTenantInfo.querySelector('#btnChangeTenant');
+    if (changeButton) {
+        changeButton.addEventListener('click', function() {
+            // Show the tenant search input again
+            const tenantSearchContainer = document.querySelector('.col-12:has(#tenantSearchDisplay)');
+            if (tenantSearchContainer) {
+                tenantSearchContainer.style.display = 'block';
+            }
+            
+            // Hide the selected tenant info
+            selectedTenantInfo.style.display = 'none';
+            
+            // Clear the selected tenant
+            selectedTenant = null;
+            
+            // Open the tenant selection modal
+            const btnOpenTenantSelection = document.getElementById('btnOpenTenantSelection');
+            if (btnOpenTenantSelection) {
+                btnOpenTenantSelection.click();
+            }
+        });
+    }
+    
+    // Set selected tenant for form submission
+    selectedTenant = selectedTenantFromModal;
+    
+    // Show success notification using animated notification system
+    showSuccess('Tenant Selected', `${selectedTenantFromModal.tenant_name} selected for manual entry`);
+}
+
+/**
+ * Update tenant search pagination
+ */
+function updateTenantSearchPagination() {
+    const paginationContainer = document.getElementById('tenantSearchPagination');
+    const paginationList = paginationContainer.querySelector('.pagination');
+    
+    if (tenantSearchTotalPages <= 1) {
+        paginationContainer.style.display = 'none';
+        return;
+    }
+    
+    paginationContainer.style.display = 'block';
+    paginationList.innerHTML = '';
+    
+    // Previous button
+    const prevLi = document.createElement('li');
+    prevLi.className = `page-item ${tenantSearchCurrentPage === 1 ? 'disabled' : ''}`;
+    prevLi.innerHTML = `<a class="page-link" href="#" data-page="${tenantSearchCurrentPage - 1}">Previous</a>`;
+    paginationList.appendChild(prevLi);
+    
+    // Page numbers
+    const startPage = Math.max(1, tenantSearchCurrentPage - 2);
+    const endPage = Math.min(tenantSearchTotalPages, tenantSearchCurrentPage + 2);
+    
+    for (let i = startPage; i <= endPage; i++) {
+        const pageLi = document.createElement('li');
+        pageLi.className = `page-item ${i === tenantSearchCurrentPage ? 'active' : ''}`;
+        pageLi.innerHTML = `<a class="page-link" href="#" data-page="${i}">${i}</a>`;
+        paginationList.appendChild(pageLi);
+    }
+    
+    // Next button
+    const nextLi = document.createElement('li');
+    nextLi.className = `page-item ${tenantSearchCurrentPage === tenantSearchTotalPages ? 'disabled' : ''}`;
+    nextLi.innerHTML = `<a class="page-link" href="#" data-page="${tenantSearchCurrentPage + 1}">Next</a>`;
+    paginationList.appendChild(nextLi);
+    
+    // Add click handlers
+    paginationList.addEventListener('click', function(e) {
+        e.preventDefault();
+        if (e.target.classList.contains('page-link') && !e.target.parentElement.classList.contains('disabled')) {
+            const page = parseInt(e.target.dataset.page);
+            if (page >= 1 && page <= tenantSearchTotalPages) {
+                tenantSearchCurrentPage = page;
+                searchTenantsInModal();
+            }
+        }
+    });
+}
+
+/**
+ * Update search input placeholder based on selected criteria
+ */
+function updateSearchPlaceholder() {
+    const searchCriteria = document.getElementById('tenantSearchCriteria').value;
+    const searchInput = document.getElementById('tenantSearchInput');
+    
+    let placeholder = 'Enter search term...';
+    switch (searchCriteria) {
+        case 'tenant_name':
+            placeholder = 'Enter tenant name (e.g., John Doe)...';
+            break;
+        case 'tenant_code':
+            placeholder = 'Enter tenant code (e.g., T000001)...';
+            break;
+    }
+    
+    searchInput.placeholder = placeholder;
+    searchInput.value = ''; // Clear previous search
+}
+
+/**
+ * Load shared units cache for both main filters and tenant lookup modal
+ */
+async function loadSharedUnitsCache() {
+    try {
+        const response = await fetch(`${ENDPOINTS.tenantSearch}?limit=1`);
+        const data = await response.json();
+        
+        if (data.success && data.data.units) {
+            // Cache all units for dynamic filtering
+            allUnitsCache = data.data.units;
+            
+            // Organize units by property code for efficient filtering
+            unitsByPropertyCache = {};
+            data.data.units.forEach(unit => {
+                const propertyCode = unit.real_property_code;
+                if (!unitsByPropertyCache[propertyCode]) {
+                    unitsByPropertyCache[propertyCode] = [];
+                }
+                unitsByPropertyCache[propertyCode].push(unit);
+            });
+        }
+    } catch (error) {
+        console.error('Error loading shared units cache:', error);
+    }
+}
+
+/**
+ * Update unit filter based on selected property
+ */
+function updateUnitFilterBasedOnProperty() {
+    const propertyFilter = document.getElementById('tenantPropertyFilter').value;
+    const unitFilter = document.getElementById('tenantUnitFilter');
+    
+    // Clear current unit selection when property changes
+    unitFilter.value = '';
+    
+    if (propertyFilter === '') {
+        // All properties selected - show all units
+        populateUnitFilter(allUnitsCache);
+    } else {
+        // Specific property selected - get units from organized cache
+        const filteredUnits = unitsByPropertyCache[propertyFilter] || [];
+        populateUnitFilter(filteredUnits);
+    }
+}
+
+/**
+ * Update property filter based on selected unit
+ */
+function updatePropertyFilterBasedOnUnit() {
+    const unitFilter = document.getElementById('tenantUnitFilter');
+    const propertyFilter = document.getElementById('tenantPropertyFilter');
+    const selectedUnitValue = unitFilter.value;
+    
+    if (selectedUnitValue) {
+        // Find the selected option to get its data-property-code attribute
+        const selectedOption = unitFilter.options[unitFilter.selectedIndex];
+        const propertyCode = selectedOption.dataset.propertyCode;
+        
+        // Auto-select the corresponding property using the data-property-code
+        if (propertyCode && propertyFilter.value !== propertyCode) {
+            propertyFilter.value = propertyCode;
+        }
+    }
+}
+
+/**
+ * Populate unit filter dropdown with given units
+ */
+function populateUnitFilter(units) {
+    const select = document.getElementById('tenantUnitFilter');
+    select.innerHTML = '<option value="">All Units</option>';
+    
+    // Sort units by property code first, then by unit number
+    const sortedUnits = units.sort((a, b) => {
+        const propertyCompare = a.real_property_code.localeCompare(b.real_property_code);
+        if (propertyCompare !== 0) return propertyCompare;
+        
+        const unitA = parseInt(a.unit_no) || 0;
+        const unitB = parseInt(b.unit_no) || 0;
+        return unitA - unitB;
+    });
+    
+    sortedUnits.forEach(unit => {
+        const option = document.createElement('option');
+        option.value = `${unit.real_property_code} ${unit.unit_no}`;
+        option.textContent = `${unit.real_property_code} ${unit.unit_no}`;
+        option.dataset.propertyCode = unit.real_property_code;
+        option.dataset.unitNo = unit.unit_no;
+        select.appendChild(option);
+    });
+}
+
+/**
+ * Load properties for tenant filter
+ */
+async function loadPropertiesForTenantFilter() {
+    try {
+        const response = await fetch(`${ENDPOINTS.tenantSearch}?limit=1`);
+        const data = await response.json();
+        
+        if (data.success && data.data.properties) {
+            const select = document.getElementById('tenantPropertyFilter');
+            select.innerHTML = '<option value="">All Properties</option>';
+            
+            data.data.properties.forEach(property => {
+                const option = document.createElement('option');
+                option.value = property.real_property_code;
+                option.textContent = `${property.real_property_name} (${property.real_property_code})`;
+                select.appendChild(option);
+            });
+        }
+    } catch (error) {
+        console.error('Error loading properties for tenant filter:', error);
+    }
+}
+
+// ===== ANIMATED NOTIFICATION SYSTEM (UX DESIGN STANDARDS) =====
+
+// Global notification management
+let currentNotifications = [];
+let notificationZIndex = 10000;
+
+/**
+ * Clear all existing notifications
+ */
+function clearAllNotifications() {
+    currentNotifications.forEach(notification => {
+        if (notification.parentNode) {
+            notification.remove();
+        }
+    });
+    currentNotifications = [];
+}
+
+/**
+ * Show success notification with green gradient
+ */
+function showSuccess(title, subtitle = '') {
+    // Clear any existing notifications to prevent overlap
+    clearAllNotifications();
+    
+    const notification = createNotification(
+        title,
+        subtitle,
+        'linear-gradient(135deg, #4caf50, #45a049)',
+        'bi-check-circle-fill',
+        4000
+    );
+    
+    // Set z-index and position
+    notification.style.zIndex = notificationZIndex++;
+    notification.style.top = '20px';
+    
+    document.body.appendChild(notification);
+    currentNotifications.push(notification);
+    
+    // Auto-dismiss after 4 seconds
+    setTimeout(() => {
+        if (notification.parentNode) {
+            notification.remove();
+            currentNotifications = currentNotifications.filter(n => n !== notification);
+        }
+    }, 4000);
+}
+
+/**
+ * Show warning notification with orange gradient
+ */
+function showWarning(title, subtitle = '') {
+    // Clear any existing notifications to prevent overlap
+    clearAllNotifications();
+    
+    const notification = createNotification(
+        title,
+        subtitle,
+        'linear-gradient(135deg, #ff9800, #f57c00)',
+        'bi-exclamation-triangle-fill',
+        5000
+    );
+    
+    // Set z-index and position
+    notification.style.zIndex = notificationZIndex++;
+    notification.style.top = '20px';
+    
+    document.body.appendChild(notification);
+    currentNotifications.push(notification);
+    
+    // Auto-dismiss after 5 seconds
+    setTimeout(() => {
+        if (notification.parentNode) {
+            notification.remove();
+            currentNotifications = currentNotifications.filter(n => n !== notification);
+        }
+    }, 5000);
+}
+
+/**
+ * Show progress notification with blue gradient (manual dismiss)
+ */
+function showProgress(message) {
+    // Clear any existing notifications to prevent overlap
+    clearAllNotifications();
+    
+    const notification = createNotification(
+        message,
+        '',
+        'linear-gradient(135deg, #2196f3, #1976d2)',
+        'spinner',
+        0 // No auto-dismiss
+    );
+    
+    // Set z-index and position
+    notification.style.zIndex = notificationZIndex++;
+    notification.style.top = '20px';
+    
+    document.body.appendChild(notification);
+    currentNotifications.push(notification);
+    
+    return notification; // Return for manual dismissal
+}
+
+/**
+ * Hide notification by element
+ */
+function hideNotification(notificationElement) {
+    if (notificationElement && notificationElement.parentNode) {
+        notificationElement.remove();
+        // Remove from tracking array
+        currentNotifications = currentNotifications.filter(n => n !== notificationElement);
+    }
+}
+
+/**
+ * Escape HTML to prevent XSS
+ */
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+/**
+ * Calculate lease duration between start and end dates
+ */
+function calculateLeaseDuration(startDate, endDate = null) {
+    if (!startDate) return 'N/A';
+    
+    const start = new Date(startDate);
+    const end = endDate ? new Date(endDate) : new Date(); // Use current date if no end date
+    
+    if (start > end) return 'Invalid dates';
+    
+    // Calculate the difference in milliseconds
+    const diffMs = end - start;
+    
+    // Convert to days
+    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+    
+    // Calculate years, months, and remaining days
+    const years = Math.floor(diffDays / 365);
+    const remainingDaysAfterYears = diffDays % 365;
+    const months = Math.floor(remainingDaysAfterYears / 30);
+    const days = remainingDaysAfterYears % 30;
+    
+    // Build duration string
+    const parts = [];
+    if (years > 0) parts.push(`${years} year${years > 1 ? 's' : ''}`);
+    if (months > 0) parts.push(`${months} month${months > 1 ? 's' : ''}`);
+    if (days > 0) parts.push(`${days} day${days > 1 ? 's' : ''}`);
+    
+    return parts.length > 0 ? parts.join(', ') : 'Less than 1 day';
+}
+
+/**
+ * Create notification element
+ */
+function createNotification(title, subtitle, gradient, icon, duration) {
+    const notification = document.createElement('div');
+    notification.className = 'notification-base';
+    notification.style.background = gradient;
+    notification.style.boxShadow = `0 4px 20px ${gradient.includes('#4caf50') ? 'rgba(76, 175, 80, 0.3)' : 
+                                                   gradient.includes('#ff9800') ? 'rgba(255, 152, 0, 0.3)' : 
+                                                   'rgba(33, 150, 243, 0.3)'}`;
+    
+    let iconHtml = '';
+    if (icon === 'spinner') {
+        iconHtml = '<div class="spinner-border spinner-border-sm me-2" role="status"><span class="visually-hidden">Loading...</span></div>';
+    } else {
+        iconHtml = `<i class="bi ${icon} me-2"></i>`;
+    }
+    
+    notification.innerHTML = `
+        <div class="d-flex align-items-center">
+            ${iconHtml}
+            <div class="flex-grow-1">
+                <div class="fw-bold">${escapeHtml(title)}</div>
+                ${subtitle ? `<div class="small opacity-75">${escapeHtml(subtitle)}</div>` : ''}
+            </div>
+        </div>
+    `;
+    
+    return notification;
+}
+
+/**
+ * Show error notification using SweetAlert2 (for critical errors)
+ */
+function showError(message) {
+    Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: message,
+        confirmButtonText: 'OK',
+        confirmButtonColor: '#dc2626'
+    });
 }

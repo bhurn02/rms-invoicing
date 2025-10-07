@@ -174,14 +174,14 @@ try {
     // Log successful reading
     logActivity("QR Reading Saved", "Reading saved for tenant {$result['tenantCode']}: {$result['prevReading']} -> {$result['currentReading']}");
         
-        // Return success response
+        // Return success response with trimmed string fields
         echo json_encode([
             'success' => true,
         'message' => $result['message'],
             'data' => [
             'readingId' => $result['readingId'],
-            'tenantCode' => $result['tenantCode'],
-            'tenantName' => $result['tenantName'],
+            'tenantCode' => trim($result['tenantCode']),
+            'tenantName' => trim($result['tenantName']),
             'prevReading' => $result['prevReading'],
             'currentReading' => $result['currentReading'],
             'readingDate' => $result['readingDate'],
@@ -194,7 +194,7 @@ try {
                 'to' => $result['billingDateTo']
             ],
             'usage' => $result['usage'],
-            'remarks' => $result['remarks']
+            'remarks' => trim($result['remarks'])
         ]
     ]);
     
