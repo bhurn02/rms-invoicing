@@ -104,30 +104,30 @@ try {
         error_log("Fallback query count: " . count($readings));
     }
     
-    // Format the data for JSON response
+    // Format the data for JSON response with trimmed string fields
     $formattedReadings = [];
     foreach ($readings as $reading) {
         $formattedReadings[] = [
             'readingId' => $reading['reading_id'],
-            'tenantCode' => $reading['tenant_code'],
-            'tenantName' => $reading['tenant_name'],
-            'propertyId' => $reading['propertyId'],
-            'propertyName' => $reading['propertyName'],
-            'buildingCode' => $reading['building_code'],
-            'unitNumber' => $reading['unitNumber'],
+            'tenantCode' => trim($reading['tenant_code']),
+            'tenantName' => trim($reading['tenant_name']),
+            'propertyId' => trim($reading['propertyId']),
+            'propertyName' => trim($reading['propertyName']),
+            'buildingCode' => trim($reading['building_code']),
+            'unitNumber' => trim($reading['unitNumber']),
             'readingDate' => $reading['reading_date'] ?: $reading['readingDate'],
             'readingDateTo' => $reading['readingDateTo'],
             'prevReading' => floatval(isset($reading['prev_reading']) ? $reading['prev_reading'] : 0),
             'meterReading' => floatval(isset($reading['meterReading']) ? $reading['meterReading'] : 0),
             'usage' => floatval(isset($reading['meterReading']) ? $reading['meterReading'] : 0) - floatval(isset($reading['prev_reading']) ? $reading['prev_reading'] : 0),
-            'remarks' => $reading['remarks'],
-            'readingBy' => $reading['reading_by'],
-            'deviceInfo' => isset($reading['device_info']) ? $reading['device_info'] : 'QR System',
-            'ipAddress' => isset($reading['ip_address']) ? $reading['ip_address'] : null,
-            'locationData' => isset($reading['location_data']) ? $reading['location_data'] : null,
-            'createdBy' => $reading['createdBy'],
+            'remarks' => trim($reading['remarks']),
+            'readingBy' => trim($reading['reading_by']),
+            'deviceInfo' => isset($reading['device_info']) ? trim($reading['device_info']) : 'QR System',
+            'ipAddress' => isset($reading['ip_address']) ? trim($reading['ip_address']) : null,
+            'locationData' => isset($reading['location_data']) ? trim($reading['location_data']) : null,
+            'createdBy' => trim($reading['createdBy']),
             'createdAt' => $reading['createdAt'],
-            'updatedBy' => $reading['updatedBy'],
+            'updatedBy' => trim($reading['updatedBy']),
             'updatedAt' => $reading['updatedAt']
         ];
     }

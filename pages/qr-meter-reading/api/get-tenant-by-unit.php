@@ -92,17 +92,17 @@ try {
         }
     }
     
-    // Return tenant information
+    // Return tenant information with trimmed string fields
     echo json_encode([
         'success' => true,
         'data' => [
-            'tenantCode' => $tenant['tenant_code'],
-            'tenantName' => $tenant['tenant_name'],
-            'realPropertyCode' => $tenant['real_property_code'],
-            'realPropertyName' => $tenant['real_property_name'],
-            'unitNo' => $tenant['unit_no'],
-            'meterNumber' => $tenant['meter_number'],
-            'unitType' => $tenant['unit_type'],
+            'tenantCode' => trim($tenant['tenant_code']),
+            'tenantName' => trim($tenant['tenant_name']),
+            'realPropertyCode' => trim($tenant['real_property_code']),
+            'realPropertyName' => trim($tenant['real_property_name']),
+            'unitNo' => trim($tenant['unit_no']),
+            'meterNumber' => trim($tenant['meter_number']),
+            'unitType' => trim($tenant['unit_type']),
             'actualMoveInDate' => $tenant['actual_move_in_date'],
             'contractExpiryDate' => $tenant['contract_expiry_date'],
             'isActive' => true

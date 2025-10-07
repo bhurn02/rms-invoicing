@@ -67,13 +67,13 @@ try {
     $lastReading = $stmt->fetch(PDO::FETCH_ASSOC);
     
     if ($lastReading) {
-        // Return the last reading data
+        // Return the last reading data with trimmed string fields
         echo json_encode([
             'success' => true,
             'data' => [
-                'tenantCode' => $lastReading['tenant_code'],
-                'tenantName' => $lastReading['tenant_name'],
-                'propertyName' => $lastReading['property_name'],
+                'tenantCode' => trim($lastReading['tenant_code']),
+                'tenantName' => trim($lastReading['tenant_name']),
+                'propertyName' => trim($lastReading['property_name']),
                 'prevReading' => $lastReading['prev_reading'] ? floatval($lastReading['prev_reading']) : null,
                 'currentReading' => floatval($lastReading['current_reading']),
                 'readingDate' => $lastReading['reading_date'],
@@ -82,7 +82,7 @@ try {
                 'billingDateFrom' => $lastReading['billing_from'],
                 'billingDateTo' => $lastReading['billing_to'],
                 'usage' => $lastReading['usage'],
-                'remarks' => $lastReading['remarks']
+                'remarks' => trim($lastReading['remarks'])
             ]
         ]);
     } else {

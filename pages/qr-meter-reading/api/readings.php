@@ -84,6 +84,7 @@ function handleGetReadings($pdo, $currentUserId) {
     // Filter parameters
     $propertyCode = $_GET['property'] ?? null;
     $tenantCode = $_GET['tenant'] ?? null;
+    $unitNo = $_GET['unit'] ?? null;
     $dateFrom = $_GET['date_from'] ?? null;
     $dateTo = $_GET['date_to'] ?? null;
     $search = $_GET['search'] ?? null;
@@ -114,13 +115,18 @@ function handleGetReadings($pdo, $currentUserId) {
         $params[] = $tenantCode;
     }
     
+    if ($unitNo) {
+        $whereConditions[] = "t.unit_no = ?";
+        $params[] = $unitNo;
+    }
+    
     if ($dateFrom) {
-        $whereConditions[] = "r.reading_date >= ?";
+        $whereConditions[] = "r.date_from >= ?";
         $params[] = $dateFrom;
     }
     
     if ($dateTo) {
-        $whereConditions[] = "r.reading_date <= ?";
+        $whereConditions[] = "r.date_to <= ?";
         $params[] = $dateTo;
     }
     
@@ -215,12 +221,44 @@ function handleGetReadings($pdo, $currentUserId) {
     $stmt->execute($params);
     $readings = $stmt->fetchAll(PDO::FETCH_ASSOC);
     
+    // Transform readings data with trimmed string fields
+    $transformedReadings = array_map(function($reading) {
+        return [
+            'reading_id' => $reading['reading_id'],
+            'tenant_code' => trim($reading['tenant_code']),
+            'date_from' => $reading['date_from'],
+            'date_to' => $reading['date_to'],
+            'prev_reading' => $reading['prev_reading'],
+            'current_reading' => $reading['current_reading'],
+            'remarks' => trim($reading['remarks']),
+            'reading_date' => $reading['reading_date'],
+            'reading_by' => trim($reading['reading_by']),
+            'billing_date_from' => $reading['billing_date_from'],
+            'billing_date_to' => $reading['billing_date_to'],
+            'created_by' => trim($reading['created_by']),
+            'date_created' => $reading['date_created'],
+            'updated_by' => trim($reading['updated_by']),
+            'date_updated' => $reading['date_updated'],
+            'tenant_name' => trim($reading['tenant_name']),
+            'property_code' => trim($reading['property_code']),
+            'unit_no' => trim($reading['unit_no']),
+            'property_name' => trim($reading['property_name']),
+            'device_info' => trim($reading['device_info']),
+            'ip_address' => trim($reading['ip_address']),
+            'user_agent' => trim($reading['user_agent']),
+            'location_data' => trim($reading['location_data']),
+            'ext_created_date' => $reading['ext_created_date'],
+            'is_invoiced' => $reading['is_invoiced'],
+            'reading_source' => trim($reading['reading_source'])
+        ];
+    }, $readings);
+    
     // Calculate pagination info
     $totalPages = ceil($totalCount / $limit);
     
     echo json_encode([
         'success' => true,
-        'data' => $readings,
+        'data' => $transformedReadings,
         'pagination' => [
             'current_page' => $page,
             'total_pages' => $totalPages,
@@ -295,9 +333,39 @@ function handleGetSingleReading($pdo, $currentUserId, $readingId) {
         throw new Exception('Reading not found');
     }
     
+    // Transform single reading data with trimmed string fields
+    $transformedReading = [
+        'reading_id' => $reading['reading_id'],
+        'tenant_code' => trim($reading['tenant_code']),
+        'tenant_name' => trim($reading['tenant_name']),
+        'real_property_code' => trim($reading['real_property_code']),
+        'real_property_name' => trim($reading['real_property_name']),
+        'unit_no' => trim($reading['unit_no']),
+        'date_from' => $reading['date_from'],
+        'date_to' => $reading['date_to'],
+        'prev_reading' => $reading['prev_reading'],
+        'current_reading' => $reading['current_reading'],
+        'reading_date' => $reading['reading_date'],
+        'reading_by' => trim($reading['reading_by']),
+        'remarks' => trim($reading['remarks']),
+        'billing_date_from' => $reading['billing_date_from'],
+        'billing_date_to' => $reading['billing_date_to'],
+        'created_by' => trim($reading['created_by']),
+        'date_created' => $reading['date_created'],
+        'updated_by' => trim($reading['updated_by']),
+        'date_updated' => $reading['date_updated'],
+        'device_info' => trim($reading['device_info']),
+        'ip_address' => trim($reading['ip_address']),
+        'user_agent' => trim($reading['user_agent']),
+        'location_data' => trim($reading['location_data']),
+        'ext_created_date' => $reading['ext_created_date'],
+        'is_invoiced' => $reading['is_invoiced'],
+        'reading_source' => trim($reading['reading_source'])
+    ];
+    
     echo json_encode([
         'success' => true,
-        'data' => $reading
+        'data' => $transformedReading
     ]);
 }
 
@@ -409,7 +477,7 @@ function handleCreateReading($pdo, $currentUserId) {
             'message' => 'Reading created successfully',
             'data' => [
                 'reading_id' => $readingId,
-                'tenant_code' => $input['tenant_code'],
+                'tenant_code' => trim($input['tenant_code']),
                 'current_reading' => $input['current_reading'],
                 'prev_reading' => $prevReadingValue,
                 'usage' => $input['current_reading'] - $prevReadingValue

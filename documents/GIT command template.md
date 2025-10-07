@@ -29,7 +29,12 @@ git log --all --decorate --date=format:'%Y-%m-%d %H:%M:%S' --pretty=format:'%C(g
 # Here's the command to get September 2025 commits and save them to an MD file:
 echo "# September 2025 Git Commits" > 2025-09-commits.md
 echo "" >> 2025-09-commits.md
-git log --all --decorate --date=format:'%Y-%m-%d %H:%M:%S' --pretty=format:'%C(green)%ad%C(reset) %C(blue)%an%C(reset) %C(cyan)%D%C(reset) %C(yellow)%h%C(reset) %C(magenta)[%S]%C(reset) %s' >> 2025-09-commits.md
+git log --all --decorate --since="2025-09-01" --until="2025-09-30" --date=format:'%Y-%m-%d %H:%M:%S' --pretty=format:'%C(green)%ad%C(reset) %C(blue)%an%C(reset) %C(cyan)%D%C(reset) %C(yellow)%h%C(reset) %C(magenta)[%S]%C(reset) %s' >> 2025-09-commits.md
+
+# Here's the command to get September 2025 commits and save them to an MD file with Pipe | delimeter:
+echo "# September 2025 Git Commits" > 2025-09-commits.md
+echo "" >> 2025-09-commits.md
+git log --all --decorate --since="2025-09-01" --until="2025-09-30" --date=format:'%Y-%m-%d %H:%M:%S' --pretty=format:'%C(green)%ad%C(reset)|%C(blue)%an%C(reset)|%C(cyan)%D%C(reset)|%C(yellow)%h%C(reset)|%C(magenta)[%S]%C(reset)|%s' >> 2025-09-commits.md
 ```
 
 ## 2. Branch Merging Sequence

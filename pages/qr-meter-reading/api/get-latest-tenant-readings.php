@@ -64,15 +64,15 @@ try {
     
     $readings = $stmt->fetchAll(PDO::FETCH_ASSOC);
     
-    // Transform data for frontend consumption
+    // Transform data for frontend consumption with trimmed string fields
     $transformedReadings = array_map(function($reading) {
         return [
-            'property_code' => $reading['property_code'],
-            'unit_no' => $reading['unit_no'],
-            'property_name' => $reading['property_name'],
-            'tenant_code' => $reading['tenant_code'],
-            'tenant_name' => $reading['tenant_name'],
-            'terminated' => $reading['terminated'],
+            'property_code' => trim($reading['property_code']),
+            'unit_no' => trim($reading['unit_no']),
+            'property_name' => trim($reading['property_name']),
+            'tenant_code' => trim($reading['tenant_code']),
+            'tenant_name' => trim($reading['tenant_name']),
+            'terminated' => trim($reading['terminated']),
             'current_reading' => (float)$reading['current_reading'],
             'prev_reading' => (float)$reading['prev_reading'],
             'usage' => (float)$reading['usage'],
@@ -81,8 +81,8 @@ try {
             'billing_to' => $reading['billing_to'],
             'reading_date_from' => $reading['reading_date_from'],
             'reading_date_to' => $reading['reading_date_to'],
-            'remarks' => $reading['remarks'],
-            'unit_desc' => $reading['unit_desc'],
+            'remarks' => trim($reading['remarks']),
+            'unit_desc' => trim($reading['unit_desc']),
             'date_created' => $reading['date_created']
         ];
     }, $readings);

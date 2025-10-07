@@ -260,16 +260,14 @@ $pageTitle = 'Tenant Readings Management';
                         <div class="row g-3">
                             <!-- Tenant Selection -->
                             <div class="col-12">
-                                <label for="tenantSearch" class="form-label">Select Tenant *</label>
+                                <label class="form-label">Select Tenant *</label>
                                 <div class="input-group">
-                                    <input type="text" class="form-control" id="tenantSearch" placeholder="Search tenants...">
-                                    <button class="btn btn-outline-secondary" type="button" id="btnTenantSearch">
-                                        <i class="fas fa-search"></i>
+                                    <input type="text" class="form-control" id="tenantSearchDisplay" placeholder="Click to search and select tenant..." readonly>
+                                    <button class="btn btn-outline-primary" type="button" id="btnOpenTenantSelection">
+                                        <i class="fas fa-search me-1"></i>Search Tenants
                                     </button>
                                 </div>
-                                <div id="tenantSearchResults" class="mt-2" style="display: none;">
-                                    <!-- Search results will be displayed here -->
-                                </div>
+                                <small class="form-text text-muted">Click "Search Tenants" to find and select a tenant for manual entry.</small>
                             </div>
 
                             <!-- Selected Tenant Info -->
@@ -462,6 +460,98 @@ $pageTitle = 'Tenant Readings Management';
                     <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
                     <button type="button" class="btn btn-primary" id="btnSaveEditReading">
                         <i class="fas fa-save me-1"></i>Save Changes
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tenant Selection Modal -->
+    <div class="modal fade" id="tenantSelectionModal" tabindex="-1" aria-labelledby="tenantSelectionModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="tenantSelectionModalLabel">
+                        <i class="fas fa-users me-2"></i>Select Tenant for Manual Entry
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- Search Criteria -->
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-4">
+                            <label for="tenantSearchCriteria" class="form-label">Search By</label>
+                            <select class="form-select" id="tenantSearchCriteria">
+                                <option value="tenant_name">Tenant Name</option>
+                                <option value="tenant_code">Tenant Code</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="tenantSearchInput" class="form-label">Search Term</label>
+                            <input type="text" class="form-control" id="tenantSearchInput" placeholder="Enter search term...">
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">&nbsp;</label>
+                            <button type="button" class="btn btn-primary w-100" id="btnSearchTenants">
+                                <i class="fas fa-search me-1"></i>Search
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Additional Filters -->
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-4">
+                            <label for="tenantPropertyFilter" class="form-label">Property Filter</label>
+                            <select class="form-select" id="tenantPropertyFilter">
+                                <option value="">All Properties</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="tenantUnitFilter" class="form-label">Property & Unit Filter</label>
+                            <select class="form-select" id="tenantUnitFilter">
+                                <option value="">All Units</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="tenantStatusFilter" class="form-label">Status Filter</label>
+                            <select class="form-select" id="tenantStatusFilter">
+                                <option value="">All Tenants</option>
+                                <option value="active">Active Only</option>
+                                <option value="terminated">Terminated Only</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Search Results -->
+                    <div id="tenantSearchResultsContainer">
+                        <div class="text-center py-5">
+                            <i class="fas fa-search fa-3x text-muted mb-3"></i>
+                            <h5 class="text-muted">Search for Tenants</h5>
+                            <p class="text-muted">Enter search criteria above to find tenants for manual entry.</p>
+                            <div class="alert alert-info mt-3">
+                                <small>
+                                    <strong>💡 Quick Search Tips:</strong><br>
+                                    • <strong>Search:</strong> Use Tenant Name or Tenant Code in the search box<br>
+                                    • <strong>Property Filter:</strong> Select property to filter units by that property<br>
+                                    • <strong>Unit Filter:</strong> Shows all units by default, or only units from selected property<br>
+                                    • <strong>Status Filter:</strong> Filter by Active or Terminated tenants<br>
+                                    • <strong>Smart Bidirectional Filtering:</strong> Selecting a property updates the unit list; selecting a unit auto-selects its property
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Pagination for Results -->
+                    <nav aria-label="Tenant search pagination" class="mt-3" id="tenantSearchPagination" style="display: none;">
+                        <ul class="pagination justify-content-center">
+                            <!-- Pagination will be generated here -->
+                        </ul>
+                    </nav>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="btnConfirmTenantSelection" disabled>
+                        <i class="fas fa-check me-1"></i>Select Tenant
                     </button>
                 </div>
             </div>
