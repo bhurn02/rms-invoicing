@@ -638,14 +638,67 @@ Test all CRUD operations and verify business logic functionality.
 **Reflection**: [reflection-phase17-4-validation-testing.md](reflection/reflection-phase17-4-validation-testing.md)  
 **Status**: ✅ **COMPLETED & ARCHIVED**
 
-##### **Phase 17.5: Edit Modal Enhancement (4-6 hours)** 📋 **PLANNED** (User Requested)
+##### **Phase 17.5: Edit Modal Enhancement (7-10 hours)** 🎨 **CREATIVE PHASE COMPLETE** (User Requested)
 
+**Status**: 🎨 **CREATIVE PHASE COMPLETE** - Design decisions finalized, ready for implementation  
+**Priority**: HIGH (User Explicitly Requested)  
+**Estimated Time**: 7-10 hours (4 sub-phases)  
+**Complexity**: Level 2-3 (Simple to Intermediate Enhancement)  
+**Dependencies**: Phase 17.4 Complete, Manual Entry modal as reference implementation  
+**Creative Phase**: [creative-phase17-5-edit-modal-enhancement.md](creative/creative-phase17-5-edit-modal-enhancement.md) ✅  
+**Design Decision**: Option 1 - Direct Function Adaptation (proven, low risk, fastest implementation)
+
+#### **📋 DETAILED IMPLEMENTATION PLAN**
+
+##### **Phase 17.5.1: Smart Date Auto-Population** (2-3 hours)
+- [ ] **Event Listener Setup**: Add `change` event to `editDateFrom` field
+- [ ] **Auto-Population Function**: Create `autoPopulateEditDates()` function
+- [ ] **Date Calculations**: Auto-calculate Date To (month-end), billing dates (next month)
+- [ ] **Validation Integration**: Integrate with smart notification system
+- [ ] **Testing**: Verify date calculations for various inputs
+
+##### **Phase 17.5.2: Reading Validation System** (2-3 hours)
+- [ ] **Previous Reading Display**: Show previous reading period and consumption in modal
+- [ ] **Period Conflict Detection**: Check for duplicate reading periods using cache
+- [ ] **Consumption Validation**: Enhanced validation (zero, negative, NaN prevention)
+- [ ] **LocalStorage Integration**: Cache previous reading data for validation
+- [ ] **API Enhancement**: Add duplicate period validation to PUT endpoint
+
+##### **Phase 17.5.3: Smart Notification Integration** (1-2 hours)
+- [ ] **Global Tracking Variables**: Add edit-specific notification IDs
+- [ ] **Smart Notification Integration**: Use `showSmartNotification()` with priority system
+- [ ] **Save Button State Control**: Disable/enable based on validation state
+- [ ] **Modal Lifecycle Management**: Clear notifications on modal events
+- [ ] **Visual Stacking**: Implement notification stacking for multiple warnings
+
+##### **Phase 17.5.4: UX Consistency & Testing** (2-3 hours)
+- [ ] **Visual Consistency**: Match modal layout to Manual Entry modal
+- [ ] **Backend Validation**: Enhanced API validation with detailed error messages
+- [ ] **Comprehensive Testing**: All validation scenarios, date auto-population, notifications
+- [ ] **Documentation Updates**: Update implementation guidelines and testing checklist
+- [ ] **Feature Parity Verification**: Confirm complete feature parity with Manual Entry
+
+#### **🎯 SUCCESS CRITERIA**
 - [ ] **Smart Date Auto-Population**: Auto-calculate Date To from Date From, billing dates, period validation
 - [ ] **Reading Calculation System**: Automatic consumption calculation, previous reading auto-fetch
 - [ ] **Validation Integration**: Duplicate period detection, period conflict validation, save button control
 - [ ] **UX Consistency**: Same modal layout, styling, and interaction patterns as Manual Entry modal
 - [ ] **Smart Notification System**: Integrated warning system with persistence, clearing logic, and priority-based suppression
 - [ ] **Feature Parity**: Complete feature parity with Manual Entry modal (smart validation, auto-populate, duplicate detection)
+
+#### **📂 FILES TO MODIFY**
+- **`pages/qr-meter-reading/assets/js/tenant-readings-management.js`**: Edit modal functions, validation, notifications
+- **`pages/qr-meter-reading/tenant-readings-management.php`**: Edit modal HTML structure, previous reading display
+- **`pages/qr-meter-reading/api/readings.php`**: PUT endpoint enhancement with duplicate validation
+- **`memory-bank/tasks.md`**: Phase 17.5 status and progress tracking
+- **`memory-bank/implementation-phase-guidelines.md`**: Documentation updates
+
+#### **⚠️ CHALLENGES & MITIGATIONS**
+- **Reading Data Context**: Implement `fetchPreviousReadingForEdit()` function with localStorage cache
+- **Duplicate Period Detection**: Reuse Manual Entry's `checkReadingPeriodConflict()` logic
+- **Notification State Management**: Use global tracking variables with modal lifecycle events
+- **Save Button State**: Centralize state control with `setSaveEditButtonEnabled()` function
+- **Backend Validation Consistency**: Enhance API with same validation logic as frontend
 
 **Rationale**: Edit modal should have same UX polish as Manual Entry modal since they share almost the same logic. User explicitly requested comprehensive enhancement to match Manual Entry features.
 
