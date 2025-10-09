@@ -66,23 +66,34 @@ try {
         throw new Exception('Invalid operation. Allowed: ' . implode(', ', $allowedOperations));
     }
     
-    // Validate reading IDs are not invoiced
+    // ✅ ENHANCED: Validate reading IDs are not invoiced with better SQL
     $placeholders = str_repeat('?,', count($readingIds) - 1) . '?';
-    $invoicedSql = "SELECT r.reading_id 
+    
+    // Check using t_tenant_reading_charges for invoice status (more reliable)
+    $invoicedSql = "SELECT r.reading_id, t.tenant_name
                     FROM t_tenant_reading r
+                    LEFT JOIN m_tenant t ON r.tenant_id = t.tenant_id
                     WHERE r.reading_id IN ($placeholders)
                     AND EXISTS (
-                        SELECT 1 FROM t_invoice_detail_reading idr
-                        INNER JOIN t_invoice_detail id ON idr.invoice_detail_id = id.invoice_detail_id
-                        WHERE idr.reading_id = r.reading_id
+                        SELECT 1 
+                        FROM t_tenant_reading_charges trc
+                        WHERE trc.reading_id = r.reading_id
+                        AND trc.invoice_id IS NOT NULL
                     )";
     
     $invoicedStmt = $pdo->prepare($invoicedSql);
     $invoicedStmt->execute($readingIds);
-    $invoicedReadings = $invoicedStmt->fetchAll(PDO::FETCH_COLUMN);
+    $invoicedReadings = $invoicedStmt->fetchAll(PDO::FETCH_ASSOC);
     
     if (!empty($invoicedReadings)) {
-        throw new Exception('Cannot modify readings that have been invoiced: ' . implode(', ', $invoicedReadings));
+        $invoicedList = array_map(function($row) {
+            return "Reading #" . $row['reading_id'] . " (" . ($row['tenant_name'] ?? 'Unknown') . ")";
+        }, $invoicedReadings);
+        
+        $invoicedMessage = implode(', ', $invoicedList);
+        
+        http_response_code(400);
+        throw new Exception("Cannot modify readings that have been invoiced: " . $invoicedMessage);
     }
     
     // Start transaction

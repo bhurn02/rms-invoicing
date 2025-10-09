@@ -88,30 +88,84 @@ try {
     $prevReading = floatval($input['prev_reading']);
     
     if ($currentReading <= $prevReading) {
-        throw new Exception('Current reading must be greater than previous reading');
+        http_response_code(400);
+        echo json_encode([
+            'success' => false,
+            'message' => 'Current reading must be greater than previous reading'
+        ]);
+        exit();
     }
     
     // Check for duplicate reading in same period (based on date_from/date_to overlap)
-    $duplicateSql = "SELECT COUNT(*) as count 
-                     FROM t_tenant_reading 
-                     WHERE tenant_code = ? 
-                     AND (
-                         (date_from <= ? AND date_to >= ?) OR  -- New period overlaps with existing
-                         (date_from <= ? AND date_to >= ?) OR  -- New period contains existing
-                         (date_from >= ? AND date_to <= ?)     -- New period is contained in existing
-                     )";
-    
-    $duplicateStmt = $pdo->prepare($duplicateSql);
-    $duplicateStmt->execute([
-        $input['tenant_code'], 
-        $input['date_from'], $input['date_from'],  // New period start overlaps
-        $input['date_to'], $input['date_to'],      // New period end overlaps  
-        $input['date_from'], $input['date_to']     // New period contains existing
-    ]);
-    $duplicateCount = $duplicateStmt->fetch(PDO::FETCH_ASSOC)['count'];
-    
-    if ($duplicateCount > 0) {
-        throw new Exception('Duplicate reading for this period already exists');
+    try {
+        $duplicateSql = "SELECT COUNT(*) as count 
+                         FROM t_tenant_reading 
+                         WHERE tenant_code = ? 
+                         AND (
+                             (date_from <= ? AND date_to >= ?) OR  -- New period overlaps with existing
+                             (date_from <= ? AND date_to >= ?) OR  -- New period contains existing
+                             (date_from >= ? AND date_to <= ?)     -- New period is contained in existing
+                         )";
+        
+        $duplicateStmt = $pdo->prepare($duplicateSql);
+        $duplicateStmt->execute([
+            $input['tenant_code'], 
+            $input['date_from'], $input['date_from'],  // New period start overlaps
+            $input['date_to'], $input['date_to'],      // New period end overlaps  
+            $input['date_from'], $input['date_to']     // New period contains existing
+        ]);
+        $duplicateCount = $duplicateStmt->fetch(PDO::FETCH_ASSOC)['count'];
+        
+        
+        if ($duplicateCount > 0) {
+            // Get the existing period details for better messaging
+            $existingPeriodSql = "SELECT TOP 1 date_from, date_to 
+                                  FROM t_tenant_reading 
+                                  WHERE tenant_code = ? 
+                                  AND (
+                                      (date_from <= ? AND date_to >= ?) OR
+                                      (date_from <= ? AND date_to >= ?) OR
+                                      (date_from >= ? AND date_to <= ?)
+                                  )
+                                  ORDER BY date_from DESC";
+            
+            $existingStmt = $pdo->prepare($existingPeriodSql);
+            $existingStmt->execute([
+                $input['tenant_code'],
+                $input['date_from'], $input['date_from'],
+                $input['date_to'], $input['date_to'],
+                $input['date_from'], $input['date_to']
+            ]);
+            $existingPeriod = $existingStmt->fetch(PDO::FETCH_ASSOC);
+            
+            $inputPeriod = date('m/d/Y', strtotime($input['date_from'])) . ' - ' . date('m/d/Y', strtotime($input['date_to']));
+            $existingPeriodFormatted = '';
+            
+            if ($existingPeriod) {
+                $existingPeriodFormatted = date('m/d/Y', strtotime($existingPeriod['date_from'])) . ' - ' . date('m/d/Y', strtotime($existingPeriod['date_to']));
+            }
+            
+            $message = $existingPeriodFormatted && $existingPeriodFormatted === $inputPeriod
+                ? "This period ({$inputPeriod}) already has a reading. Please select a different date range."
+                : $existingPeriodFormatted 
+                    ? "This period overlaps with existing reading ({$existingPeriodFormatted}). Please select a different date range."
+                    : "This period overlaps with an existing reading. Please select a different date range.";
+            
+            http_response_code(400);
+            echo json_encode([
+                'success' => false,
+                'message' => $message
+            ]);
+            exit();
+        }
+    } catch (Exception $e) {
+        // If duplicate check fails, treat it as a duplicate (safer approach)
+        http_response_code(400);
+        echo json_encode([
+            'success' => false,
+            'message' => 'This period overlaps with an existing reading. Please select a different date range.'
+        ]);
+        exit();
     }
     
     // Start transaction

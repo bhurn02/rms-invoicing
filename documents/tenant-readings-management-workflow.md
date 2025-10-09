@@ -168,38 +168,61 @@ flowchart TD
 
 ## 4) Manual Entry Workflow
 
-### **Complete Manual Entry Process**
+### **Complete Manual Entry Process with Smart Validation**
 ```mermaid
 flowchart TD
     A[Click Manual Entry Button] --> B[Open Manual Entry Modal]
-    B --> C[Reset Form State]
-    C --> D[Show Tenant Search Input]
+    B --> C[Reset Form State<br>Clear Notifications]
+    C --> D[Show Tenant Search Input<br>Default: Current=0, Previous=0]
     
     D --> E[User Clicks Search Tenants]
-    E --> F[Open Tenant Selection Modal]
+    E --> F[Open Tenant Selection Modal<br>Select2 with dropdownParent]
     F --> G[Execute Tenant Lookup Workflow]
     G --> H[User Selects Tenant]
     H --> I[Close Tenant Selection Modal]
     
-    I --> J[Hide Tenant Search Input]
-    J --> K[Display Compact Tenant Card]
-    K --> L[Show Change Button]
+    I --> J[fetchAndPopulatePreviousReading<br>isAutoPopulating=true]
+    J --> K[Display Compact Tenant Card<br>with Last Reading Info]
+    K --> L[Auto-Populate Previous Reading<br>Editable for Meter Replacement]
+    L --> M[validatePeriodConflictIfDatesEntered<br>if Dates Already Entered]
     
-    L --> M[User Enters Reading Data]
-    M --> N[Validate Required Fields]
-    N --> O{Validation Passed}
-    O -->|No| P[Show Validation Error]
-    P --> M
-    O -->|Yes| Q[Submit Reading Data]
+    M --> N[User Enters Reading Data]
+    N --> O[User Selects Date From]
+    O --> P[autoPopulateDates<br>Calculate Month-End & Billing]
+    P --> Q[checkReadingPeriodConflict<br>LocalStorage Cache]
     
-    Q --> R[API Validation]
-    R --> S{API Validation Passed}
-    S -->|No| T[Show API Error]
-    T --> M
-    S -->|Yes| U[Save Reading Successfully]
-    U --> V[Show Success Notification]
-    V --> W[Close Modal]
-    W --> X[Refresh Readings Table]
+    Q --> R{Period<br>Conflict?}
+    R -->|Yes| S[showSmartNotification WARNING<br>Persistent - Position 1/2]
+    R -->|No| T[showSmartNotification SUCCESS<br>if No Other Warnings]
+    
+    N --> U[User Changes Current Reading]
+    U --> V[calculateConsumption]
+    V --> W{Valid<br>Consumption?}
+    W -->|No| X[showSmartNotification WARNING<br>Invalid Usage - Stacks]
+    W -->|Yes| Y[Clear Invalid Usage Warning<br>if Exists]
+    
+    S --> Z[Disable Save Button]
+    X --> Z
+    Y --> AA{hasActiveValidationWarnings}
+    AA -->|No| AB[Enable Save Button]
+    AA -->|Yes| Z
+    
+    AB --> AC[User Clicks Save]
+    AC --> AD[Validate All Required Fields<br>FormData with name attributes]
+    AD --> AE{All Fields<br>Valid?}
+    AE -->|No| AF[showInlineValidationError<br>Field-Specific]
+    AF --> N
+    AE -->|Yes| AG[Submit Reading Data<br>POST to API]
+    
+    AG --> AH[API Validation]
+    AH --> AI{API Validation<br>Passed?}
+    AI -->|No| AJ[showSmartNotification ERROR<br>SweetAlert]
+    AJ --> N
+    AI -->|Yes| AK[Save Reading Successfully]
+    AK --> AL[showSmartNotification SUCCESS<br>if No Warnings]
+    AL --> AM[Slide-Up Animation<br>300ms]
+    AM --> AN[Close Modal<br>Clear All Notifications]
+    AN --> AO[Refresh Readings Table]
 ```
 
 ### **Tenant Selection Modal Features**
@@ -318,33 +341,101 @@ flowchart TD
 
 ## 8) Notification & UX System
 
-### **Smart Notification Strategy**
+### **Smart Notification Manager with Priority Queue**
 ```mermaid
 flowchart TD
     A[System Action] --> B{Action Type}
-    B -->|Success| C[Show Inline Success Notification]
-    B -->|Warning| D[Show Inline Warning Notification]
-    B -->|Error| E[Show Inline Error Notification]
-    B -->|Destructive Action| F[Show SweetAlert Confirmation]
-    B -->|Critical Error| G[Show SweetAlert Error]
+    B -->|Success| C[showSmartNotification<br>SUCCESS]
+    B -->|Info| D[showSmartNotification<br>INFO]
+    B -->|Warning| E[showSmartNotification<br>WARNING]
+    B -->|Error| F[showSmartNotification<br>ERROR]
+    B -->|Destructive Action| G[Show SweetAlert Confirmation]
     
-    C --> H[Auto-dismiss after 3 seconds]
+    C --> H{Validation<br>Warnings Active?}
     D --> H
-    E --> H
-    F --> I[User Confirms or Cancels]
-    G --> J[User Acknowledges]
+    H -->|Yes| I[Suppress<br>Lower Priority]
+    H -->|No| J[Show Green<br>Notification]
     
-    I --> K[Execute or Cancel Action]
-    J --> L[Return to Interface]
-    H --> M[Continue Normal Flow]
+    E --> K{Existing<br>Warnings?}
+    K -->|0 Warnings| L[Show at Position 1<br>top: 20px]
+    K -->|1 Warning| M[Show at Position 2<br>top: 90px]
+    M --> N[Add '2 Issues' Badge]
+    
+    F --> O[Show SweetAlert<br>Blocking Error]
+    
+    J --> P[Auto-dismiss<br>4 seconds]
+    L --> Q{Persistent?}
+    M --> Q
+    Q -->|Yes| R[Stay Until Resolved]
+    Q -->|No| S[Auto-dismiss<br>5 seconds]
+    
+    P --> T[Slide-Up Animation<br>300ms]
+    S --> T
+    T --> U[Remove from DOM]
+    U --> V[Update Stack Positions]
+    
+    R --> W[User Resolves Issue]
+    W --> T
+    
+    G --> X[User Confirms or Cancels]
+    O --> Y[User Acknowledges]
+    
+    X --> Z[Execute or Cancel Action]
+    Y --> AA[Return to Interface]
+    I --> AB[Continue Normal Flow]
+    V --> AB
 ```
 
-### **Notification Types**
-- **Success**: Reading saved, batch operation completed
-- **Warning**: Validation errors, duplicate prevention
-- **Error**: API errors, network issues
-- **Destructive**: Delete confirmations, bulk operations
-- **Progress**: Loading states, sync operations
+### **Notification Priority System**
+- **ERROR (Priority 4)**: SweetAlert (blocking) - Critical errors, stacks with warnings
+- **WARNING (Priority 3)**: Orange notification (persistent) - Validation errors, stacks with other warnings
+- **INFO (Priority 2)**: Green notification (auto-dismiss) - Suppressed by ERROR/WARNING
+- **SUCCESS (Priority 1)**: Green notification (auto-dismiss) - Suppressed by ERROR/WARNING
+
+### **Visual Stacking Behavior**
+- **Multiple Warnings**: Stack with 70px vertical offset
+- **Position 1**: top: 20px, z-index: 10001
+- **Position 2**: top: 90px, z-index: 10000 (with depth indicator)
+- **Count Badge**: "2 Issues" appears when 2+ warnings active
+- **Stack Management**: Automatic repositioning when warnings dismissed
+
+### **Animation System**
+- **Entry**: slideDownNotification (fade in + slide down 20px, 300ms ease-out)
+- **Dismiss**: slideUpNotification (fade out + slide up 20px, 300ms ease-out)
+- **Timing**: Success 4s, Warning 5s, persistent warnings stay until resolved
+
+### **Notification Stacking Workflow**
+```mermaid
+flowchart TD
+    A[Validation Trigger] --> B{Check<br>hasActiveValidationWarnings}
+    
+    B -->|No Warnings| C[Create First Warning]
+    C --> D[notification-stack-position-1<br>top: 20px, z-index: 10001]
+    D --> E[Track Global ID<br>readingPeriodConflictNoticeId]
+    
+    B -->|1 Warning Active| F[Create Second Warning]
+    F --> G[notification-stack-position-2<br>top: 90px, z-index: 10000]
+    G --> H[Track Global ID<br>negativeUsageNoticeId]
+    H --> I[Add '2 Issues' Badge<br>to First Warning]
+    
+    E --> J{User Action}
+    I --> J
+    
+    J -->|Resolves Issue| K[hideNotification<br>with Animation]
+    K --> L[Add notification-dismissing<br>Class]
+    L --> M[300ms Slide-Up<br>Animation]
+    M --> N[Remove from DOM]
+    N --> O[Clear Global ID<br>Variable]
+    O --> P[updateNotificationStack]
+    
+    P --> Q{Remaining<br>Warnings?}
+    Q -->|1 Warning| R[Reposition to Position 1<br>Remove Badge]
+    Q -->|2 Warnings| S[Maintain Positions<br>Keep Badge]
+    Q -->|0 Warnings| T[Enable Save Button<br>if No Other Errors]
+    
+    J -->|Closes Modal| U[hidden.bs.modal Event]
+    U --> V[Clear All Notifications<br>Clear Global IDs]
+```
 
 ---
 
@@ -378,32 +469,45 @@ flowchart TD
 
 ## 10) Data Integrity & Validation
 
-### **Comprehensive Validation Layers**
+### **Comprehensive Validation Layers with Smart Notifications**
 ```mermaid
 flowchart TD
     A[User Input] --> B[Client-Side Validation]
     B --> C{Validation Passed}
-    C -->|No| D[Show Inline Error]
+    C -->|No| D[showSmartNotification<br>WARNING - Persistent]
     C -->|Yes| E[Send to API]
+    
+    D --> D1{Multiple<br>Warnings?}
+    D1 -->|First Warning| D2[Position 1<br>top: 20px]
+    D1 -->|Second Warning| D3[Position 2<br>top: 90px]
+    D3 --> D4[Add '2 Issues' Badge]
     
     E --> F[Server-Side Validation]
     F --> G{API Validation Passed}
-    G -->|No| H[Return API Error]
+    G -->|No| H[Return API Error<br>showSmartNotification ERROR]
     G -->|Yes| I[Business Logic Validation]
     
     I --> J{Business Rules Passed}
-    J -->|No| K[Return Business Error]
+    J -->|No| K[Return Business Error<br>showSmartNotification WARNING]
     J -->|Yes| L[Database Constraints]
     
     L --> M{Database Validation Passed}
-    M -->|No| N[Return Database Error]
+    M -->|No| N[Return Database Error<br>showSmartNotification ERROR]
     M -->|Yes| O[Save Successfully]
     
-    D --> P[User Corrects Input]
-    H --> P
-    K --> P
-    N --> P
-    P --> A
+    O --> P[showSmartNotification<br>SUCCESS]
+    P --> Q{Validation<br>Warnings Active?}
+    Q -->|Yes| R[Suppress Success<br>Keep Warnings Visible]
+    Q -->|No| S[Show Success<br>4s Auto-dismiss]
+    
+    D2 --> T[User Corrects Input]
+    D4 --> T
+    H --> T
+    K --> T
+    N --> T
+    T --> A
+    
+    S --> U[Slide-Up Animation<br>Remove from DOM]
 ```
 
 ### **Validation Types**
@@ -486,39 +590,61 @@ flowchart TD
 - ✅ Implemented animated gradient notifications
 - ✅ Smart alert strategy (SweetAlert vs inline notifications)
 
-### **Phase 17.3.3: UX/UI Enhancements & Validation**
+### **Phase 17.3.3: UX/UI Enhancements with Smart Notification System**
 
-**1. Smart Notification Queue System**
+**1. Smart Notification Manager with Visual Stacking**
 - ✅ Priority-based notification system (ERROR > WARNING > INFO > SUCCESS)
-- ✅ Suppresses lower priority notifications when validation warnings active
+- ✅ Visual stacking: Multiple warnings display with 70px offset and depth indicators
+- ✅ Warning count badge: "2 Issues" badge appears when 2+ warnings active
+- ✅ Suppression logic: SUCCESS/INFO suppressed when ERROR/WARNING active
 - ✅ Persistent validation warnings until resolved or modal closed
-- ✅ No overlapping notifications (single notification at a time)
-- ✅ Modal cleanup on close (removes all active notifications)
+- ✅ DOM existence checks prevent duplicate warnings
+- ✅ Modal cleanup on close (removes all active notifications via hidden.bs.modal)
+- ✅ Helper functions: hasActiveValidationWarnings(), updateNotificationStack()
 
-**2. Consumption Validation**
+**2. Notification Animations**
+- ✅ Entry animation: slideDownNotification (fade in + slide down 20px, 300ms ease-out)
+- ✅ Dismiss animation: slideUpNotification (fade out + slide up 20px, 300ms ease-out)
+- ✅ Smooth transitions for professional polish
+- ✅ Auto-dismiss timing: Success 4s, Warning 5s (non-persistent only)
+
+**3. Consumption Validation**
 - ✅ Prevents zero consumption (current = previous)
 - ✅ Prevents negative consumption (current < previous)
 - ✅ Prevents NaN consumption (invalid input)
 - ✅ Prevents empty consumption (missing current reading)
-- ✅ Persistent warning until fixed
+- ✅ Persistent warning with visual stacking support
 - ✅ Save button disabled during validation errors
+- ✅ isAutoPopulating flag prevents premature validation
 
-**3. Default Field Values**
+**4. Integer Input Behavior**
+- ✅ Changed step="0.01" to step="1" for all reading inputs
+- ✅ Arrow keys increment/decrement by 1 (whole numbers)
+- ✅ Consistent with integer consumption display
+- ✅ Applied to Manual Entry and Edit modals
+
+**5. Editable Previous Reading**
+- ✅ Removed readonly restriction from previous reading field
+- ✅ Supports meter replacement scenarios (old meter → new meter)
+- ✅ Tooltip indicates editability for meter replacement
+- ✅ Helper text clarifies auto-population with manual override
+
+**6. Default Field Values**
 - ✅ Current reading defaults to 0 on modal open
 - ✅ Previous reading defaults to 0 on modal open
 - ✅ Prevents NaN calculations on initial load
 - ✅ Clear starting state for users
 
-**4. Required Fields Fix**
+**7. Required Fields Fix**
 - ✅ All form inputs have proper `name` attributes
 - ✅ FormData correctly captures all field values
 - ✅ Frontend validation before API call
 - ✅ Inline validation errors with field focus
 
-**5. Period Validation Enhancement**
+**8. Period Validation Enhancement**
 - ✅ Validates period conflicts even when dates entered before tenant selection
 - ✅ `validatePeriodConflictIfDatesEntered()` called after tenant selection
-- ✅ Persistent warning notification until conflict resolved
+- ✅ Persistent warning notification with visual stacking
 - ✅ Save button disabled during conflict
 
 **2. Tenant Lookup Enhancement**
@@ -580,14 +706,19 @@ flowchart TD
 - ✅ **Accessibility**: Fixed modal warnings and added defensive programming
 
 **Phase 17.3.3:**
-- ✅ **Smart Notification Manager**: Priority-based system (ERROR > WARNING > INFO > SUCCESS) with visual stacking
+- ✅ **Smart Notification Manager**: Priority-based system (ERROR > WARNING > INFO > SUCCESS) with visual stacking and animations
 - ✅ **Visual Stacking System**: Multiple warnings stack with 70px offset, depth indicators, and "2 Issues" badge
+- ✅ **Notification Animations**: 300ms slide-down entry and slide-up dismiss animations
 - ✅ **Suppression Logic**: SUCCESS/INFO notifications suppressed when ERROR/WARNING active
+- ✅ **Helper Functions**: hasActiveValidationWarnings(), updateNotificationStack(), badge management
 - ✅ **Consumption Validation**: Prevents zero, negative, NaN, and empty consumption
 - ✅ **Persistent Warnings**: Validation warnings with DOM existence checks remain until resolved
+- ✅ **Integer Input Behavior**: Arrow keys increment by 1 (step="1") for all reading fields
+- ✅ **Editable Previous Reading**: Supports meter replacement scenarios with tooltip guidance
 - ✅ **Default Field Values**: Current and previous readings default to 0
 - ✅ **Required Fields Fix**: All inputs have proper `name` attributes for FormData
 - ✅ **Period Validation**: Works regardless of tenant/date entry order
+- ✅ **Modal Cleanup**: hidden.bs.modal event clears all notifications automatically
 - ✅ **UX Standards Compliance**: No SweetAlert for form validation, ready for global adoption
 - ✅ **Working Operations**: Manual entry save and delete fully functional
 
