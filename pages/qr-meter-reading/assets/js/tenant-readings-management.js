@@ -31,6 +31,7 @@ document.addEventListener('DOMContentLoaded', function() {
     setTimeout(() => {
         initializeSelect2();
         initializeEventListeners();
+        initializeButtonStates(); // ✅ FIX: Set initial button states
         loadInitialData();
         setupDateDefaults();
     }, 100);
@@ -118,6 +119,29 @@ function reinitializeSelect2(selector) {
 }
 
 /**
+ * Initialize button states on page load
+ */
+function initializeButtonStates() {
+    // Disable Batch Operations button initially (no readings selected)
+    const batchBtn = document.getElementById('btnBatchOperations');
+    if (batchBtn) {
+        batchBtn.disabled = true;
+    }
+    
+    // Disable Clear Selection button initially (no readings selected)
+    const clearBtn = document.getElementById('btnClearSelection');
+    if (clearBtn) {
+        clearBtn.disabled = true;
+    }
+    
+    // Set initial selected count to 0
+    const countElement = document.getElementById('selectedReadingsCount');
+    if (countElement) {
+        countElement.textContent = '0';
+    }
+}
+
+/**
  * Initialize all event listeners
  */
 function initializeEventListeners() {
@@ -151,12 +175,22 @@ function initializeEventListeners() {
     
     // Manual entry date auto-population and validation
     safeAddEventListener('dateFrom', 'change', function() {
+        // Clear duplicate reading warning when dates change
+        if (duplicateReadingNoticeId) {
+            hideNotification(duplicateReadingNoticeId);
+            duplicateReadingNoticeId = null;
+        }
         autoPopulateDates();
         updateTenantCardDates();
     });
     
     // Validate period when dateTo changes manually (after auto-population)
     safeAddEventListener('dateTo', 'change', function() {
+        // Clear duplicate reading warning when dates change
+        if (duplicateReadingNoticeId) {
+            hideNotification(duplicateReadingNoticeId);
+            duplicateReadingNoticeId = null;
+        }
         updateTenantCardDates();
         // Validate period conflict if tenant is already selected
         if (selectedTenant && selectedTenantFromModal && previousReadingCache) {
@@ -171,7 +205,7 @@ function initializeEventListeners() {
                         ? `This period (${selectedPeriod}) already has a reading. Please select a different date range.`
                         : `This period overlaps with last reading (${lastPeriod}). Please select a different date range.`;
                     if (!readingPeriodConflictNoticeId) {
-                        readingPeriodConflictNoticeId = showWarning('Reading Period Conflict', msg, true);
+                        readingPeriodConflictNoticeId = showSmartNotification('WARNING', 'Reading Period Conflict', msg, true);
                     }
                     setSaveButtonEnabled(false);
                 } else {
@@ -234,6 +268,14 @@ function initializeEventListeners() {
             if (negativeUsageNoticeId) {
                 hideNotification(negativeUsageNoticeId);
                 negativeUsageNoticeId = null;
+            }
+            if (duplicateReadingNoticeId) {
+                hideNotification(duplicateReadingNoticeId);
+                duplicateReadingNoticeId = null;
+            }
+            if (saveFailedNoticeId) {
+                hideNotification(saveFailedNoticeId);
+                saveFailedNoticeId = null;
             }
         });
     }
@@ -449,11 +491,19 @@ function renderReadingsTable() {
     
     allReadings.forEach(reading => {
         const row = document.createElement('tr');
+        const isInvoiced = reading.is_invoiced == '1';
+        
+        // Add data attributes for invoice status
+        row.setAttribute('data-reading-id', reading.reading_id);
+        row.setAttribute('data-is-invoiced', isInvoiced ? '1' : '0');
+        row.setAttribute('data-tenant-name', escapeHtml(reading.tenant_name));
+        
         row.innerHTML = `
             <td>
                 <input type="checkbox" class="form-check-input reading-checkbox" 
                        value="${reading.reading_id}" 
-                       ${selectedReadings.has(reading.reading_id) ? 'checked' : ''}>
+                       ${selectedReadings.has(reading.reading_id) ? 'checked' : ''}
+                       ${isInvoiced ? 'disabled title="Cannot select invoiced readings"' : ''}>
             </td>
             <td>${escapeHtml(reading.tenant_name)}</td>
             <td>${escapeHtml(reading.property_name)}</td>
@@ -473,12 +523,12 @@ function renderReadingsTable() {
                     </button>
                     <button type="button" class="btn btn-sm btn-outline-warning" 
                             onclick="editReading(${reading.reading_id})" title="Edit"
-                            ${reading.is_invoiced == '1' ? 'disabled' : ''}>
+                            ${isInvoiced ? 'disabled' : ''}>
                         <i class="fas fa-edit"></i>
                     </button>
                     <button type="button" class="btn btn-sm btn-outline-danger" 
                             onclick="deleteReading(${reading.reading_id})" title="Delete"
-                            ${reading.is_invoiced == '1' ? 'disabled' : ''}>
+                            ${isInvoiced ? 'disabled' : ''}>
                         <i class="fas fa-trash"></i>
                     </button>
                 </div>
@@ -514,6 +564,16 @@ function renderReadingsTable() {
             
             // Don't toggle if clicking on action buttons
             if (e.target.closest('.btn-group') || e.target.closest('button')) {
+                return;
+            }
+            
+            // Check if this reading is invoiced
+            const isInvoiced = row.getAttribute('data-is-invoiced') === '1';
+            if (isInvoiced) {
+                const tenantName = row.getAttribute('data-tenant-name');
+                const decodedTenantName = decodeHtmlEntities(tenantName);
+                showWarning('Cannot Select Invoiced Reading', 
+                    `This reading for ${decodedTenantName} has been invoiced and cannot be selected for batch operations.`);
                 return;
             }
             
@@ -693,7 +753,15 @@ function updateSelectionUI() {
     
     // Update batch operations button state
     const batchBtn = document.getElementById('btnBatchOperations');
-    batchBtn.disabled = count === 0;
+    if (batchBtn) {
+        batchBtn.disabled = count === 0;
+    }
+    
+    // Update clear selection button state
+    const clearBtn = document.getElementById('btnClearSelection');
+    if (clearBtn) {
+        clearBtn.disabled = count === 0;
+    }
 }
 
 /**
@@ -753,6 +821,12 @@ function renderTenantSearchResults(tenants) {
 function selectTenant(tenant) {
     selectedTenant = tenant;
     
+    // Clear duplicate reading warning when tenant changes
+    if (duplicateReadingNoticeId) {
+        hideNotification(duplicateReadingNoticeId);
+        duplicateReadingNoticeId = null;
+    }
+    
     // Update UI
     document.getElementById('tenantSearch').value = tenant.tenant_name;
     document.getElementById('tenantSearchResults').style.display = 'none';
@@ -806,7 +880,7 @@ function calculateConsumption() {
         
         if (!existingNotification) {
             // Notification doesn't exist in DOM, create it
-            negativeUsageNoticeId = showWarning('Invalid Usage', 'Current reading must be greater than previous reading', true);
+            negativeUsageNoticeId = showSmartNotification('WARNING', 'Invalid Usage', 'Current reading must be greater than previous reading', true);
         }
         setSaveButtonEnabled(false);
     } else if (!isCurrentEmpty && !isInvalid) {
@@ -846,60 +920,6 @@ function calculateEditConsumption() {
     }
 }
 
-/**
- * Save manual entry
- */
-async function saveManualEntry() {
-    try {
-        if (!selectedTenant) {
-            showError('Please select a tenant');
-            return;
-        }
-        
-        const formData = {
-            tenant_code: selectedTenant.tenant_code,
-            real_property_code: selectedTenant.real_property_code,
-            unit_no: selectedTenant.unit_no,
-            meter_number: selectedTenant.meter_number,
-            date_from: document.getElementById('dateFrom').value,
-            date_to: document.getElementById('dateTo').value,
-            billing_date_from: document.getElementById('billingDateFrom').value,
-            billing_date_to: document.getElementById('billingDateTo').value,
-            current_reading: document.getElementById('currentReading').value,
-            prev_reading: document.getElementById('previousReading').value,
-            remarks: document.getElementById('remarks') ? document.getElementById('remarks').value || '' : ''
-        };
-        
-        // Debug: Log form data to help identify issues
-        console.log('Form data being validated:', formData);
-        
-        // Validate form
-        if (!validateManualEntryForm(formData)) {
-            return;
-        }
-        
-        const response = await fetch(ENDPOINTS.manualEntry, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(formData)
-        });
-        
-        const data = await response.json();
-        
-        if (data.success) {
-            showSuccess('Reading Created Successfully!', 'Manual entry has been saved to the system');
-            bootstrap.Modal.getInstance(document.getElementById('manualEntryModal')).hide();
-            loadReadings(currentPage);
-        } else {
-            throw new Error(data.message);
-        }
-    } catch (error) {
-        console.error('Error saving manual entry:', error);
-        showError('Failed to save reading: ' + error.message);
-    }
-}
 
 /**
  * Validate manual entry form
@@ -1509,6 +1529,14 @@ function showManualEntryModal() {
         hideNotification(negativeUsageNoticeId);
         negativeUsageNoticeId = null;
     }
+    if (duplicateReadingNoticeId) {
+        hideNotification(duplicateReadingNoticeId);
+        duplicateReadingNoticeId = null;
+    }
+    if (saveFailedNoticeId) {
+        hideNotification(saveFailedNoticeId);
+        saveFailedNoticeId = null;
+    }
     
     // Restore tenant search input visibility (in case it was hidden from previous selection)
     const tenantSearchContainer = document.querySelector('.col-12:has(#tenantSearchDisplay)');
@@ -1538,9 +1566,21 @@ function showBatchOperationsModal() {
         return;
     }
     
+    // ✅ CRITICAL FIX: Check if any selected readings are invoiced
+    const invoicedReadings = checkForInvoicedReadings();
+    
     // Show modal
     const modal = new bootstrap.Modal(document.getElementById('batchOperationsModal'));
     modal.show();
+    
+    // ✅ CRITICAL FIX: If invoiced readings found, show warning and disable Execute button
+    if (invoicedReadings.length > 0) {
+        showInvoicedReadingsWarning(invoicedReadings);
+        disableBatchOperationExecute(true, invoicedReadings.length);
+    } else {
+        clearInvoicedReadingsWarning();
+        disableBatchOperationExecute(false);
+    }
 }
 
 /**
@@ -1549,19 +1589,21 @@ function showBatchOperationsModal() {
 async function saveManualEntryReading() {
     // Check if there are active validation warnings - prevent save if so
     if (readingPeriodConflictNoticeId) {
-        console.log('Save blocked: Period conflict active');
-        showWarning('Period Conflict', 'Please resolve the reading period conflict before saving');
+        showSmartNotification('WARNING', 'Period Conflict', 'Please resolve the reading period conflict before saving', true);
+        return;
+    }
+    if (duplicateReadingNoticeId) {
+        showSmartNotification('WARNING', 'Duplicate Reading', 'Please resolve the duplicate reading issue before saving', true);
         return;
     }
     
     if (negativeUsageNoticeId) {
-        console.log('Save blocked: Negative usage active');
-        showWarning('Invalid Usage', 'Current reading must be greater than previous reading');
+        showSmartNotification('WARNING', 'Invalid Usage', 'Current reading must be greater than previous reading', true);
         return;
     }
     
     if (!selectedTenant) {
-        showWarning('Tenant Required', 'Please select a tenant first');
+        showSmartNotification('WARNING', 'Tenant Required', 'Please select a tenant first', true);
         return;
     }
     
@@ -1580,9 +1622,7 @@ async function saveManualEntryReading() {
     
     for (const field of requiredFields) {
         const value = formData.get(field.key);
-        console.log(`Validating ${field.key}:`, value, 'Type:', typeof value, 'Trimmed:', value?.toString().trim());
         if (!value || value.toString().trim() === '') {
-            console.log(`❌ Validation failed for ${field.key}`);
             const element = document.getElementById(field.element);
             if (element) {
                 showInlineValidationError(element, `${field.label} is required`);
@@ -1591,17 +1631,13 @@ async function saveManualEntryReading() {
         return;
     }
     }
-    console.log('✅ All required fields validation passed');
     
     // Validate current reading > previous reading
     const currentReading = parseFloat(formData.get('current_reading'));
     const previousReading = parseFloat(formData.get('previousReading'));
     
-    console.log('Usage Validation - Current:', currentReading, 'Previous:', previousReading);
-    
     // Check for invalid numbers
     if (isNaN(currentReading) || isNaN(previousReading)) {
-        console.log('❌ Invalid number detected');
         const currentReadingEl = document.getElementById('currentReading');
         if (currentReadingEl && isNaN(currentReading)) {
             showInlineValidationError(currentReadingEl, 'Current reading must be a valid number');
@@ -1617,7 +1653,6 @@ async function saveManualEntryReading() {
     }
     
     if (currentReading < previousReading) {
-        console.log('❌ Current reading less than previous');
         const currentReadingEl = document.getElementById('currentReading');
         if (currentReadingEl) {
             showInlineValidationError(currentReadingEl, 'Current reading must be greater than previous reading');
@@ -1625,8 +1660,6 @@ async function saveManualEntryReading() {
         }
         return;
     }
-    
-    console.log('✅ Usage validation passed');
     
     try {
         const manualEntryData = {
@@ -1650,7 +1683,17 @@ async function saveManualEntryReading() {
         
         const data = await response.json();
         
+        // Handle HTTP 400 (Bad Request) responses for validation errors
+        if (response.status === 400) {
+            if (data.message && data.message.includes('Duplicate reading for this period already exists')) {
+                handleDuplicateReadingError(data.message);
+                return;
+            }
+        }
+        
         if (data.success) {
+            // Clear any persistent validation warnings on successful save
+            clearAllValidationWarnings();
             Swal.fire({
                 title: 'Success!',
                 text: 'Manual reading saved successfully',
@@ -1668,7 +1711,7 @@ async function saveManualEntryReading() {
         }
     } catch (error) {
         console.error('Error saving manual reading:', error);
-        showWarning('Save Failed', error.message || 'Error saving manual reading. Please check your inputs and try again.');
+        saveFailedNoticeId = showSmartNotification('WARNING', 'Save Failed', error.message || 'Error saving manual reading. Please check your inputs and try again.', true);
     }
 }
 
@@ -1737,10 +1780,112 @@ function toggleBatchOperationFields() {
 /**
  * Execute batch operations
  */
+/**
+ * Check if any selected readings are invoiced
+ */
+function checkForInvoicedReadings() {
+    const invoicedReadings = [];
+    const readingsToCheck = Array.from(selectedReadings);
+    
+    for (const readingId of readingsToCheck) {
+        const row = document.querySelector(`tr[data-reading-id="${readingId}"]`);
+        if (row) {
+            const isInvoiced = row.getAttribute('data-is-invoiced');
+            if (isInvoiced === '1') {
+                const tenantName = row.getAttribute('data-tenant-name');
+                const decodedTenantName = decodeHtmlEntities(tenantName);
+                invoicedReadings.push({
+                    id: readingId,
+                    tenant: decodedTenantName
+                });
+            }
+        }
+    }
+    
+    return invoicedReadings;
+}
+
+/**
+ * Show warning notification for invoiced readings in batch modal
+ */
+function showInvoicedReadingsWarning(invoicedReadings) {
+    const container = document.getElementById('batchOperationsModal')?.querySelector('.modal-body');
+    if (!container) return;
+    
+    // Remove existing warning if any
+    const existingWarning = container.querySelector('.invoiced-warning');
+    if (existingWarning) {
+        existingWarning.remove();
+    }
+    
+    // Create warning element
+    const warning = document.createElement('div');
+    warning.className = 'invoiced-warning alert alert-danger d-flex align-items-center mb-3';
+    warning.style.cssText = 'animation: slideDownNotification 0.3s ease-out;';
+    warning.role = 'alert';
+    
+    const invoicedList = invoicedReadings.map(r => `<li>Reading #${r.id} - ${r.tenant}</li>`).join('');
+    
+    warning.innerHTML = `
+        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+        <div>
+            <strong>Cannot Perform Batch Operations on Invoiced Readings</strong>
+            <p class="mb-1 mt-2">The following ${invoicedReadings.length} reading(s) have been invoiced and cannot be modified:</p>
+            <ul class="mb-0">${invoicedList}</ul>
+            <p class="mb-0 mt-2"><strong>Action Required:</strong> Please deselect these readings before proceeding.</p>
+        </div>
+    `;
+    
+    // Insert at the top of modal body
+    container.insertBefore(warning, container.firstChild);
+}
+
+/**
+ * Clear invoiced readings warning
+ */
+function clearInvoicedReadingsWarning() {
+    const warning = document.querySelector('.invoiced-warning');
+    if (warning) {
+        warning.remove();
+    }
+}
+
+/**
+ * Disable/enable batch operation execute button
+ */
+function disableBatchOperationExecute(disable, count = 0) {
+    const executeBtn = document.getElementById('btnExecuteBatchOperation');
+    if (!executeBtn) return;
+    
+    if (disable) {
+        executeBtn.disabled = true;
+        executeBtn.classList.add('disabled');
+        executeBtn.title = `Cannot execute: ${count} invoiced reading(s) selected`;
+    } else {
+        executeBtn.disabled = false;
+        executeBtn.classList.remove('disabled');
+        executeBtn.title = 'Execute batch operation';
+    }
+}
+
 async function executeBatchOperation(operation) {
     if (selectedReadings.size === 0) {
         showError('Please select readings first');
         return;
+    }
+    
+    // ✅ FINAL CHECK: Verify no invoiced readings (defense in depth)
+    const invoicedReadings = checkForInvoicedReadings();
+    if (invoicedReadings.length > 0) {
+        const invoicedList = invoicedReadings.map(r => `• Reading #${r.id} (${r.tenant})`).join('<br>');
+        await Swal.fire({
+            title: 'Cannot Perform Batch Operation',
+            html: `The following ${invoicedReadings.length} reading(s) have been invoiced and cannot be modified:<br><br>${invoicedList}<br><br>Please deselect these readings before proceeding.`,
+            icon: 'error',
+            confirmButtonText: 'OK',
+            confirmButtonColor: '#dc3545'
+        });
+        return; // Block the operation
     }
     
     let confirmMessage = `Are you sure you want to ${operation} ${selectedReadings.size} reading(s)?`;
@@ -2040,6 +2185,73 @@ function setSaveButtonEnabled(enabled) {
 }
 
 /**
+ * Handle duplicate reading error from backend
+ * Shows persistent warning and disables save button
+ */
+function handleDuplicateReadingError(errorMessage) {
+    // Extract the period information if available
+    const message = 'This reading period already exists. Please select a different date range.';
+    
+    // Clear any existing duplicate reading notice
+    if (duplicateReadingNoticeId) {
+        hideNotification(duplicateReadingNoticeId);
+        duplicateReadingNoticeId = null;
+    }
+    
+    // Show persistent warning in same style as Reading Period Conflict
+    duplicateReadingNoticeId = showSmartNotification('WARNING', 'Duplicate Reading', message, true);
+    
+    // Disable save button
+    setSaveButtonEnabled(false);
+    
+}
+
+/**
+ * Clear all validation warnings
+ */
+function clearAllValidationWarnings() {
+    if (readingPeriodConflictNoticeId) {
+        hideNotification(readingPeriodConflictNoticeId);
+        readingPeriodConflictNoticeId = null;
+    }
+    if (negativeUsageNoticeId) {
+        hideNotification(negativeUsageNoticeId);
+        negativeUsageNoticeId = null;
+    }
+    if (duplicateReadingNoticeId) {
+        hideNotification(duplicateReadingNoticeId);
+        duplicateReadingNoticeId = null;
+    }
+    if (saveFailedNoticeId) {
+        hideNotification(saveFailedNoticeId);
+        saveFailedNoticeId = null;
+    }
+}
+
+/**
+ * Hide all success notifications (used when validation warnings appear)
+ */
+function hideAllSuccessNotifications() {
+    const successNotifications = document.querySelectorAll('[id^="success-"]');
+    successNotifications.forEach(notification => {
+        hideNotification(notification.id);
+    });
+}
+
+/**
+ * Decode HTML entities in text
+ */
+function decodeHtmlEntities(text) {
+    if (!text) return text;
+    return text.replace(/&amp;/g, '&')
+               .replace(/&lt;/g, '<')
+               .replace(/&gt;/g, '>')
+               .replace(/&quot;/g, '"')
+               .replace(/&#39;/g, "'")
+               .replace(/&apos;/g, "'");
+}
+
+/**
  * Helper function to populate date fields
  */
 function populateDateFields(dateToFormatted, billingDateFromFormatted, billingDateToFormatted) {
@@ -2066,23 +2278,15 @@ function validatePeriodConflictIfDatesEntered() {
     const dateFromInput = document.getElementById('dateFrom');
     const dateToInput = document.getElementById('dateTo');
     
-    console.log('validatePeriodConflictIfDatesEntered called');
-    console.log('Date From:', dateFromInput?.value);
-    console.log('Date To:', dateToInput?.value);
-    console.log('Previous Reading Cache:', previousReadingCache);
-    
     if (!dateFromInput || !dateToInput || !dateFromInput.value || !dateToInput.value) {
-        console.log('No dates entered, skipping validation');
         return; // No dates entered yet
     }
     
     if (!previousReadingCache) {
-        console.log('No previous reading cache, skipping validation');
         return; // No cache available
     }
     
     const conflictCheck = checkReadingPeriodConflict(dateFromInput.value, dateToInput.value);
-    console.log('Conflict check result:', conflictCheck);
     
     if (conflictCheck && conflictCheck.conflict) {
         const lastPeriod = `${previousReadingCache.dateFrom?.replace(/\\/g,'')} - ${previousReadingCache.dateTo?.replace(/\\/g,'')}`;
@@ -2091,20 +2295,15 @@ function validatePeriodConflictIfDatesEntered() {
             ? `This period (${selectedPeriod}) already has a reading. Please select a different date range.`
             : `This period overlaps with last reading (${lastPeriod}). Please select a different date range.`;
         
-        console.log('CONFLICT DETECTED! Showing warning:', msg);
-        console.log('Current readingPeriodConflictNoticeId:', readingPeriodConflictNoticeId);
-        
         // Check if notification actually exists in DOM
         const existingNotification = readingPeriodConflictNoticeId ? document.getElementById(readingPeriodConflictNoticeId) : null;
         
         if (!existingNotification) {
             // Notification doesn't exist in DOM, create it
-            readingPeriodConflictNoticeId = showWarning('Reading Period Conflict', msg, true);
-            console.log('Warning shown, new ID:', readingPeriodConflictNoticeId);
+            readingPeriodConflictNoticeId = showSmartNotification('WARNING', 'Reading Period Conflict', msg, true);
         }
         setSaveButtonEnabled(false);
     } else {
-        console.log('No conflict detected');
         // No conflict - ensure notification is cleared and button is enabled
         if (readingPeriodConflictNoticeId) {
             hideNotification(readingPeriodConflictNoticeId);
@@ -2121,7 +2320,7 @@ function validatePeriodConflictIfDatesEntered() {
  * Returns true if there are any ERROR or WARNING level notifications
  */
 function hasActiveValidationWarnings() {
-    return !!(readingPeriodConflictNoticeId || negativeUsageNoticeId);
+    return !!(readingPeriodConflictNoticeId || negativeUsageNoticeId || duplicateReadingNoticeId || saveFailedNoticeId);
 }
 
 /**
@@ -2137,14 +2336,17 @@ function showSmartNotification(type, title, message, persistent = false) {
     
     // SUCCESS messages are suppressed if any ERROR or WARNING notifications are active
     if (type === 'SUCCESS' && hasActiveValidationWarnings()) {
-        console.log('[showSmartNotification] Suppressing SUCCESS - validation warnings active');
         return null;
     }
     
     // INFO messages are suppressed if any ERROR or WARNING notifications are active
     if (type === 'INFO' && hasActiveValidationWarnings()) {
-        console.log('[showSmartNotification] Suppressing INFO - validation warnings active');
         return null;
+    }
+    
+    // If showing a WARNING, hide any existing SUCCESS notifications
+    if (type === 'WARNING') {
+        hideAllSuccessNotifications();
     }
     
     // If same type of persistent notification already exists, don't create duplicate
@@ -2154,6 +2356,9 @@ function showSmartNotification(type, title, message, persistent = false) {
         }
         if (type === 'WARNING' && title.includes('Invalid Usage') && negativeUsageNoticeId) {
             return negativeUsageNoticeId;
+        }
+        if (type === 'WARNING' && title.includes('Duplicate Reading') && duplicateReadingNoticeId) {
+            return duplicateReadingNoticeId;
         }
     }
     
@@ -2244,7 +2449,7 @@ function autoPopulateDates() {
                 : `This period overlaps with last reading (${lastPeriod}). Please select a different date range.`;
             
             if (!readingPeriodConflictNoticeId) {
-                readingPeriodConflictNoticeId = showWarning('Reading Period Conflict', msg, true); // persistent
+                readingPeriodConflictNoticeId = showSmartNotification('WARNING', 'Reading Period Conflict', msg, true); // persistent
             } else {
                 // Update existing notification
                 const existingNotice = document.getElementById(readingPeriodConflictNoticeId);
@@ -2307,6 +2512,10 @@ let previousReadingCache = null;
 let readingPeriodConflictNoticeId = null;
 // Persistent notification id for negative usage
 let negativeUsageNoticeId = null;
+// Persistent notification id for duplicate reading
+let duplicateReadingNoticeId = null;
+// Persistent notification id for save failed
+let saveFailedNoticeId = null;
 // Flag to skip validation during programmatic updates
 let isAutoPopulating = false;
 
@@ -2658,8 +2867,8 @@ async function confirmTenantSelection() {
     await fetchAndPopulatePreviousReading(selectedTenantFromModal);
     
     // Only show success notification if no validation warnings are present
-    // Don't overwrite period conflict or negative usage warnings
-    if (!readingPeriodConflictNoticeId && !negativeUsageNoticeId) {
+    // Don't overwrite period conflict, negative usage, or duplicate reading warnings
+    if (!readingPeriodConflictNoticeId && !negativeUsageNoticeId && !duplicateReadingNoticeId) {
         showSuccess('Tenant Selected', `${selectedTenantFromModal.tenant_name} selected for manual entry`);
     }
 }
@@ -2930,7 +3139,6 @@ async function fetchAndPopulatePreviousReading(tenant) {
             // Update tenant card showing no previous reading
             updateTenantCardWithReadingInfo(tenant, null, false);
             
-            console.log('No previous reading found for this tenant');
         }
     } catch (error) {
         console.error('Error fetching previous reading:', error);
@@ -3221,23 +3429,12 @@ function showWarning(title, subtitle = '', persistent = false) {
     const existingWarnings = document.querySelectorAll('[id^="warning-"]');
     const warningCount = existingWarnings.length;
     
-    console.log(`[showWarning] Creating warning: "${title}"`);
-    console.log(`[showWarning] Existing warnings count: ${warningCount}`);
-    console.log(`[showWarning] Existing warning IDs:`, Array.from(existingWarnings).map(w => w.id));
-    console.log(`[showWarning] Existing warnings visible:`, Array.from(existingWarnings).map(w => ({
-        id: w.id,
-        inDOM: document.body.contains(w),
-        display: window.getComputedStyle(w).display,
-        visibility: window.getComputedStyle(w).visibility
-    })));
     
     // Apply stacking classes based on position
     if (warningCount === 0) {
         notification.classList.add('notification-stack-position-1');
-        console.log(`[showWarning] Applied position-1 class`);
     } else if (warningCount === 1) {
         notification.classList.add('notification-stack-position-2');
-        console.log(`[showWarning] Applied position-2 class`);
     }
     
     // Note: z-index and top position are handled by CSS classes with !important
@@ -3248,42 +3445,10 @@ function showWarning(title, subtitle = '', persistent = false) {
     // Force reflow to ensure styles are applied
     notification.offsetHeight;
     
-    console.log(`[showWarning] Added to DOM with ID: ${notificationId}`);
-    console.log(`[showWarning] Notification classes:`, notification.className);
-    console.log(`[showWarning] Computed styles:`, {
-        top: window.getComputedStyle(notification).top,
-        zIndex: window.getComputedStyle(notification).zIndex,
-        display: window.getComputedStyle(notification).display,
-        visibility: window.getComputedStyle(notification).visibility,
-        position: window.getComputedStyle(notification).position
-    });
-    console.log(`[showWarning] Actual position:`, {
-        offsetTop: notification.offsetTop,
-        offsetLeft: notification.offsetLeft,
-        boundingRect: notification.getBoundingClientRect()
-    });
     
     // Add count badge to first notification when second one appears
     if (warningCount === 1) {
-        console.log(`[showWarning] Adding count badge (2 warnings total)`);
         addWarningCountBadge();
-        
-        // Verify both notifications are still in DOM after badge is added
-        setTimeout(() => {
-            const allWarnings = document.querySelectorAll('[id^="warning-"]');
-            console.log(`[VERIFICATION] After badge added, warnings in DOM:`, allWarnings.length);
-            allWarnings.forEach((w, i) => {
-                console.log(`[VERIFICATION] Warning ${i+1}:`, {
-                    id: w.id,
-                    classes: w.className,
-                    inDOM: document.body.contains(w),
-                    visible: window.getComputedStyle(w).visibility,
-                    display: window.getComputedStyle(w).display,
-                    top: window.getComputedStyle(w).top,
-                    boundingRect: w.getBoundingClientRect()
-                });
-            });
-        }, 100);
     }
     
     // Only auto-dismiss if not persistent
@@ -3336,8 +3501,6 @@ function hideNotification(notificationElementOrId) {
         notificationId = notificationElement.id;
     }
     
-    console.log(`[hideNotification] Called with ID: ${notificationId}`);
-    console.log(`[hideNotification] Element found:`, !!notificationElement);
     
     if (notificationElement && notificationElement.parentNode) {
         // Add dismissing animation class
@@ -3350,24 +3513,21 @@ function hideNotification(notificationElementOrId) {
                 // Remove from tracking array
                 currentNotifications = currentNotifications.filter(n => n !== notificationElement);
                 
-                console.log(`[hideNotification] Removed notification: ${notificationId}`);
-                
                 // Clear global notification ID variables if this matches
                 if (notificationId === readingPeriodConflictNoticeId) {
-                    console.log(`[hideNotification] Cleared readingPeriodConflictNoticeId`);
                     readingPeriodConflictNoticeId = null;
                 }
                 if (notificationId === negativeUsageNoticeId) {
-                    console.log(`[hideNotification] Cleared negativeUsageNoticeId`);
                     negativeUsageNoticeId = null;
+                }
+                if (notificationId === duplicateReadingNoticeId) {
+                    duplicateReadingNoticeId = null;
                 }
                 
                 // Reposition remaining notifications
                 updateNotificationStack();
             }
         }, 300); // Match animation duration in CSS
-    } else {
-        console.log(`[hideNotification] Element not found or not in DOM: ${notificationId}`);
     }
 }
 
