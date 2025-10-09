@@ -60,19 +60,27 @@ try {
         }
     }
     
-    // Validate tenant exists and is active
+    // Validate tenant exists (allow both active and terminated tenants)
     $tenantSql = "SELECT t.tenant_code, t.tenant_name, t.real_property_code, t.unit_no,
-                         p.real_property_name
+                         p.real_property_name, ISNULL(t.terminated,'N') as is_terminated
                   FROM m_tenant t
                   INNER JOIN m_real_property p ON t.real_property_code = p.real_property_code
-                  WHERE t.tenant_code = ? AND ISNULL(t.terminated,'N') = 'N'";
+                  WHERE t.tenant_code = ?";
     
     $tenantStmt = $pdo->prepare($tenantSql);
     $tenantStmt->execute([$input['tenant_code']]);
     $tenant = $tenantStmt->fetch(PDO::FETCH_ASSOC);
     
     if (!$tenant) {
-        throw new Exception('Invalid or inactive tenant');
+        throw new Exception('Invalid tenant');
+    }
+    
+    // Validate that frontend data matches tenant data (security check)
+    if (isset($input['real_property_code']) && $input['real_property_code'] !== $tenant['real_property_code']) {
+        throw new Exception('Property code mismatch');
+    }
+    if (isset($input['unit_no']) && $input['unit_no'] !== $tenant['unit_no']) {
+        throw new Exception('Unit number mismatch');
     }
     
     // Validate reading values
@@ -83,15 +91,23 @@ try {
         throw new Exception('Current reading must be greater than previous reading');
     }
     
-    // Check for duplicate reading in same period
+    // Check for duplicate reading in same period (based on date_from/date_to overlap)
     $duplicateSql = "SELECT COUNT(*) as count 
                      FROM t_tenant_reading 
                      WHERE tenant_code = ? 
-                     AND YEAR(reading_date) = YEAR(?) 
-                     AND MONTH(reading_date) = MONTH(?)";
+                     AND (
+                         (date_from <= ? AND date_to >= ?) OR  -- New period overlaps with existing
+                         (date_from <= ? AND date_to >= ?) OR  -- New period contains existing
+                         (date_from >= ? AND date_to <= ?)     -- New period is contained in existing
+                     )";
     
     $duplicateStmt = $pdo->prepare($duplicateSql);
-    $duplicateStmt->execute([$input['tenant_code'], $input['date_from'], $input['date_from']]);
+    $duplicateStmt->execute([
+        $input['tenant_code'], 
+        $input['date_from'], $input['date_from'],  // New period start overlaps
+        $input['date_to'], $input['date_to'],      // New period end overlaps  
+        $input['date_from'], $input['date_to']     // New period contains existing
+    ]);
     $duplicateCount = $duplicateStmt->fetch(PDO::FETCH_ASSOC)['count'];
     
     if ($duplicateCount > 0) {

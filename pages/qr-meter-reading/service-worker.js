@@ -3,21 +3,27 @@
  * Provides offline functionality and caching for the PWA
  */
 
-const CACHE_NAME = 'qr-meter-reading-v1.2.0';
-const STATIC_CACHE = 'qr-meter-reading-static-v1.2.0';
-const DYNAMIC_CACHE = 'qr-meter-reading-dynamic-v1.2.0';
+const CACHE_NAME = 'qr-meter-reading-v1.3.0';
+const STATIC_CACHE = 'qr-meter-reading-static-v1.3.0';
+const DYNAMIC_CACHE = 'qr-meter-reading-dynamic-v1.3.0';
 
-// Files to cache for offline functionality
+// Files to cache for offline functionality (ONLY static assets, NOT authenticated pages)
 const STATIC_FILES = [
-    '/rms/qr-meter-reading/',
-    '/rms/qr-meter-reading/index.php',
-    '/rms/qr-meter-reading/tenant-readings-management.php',
     '/rms/qr-meter-reading/assets/css/custom-theme.css',
     '/rms/qr-meter-reading/assets/css/qr-scanner.css',
     '/rms/qr-meter-reading/assets/css/tenant-readings-management.css',
     '/rms/qr-meter-reading/assets/js/app.js',
     '/rms/qr-meter-reading/assets/js/tenant-readings-management.js',
     '/rms/qr-meter-reading/manifest.json'
+];
+
+// Authenticated pages that should NEVER be cached (always fetch fresh)
+const AUTHENTICATED_PAGES = [
+    '/rms/qr-meter-reading/',
+    '/rms/qr-meter-reading/index.php',
+    '/rms/qr-meter-reading/tenant-readings-management.php',
+    '/rms/qr-meter-reading/dashboard.php',
+    '/rms/qr-meter-reading/profile.php'
 ];
 
 // External CDN files - cache separately to avoid CORS issues
@@ -216,6 +222,28 @@ async function handleDynamicRequest(request) {
         return fetch(request);
     }
     
+    const url = new URL(request.url);
+    const pathname = url.pathname;
+    
+    // Check if this is an authenticated page - NEVER cache these
+    const isAuthenticatedPage = AUTHENTICATED_PAGES.some(page => pathname === page || pathname.endsWith(page));
+    
+    if (isAuthenticatedPage) {
+        console.log('Service Worker: Bypassing cache for authenticated page:', pathname);
+        // Always fetch fresh for authenticated pages (network-only strategy)
+        try {
+            return await fetch(request);
+        } catch (error) {
+            console.log('Service Worker: Authenticated page fetch failed, showing offline page');
+            // Don't serve cached authenticated pages - show offline page instead
+            return caches.match('/offline.html') || new Response('Offline - Please check your connection', {
+                status: 503,
+                statusText: 'Service Unavailable'
+            });
+        }
+    }
+    
+    // For non-authenticated pages, use cache-first strategy
     try {
         const response = await fetch(request);
         

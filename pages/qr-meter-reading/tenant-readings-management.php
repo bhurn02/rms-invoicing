@@ -42,6 +42,10 @@ $pageTitle = 'Tenant Readings Management';
     <!-- SweetAlert2 -->
     <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
     
+    <!-- Select2 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" rel="stylesheet">
+    
     <!-- Custom CSS -->
     <link href="assets/css/tenant-readings-management.css" rel="stylesheet">
     
@@ -281,31 +285,34 @@ $pageTitle = 'Tenant Readings Management';
                             <!-- Reading Dates -->
                             <div class="col-md-6">
                                 <label for="dateFrom" class="form-label">Date From *</label>
-                                <input type="date" class="form-control" id="dateFrom" required>
+                                <input type="date" class="form-control" id="dateFrom" name="date_from" required>
                             </div>
                             <div class="col-md-6">
                                 <label for="dateTo" class="form-label">Date To *</label>
-                                <input type="date" class="form-control" id="dateTo" required>
+                                <input type="date" class="form-control" id="dateTo" name="date_to" required>
                             </div>
 
                             <!-- Billing Dates -->
                             <div class="col-md-6">
                                 <label for="billingDateFrom" class="form-label">Billing Date From *</label>
-                                <input type="date" class="form-control" id="billingDateFrom" required>
+                                <input type="date" class="form-control" id="billingDateFrom" name="billing_date_from" required>
                             </div>
                             <div class="col-md-6">
                                 <label for="billingDateTo" class="form-label">Billing Date To *</label>
-                                <input type="date" class="form-control" id="billingDateTo" required>
+                                <input type="date" class="form-control" id="billingDateTo" name="billing_date_to" required>
                             </div>
 
                             <!-- Reading Values -->
                             <div class="col-md-6">
                                 <label for="currentReading" class="form-label">Current Reading *</label>
-                                <input type="number" class="form-control" id="currentReading" step="0.01" min="0" required>
+                                <input type="number" class="form-control" id="currentReading" name="current_reading" step="1" min="0" required>
                             </div>
                             <div class="col-md-6">
                                 <label for="previousReading" class="form-label">Previous Reading *</label>
-                                <input type="number" class="form-control" id="previousReading" step="0.01" min="0" required>
+                                <input type="number" class="form-control" id="previousReading" name="previousReading" step="1" min="0" required>
+                                <small class="form-text text-muted" id="previousReadingHelper" style="display: none;">
+                                    <i class="fas fa-info-circle me-1"></i>Auto-loaded from last reading
+                                </small>
                             </div>
 
                             <!-- Calculated Consumption -->
@@ -313,6 +320,13 @@ $pageTitle = 'Tenant Readings Management';
                                 <div class="alert alert-success">
                                     <strong>Calculated Consumption:</strong> <span id="calculatedConsumption">0.00</span>
                                 </div>
+                            </div>
+
+                            <!-- Remarks -->
+                            <div class="col-12">
+                                <label for="remarks" class="form-label">Remarks</label>
+                                <textarea class="form-control" id="remarks" name="remarks" rows="3" placeholder="Enter any additional notes or remarks (optional)"></textarea>
+                                <small class="form-text text-muted">Optional field for additional notes about this reading.</small>
                             </div>
                         </div>
                     </form>
@@ -411,9 +425,13 @@ $pageTitle = 'Tenant Readings Management';
                         <div class="row g-3">
                             <!-- Tenant Info (Read-only) -->
                             <div class="col-12">
-                                <div class="alert alert-info">
-                                    <h6 class="alert-heading">Tenant Information</h6>
-                                    <div id="editTenantDetails"></div>
+                                <div class="card" style="background-color: #e7f3ff; border: 1px solid #b3d9ff;">
+                                    <div class="card-body">
+                                        <h6 class="card-title mb-3 text-primary">
+                                            <i class="fas fa-user me-2"></i>Tenant Information
+                                        </h6>
+                                        <div id="editTenantDetails"></div>
+                                    </div>
                                 </div>
                             </div>
 
@@ -440,11 +458,11 @@ $pageTitle = 'Tenant Readings Management';
                             <!-- Reading Values -->
                             <div class="col-md-6">
                                 <label for="editCurrentReading" class="form-label">Current Reading *</label>
-                                <input type="number" class="form-control" id="editCurrentReading" step="0.01" min="0" required>
+                                <input type="number" class="form-control" id="editCurrentReading" step="1" min="0" required>
                             </div>
                             <div class="col-md-6">
                                 <label for="editPreviousReading" class="form-label">Previous Reading *</label>
-                                <input type="number" class="form-control" id="editPreviousReading" step="0.01" min="0" required>
+                                <input type="number" class="form-control" id="editPreviousReading" step="1" min="0" required>
                             </div>
 
                             <!-- Calculated Consumption -->
@@ -558,8 +576,14 @@ $pageTitle = 'Tenant Readings Management';
         </div>
     </div>
 
+    <!-- jQuery (required for Select2) -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Select2 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     
     <!-- SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
