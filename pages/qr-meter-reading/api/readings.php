@@ -186,7 +186,11 @@ function handleGetReadings($pdo, $currentUserId) {
                 t.tenant_name,
                 t.real_property_code as property_code,
                 t.unit_no,
+                t.actual_move_in_date,
+                t.date_terminated,
+                t.terminated as is_terminated,
                 p.real_property_name as property_name,
+                u.meter_number,
                 ext.device_info,
                 ext.ip_address,
                 ext.user_agent,
@@ -211,6 +215,7 @@ function handleGetReadings($pdo, $currentUserId) {
             FROM t_tenant_reading r
             INNER JOIN m_tenant t ON r.tenant_code = t.tenant_code
             INNER JOIN m_real_property p ON t.real_property_code = p.real_property_code
+            LEFT JOIN m_units u ON t.real_property_code = u.real_property_code AND t.unit_no = u.unit_no
             LEFT JOIN t_tenant_reading_ext ext ON r.reading_id = ext.reading_id
             $whereClause
             ORDER BY r.$sortBy $sortOrder
@@ -242,7 +247,11 @@ function handleGetReadings($pdo, $currentUserId) {
             'tenant_name' => trim($reading['tenant_name']),
             'property_code' => trim($reading['property_code']),
             'unit_no' => trim($reading['unit_no']),
+            'actual_move_in_date' => $reading['actual_move_in_date'],
+            'date_terminated' => $reading['date_terminated'],
+            'is_terminated' => trim($reading['is_terminated']),
             'property_name' => trim($reading['property_name']),
+            'meter_number' => trim($reading['meter_number']),
             'device_info' => trim($reading['device_info']),
             'ip_address' => trim($reading['ip_address']),
             'user_agent' => trim($reading['user_agent']),
@@ -297,7 +306,11 @@ function handleGetSingleReading($pdo, $currentUserId, $readingId) {
                 t.tenant_name,
                 t.real_property_code as property_code,
                 t.unit_no,
+                t.actual_move_in_date,
+                t.date_terminated,
+                t.terminated as is_terminated,
                 p.real_property_name as property_name,
+                u.meter_number,
                 ext.device_info,
                 ext.ip_address,
                 ext.user_agent,
@@ -322,6 +335,7 @@ function handleGetSingleReading($pdo, $currentUserId, $readingId) {
             FROM t_tenant_reading r
             INNER JOIN m_tenant t ON r.tenant_code = t.tenant_code
             INNER JOIN m_real_property p ON t.real_property_code = p.real_property_code
+            LEFT JOIN m_units u ON t.real_property_code = u.real_property_code AND t.unit_no = u.unit_no
             LEFT JOIN t_tenant_reading_ext ext ON r.reading_id = ext.reading_id
             WHERE r.reading_id = ?";
     
@@ -338,9 +352,13 @@ function handleGetSingleReading($pdo, $currentUserId, $readingId) {
         'reading_id' => $reading['reading_id'],
         'tenant_code' => trim($reading['tenant_code']),
         'tenant_name' => trim($reading['tenant_name']),
-        'real_property_code' => trim($reading['real_property_code']),
-        'real_property_name' => trim($reading['real_property_name']),
+        'property_code' => trim($reading['property_code']),
+        'property_name' => trim($reading['property_name']),
         'unit_no' => trim($reading['unit_no']),
+        'actual_move_in_date' => $reading['actual_move_in_date'],
+        'date_terminated' => $reading['date_terminated'],
+        'is_terminated' => trim($reading['is_terminated']),
+        'meter_number' => trim($reading['meter_number']),
         'date_from' => $reading['date_from'],
         'date_to' => $reading['date_to'],
         'prev_reading' => $reading['prev_reading'],

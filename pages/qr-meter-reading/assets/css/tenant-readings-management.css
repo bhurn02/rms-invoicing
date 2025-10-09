@@ -249,10 +249,68 @@
     text-align: center;
     max-width: 400px;
     color: white;
+    box-shadow: rgb(62 37 0 / 30%) 0px 4px 20px;
     animation: slideDownNotification 0.3s ease-out;
 }
 
-/* Notification Animation */
+/* Stacked Notifications - Multiple Warnings Visible */
+.notification-stack-position-1 {
+    /* First notification - primary position */
+    top: 20px !important;
+    z-index: 10001 !important;
+    box-shadow: rgb(62 37 0 / 30%) 0px 4px 20px !important;
+    transition: top 0.3s ease-out, box-shadow 0.3s ease-out;
+}
+
+.notification-stack-position-2 {
+    /* Second notification - stacked below first */
+    top: 90px !important;
+    z-index: 10000 !important;
+    box-shadow: rgb(62 37 0 / 30%) 0px 4px 20px !important;
+    transition: top 0.3s ease-out, box-shadow 0.3s ease-out;
+}
+
+.notification-stack-position-2::before {
+    /* Visual indicator of stacking - subtle shadow line */
+    content: '';
+    position: absolute;
+    top: -6px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 95%;
+    height: 4px;
+    background: linear-gradient(180deg, rgba(0, 0, 0, 0.1), transparent);
+    border-radius: 8px 8px 0 0;
+    z-index: -1;
+}
+
+/* Warning count badge - shows "2 Issues" when stacked */
+.notification-warning-count {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    color: white;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 4px 8px;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(239, 68, 68, 0.4);
+    animation: pulseWarning 2s ease-in-out infinite;
+}
+
+@keyframes pulseWarning {
+    0%, 100% {
+        transform: scale(1);
+        box-shadow: 0 2px 8px rgba(239, 68, 68, 0.4);
+    }
+    50% {
+        transform: scale(1.05);
+        box-shadow: 0 4px 12px rgba(239, 68, 68, 0.6);
+    }
+}
+
+/* Notification Animations */
 @keyframes slideDownNotification {
     from { 
         transform: translateX(-50%) translateY(-20px); 
@@ -264,9 +322,153 @@
     }
 }
 
+@keyframes slideUpNotification {
+    from {
+        transform: translateX(-50%) translateY(0);
+        opacity: 1;
+    }
+    to {
+        transform: translateX(-50%) translateY(-20px);
+        opacity: 0;
+    }
+}
+
+/* Notification dismiss animation class */
+.notification-dismissing {
+    animation: slideUpNotification 0.3s ease-out forwards !important;
+}
+
 /* Bootstrap Icons Support */
 .bi {
     font-size: 16px;
+}
+
+/* ===== SELECT2 CUSTOMIZATION ===== */
+
+/* Match Select2 height with form-select */
+.select2-container--bootstrap-5 .select2-selection {
+    min-height: 38px !important;
+    height: 38px !important;
+    display: flex !important;
+    align-items: center !important;
+}
+
+/* Match font size and color */
+.select2-container--bootstrap-5 .select2-selection__rendered {
+    color: #374151 !important;
+    font-size: 1rem !important;
+    line-height: 1.5 !important;
+    padding-left: 0.75rem !important;
+    padding-right: 0.75rem !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+}
+
+/* Match placeholder color */
+.select2-container--bootstrap-5 .select2-selection__placeholder {
+    color: #9ca3af !important;
+    line-height: 1.5 !important;
+}
+
+/* Single select specific alignment */
+.select2-container--bootstrap-5 .select2-selection--single {
+    display: flex !important;
+    align-items: center !important;
+}
+
+.select2-container--bootstrap-5 .select2-selection--single .select2-selection__rendered {
+    padding-left: 0.75rem !important;
+    padding-right: 2.5rem !important;
+}
+
+/* Dropdown styling */
+.select2-container--bootstrap-5 .select2-dropdown {
+    border-color: #dee2e6 !important;
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+}
+
+/* Search box in dropdown */
+.select2-container--bootstrap-5 .select2-search__field {
+    color: #374151 !important;
+    border-color: #dee2e6 !important;
+}
+
+/* Selected item in dropdown */
+.select2-container--bootstrap-5 .select2-results__option--selected {
+    background-color: #0d6efd !important;
+    color: white !important;
+}
+
+/* Highlighted item in dropdown */
+.select2-container--bootstrap-5 .select2-results__option--highlighted {
+    background-color: #e7f3ff !important;
+    color: #374151 !important;
+}
+
+/* Clear button */
+.select2-container--bootstrap-5 .select2-selection__clear {
+    color: #6c757d !important;
+    font-size: 1.2rem !important;
+    margin-right: 0.5rem !important;
+}
+
+/* Arrow indicator */
+.select2-container--bootstrap-5 .select2-selection__arrow {
+    height: 36px !important;
+    top: 1px !important;
+}
+
+.select2-container--bootstrap-5 .select2-selection__arrow b {
+    border-color: #6c757d transparent transparent transparent !important;
+    border-width: 6px 4px 0 4px !important;
+}
+
+/* Focus state */
+.select2-container--bootstrap-5.select2-container--focus .select2-selection,
+.select2-container--bootstrap-5.select2-container--open .select2-selection {
+    border-color: #86b7fe !important;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25) !important;
+}
+
+/* Match disabled state */
+.select2-container--bootstrap-5 .select2-selection--single[aria-disabled="true"] {
+    background-color: #e9ecef !important;
+    cursor: not-allowed !important;
+}
+
+/* Results container */
+.select2-container--bootstrap-5 .select2-results__options {
+    max-height: 250px !important;
+}
+
+/* Loading state */
+.select2-container--bootstrap-5 .select2-results__option[aria-selected] {
+    color: #374151 !important;
+}
+
+/* Fix for Select2 inside modals */
+.modal .select2-container {
+    z-index: 1056 !important; /* Above modal backdrop (1055) */
+}
+
+.modal .select2-dropdown {
+    z-index: 1057 !important; /* Above modal and container */
+}
+
+/* Ensure Select2 search input is accessible in modals */
+.modal .select2-search__field {
+    background-color: white !important;
+    color: #374151 !important;
+    border: 1px solid #dee2e6 !important;
+    padding: 0.375rem 0.75rem !important;
+}
+
+.modal .select2-search__field:focus {
+    outline: none !important;
+    border-color: #86b7fe !important;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25) !important;
 }
 
 /* ===== SPECIFIC ISSUES FIX ===== */
@@ -276,4 +478,60 @@
     right: 0 !important;
     left: auto !important;
     margin-right: 0.5rem !important;
+}
+
+/* ===== MANUAL ENTRY TENANT CARD ENHANCEMENTS ===== */
+
+/* Last Reading Information Section - Compact */
+.selected-tenant-compact .border-top {
+    border-color: #dee2e6 !important;
+}
+
+/* Compact reading info line */
+.selected-tenant-compact .d-flex.small {
+    font-size: 0.875rem;
+    gap: 0.5rem;
+}
+
+/* Loading spinner in tenant card */
+.selected-tenant-compact .spinner-border-sm {
+    width: 0.875rem;
+    height: 0.875rem;
+    border-width: 0.15em;
+}
+
+/* ===== TABLE ROW SELECTION STYLES ===== */
+
+/* Clickable table rows */
+#readingsTableBody tr {
+    cursor: pointer;
+    transition: background-color 0.15s ease-in-out;
+}
+
+/* Hover effect for table rows */
+#readingsTableBody tr:hover:not(.table-primary) {
+    background-color: #f8f9fa !important;
+}
+
+/* Selected row highlight using Bootstrap table-primary */
+#readingsTableBody tr.table-primary {
+    background-color: #cfe2ff !important;
+}
+
+#readingsTableBody tr.table-primary:hover {
+    background-color: #b6d4fe !important;
+}
+
+/* Checkbox cell - keep pointer cursor */
+#readingsTableBody td:first-child {
+    cursor: pointer;
+}
+
+/* Action buttons cell - keep default cursor for buttons */
+#readingsTableBody td:last-child {
+    cursor: default;
+}
+
+#readingsTableBody td:last-child button {
+    cursor: pointer;
 }
