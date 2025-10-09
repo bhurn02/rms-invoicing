@@ -61,6 +61,22 @@ This demonstrates why **Creative Mode** document analysis is essential - it reve
 
 ## 🎨 **ANIMATED NOTIFICATION SYSTEM STANDARDS**
 
+### **⚠️ CRITICAL: Smart Notification Manager is MANDATORY**
+**All pages and implementations MUST use the Smart Notification Manager** developed in Phase 17.3.3. This is a **global standard** that prevents notification clutter and ensures consistent user experience across the entire application.
+
+**❌ DO NOT:**
+- Call `showSuccess()`, `showWarning()`, or `showError()` directly
+- Create custom notification logic without priority management
+- Allow multiple notifications to overlap
+- Show success messages when validation warnings are active
+
+**✅ ALWAYS:**
+- Use `showSmartNotification(type, title, message, persistent)` for all notifications
+- Implement `hasActiveValidationWarnings()` helper function
+- Track persistent notification IDs globally
+- Check DOM existence before creating duplicate warnings
+- Clear notifications on modal/page close
+
 ### **Beautiful Notification Design Pattern**
 All phases must implement the **animated notification system** developed in Phase 17, featuring:
 
@@ -151,12 +167,167 @@ function hideNotification(id) {
 }
 ```
 
+### **Notification Priority & Queue System**
+
+To prevent overlapping notifications and provide clear user feedback, implement a priority-based system with visual stacking:
+
+#### **Priority Levels** (Higher = More Important)
+1. **SUCCESS** (Priority 1) - Non-blocking, auto-dismiss, suppressed by higher priorities
+2. **INFO** (Priority 2) - Non-blocking, auto-dismiss, suppressed by higher priorities
+3. **WARNING** (Priority 3) - Persistent until resolved, stacks with other warnings
+4. **ERROR** (Priority 4) - Blocking (SweetAlert), stacks with warnings
+
+#### **Smart Notification Behavior**
+
+**ERROR and WARNING: Stack with Visual Depth**
+- Multiple warnings can coexist with visual stacking
+- Each warning positioned with vertical offset (70px spacing)
+- "2 Issues" badge appears when 2+ warnings active
+- Persistent until issue resolved or modal closed
+- Priority tracking via global notification IDs
+
+**INFO and SUCCESS: Suppressed by Higher Priority**
+- Automatically suppressed when ERROR or WARNING exists
+- Prevents notification clutter during validation issues
+- Auto-dismiss when shown (4 seconds for success, 5 seconds for info)
+- Non-blocking, maintains workflow continuity
+
+#### **Implementation Pattern**
+```javascript
+// Global notification tracking
+let readingPeriodConflictNoticeId = null;
+let negativeUsageNoticeId = null;
+
+// Helper to check for active validation warnings
+function hasActiveValidationWarnings() {
+    return !!(readingPeriodConflictNoticeId || negativeUsageNoticeId);
+}
+
+// Smart notification manager with priority-based handling
+function showSmartNotification(type, title, message, persistent = false) {
+    const priority = NOTIFICATION_PRIORITY[type.toUpperCase()] || NOTIFICATION_PRIORITY.INFO;
+    
+    // SUCCESS messages are suppressed if any ERROR or WARNING notifications are active
+    if (type === 'SUCCESS' && hasActiveValidationWarnings()) {
+        console.log('[showSmartNotification] Suppressing SUCCESS - validation warnings active');
+        return null;
+    }
+    
+    // INFO messages are suppressed if any ERROR or WARNING notifications are active
+    if (type === 'INFO' && hasActiveValidationWarnings()) {
+        console.log('[showSmartNotification] Suppressing INFO - validation warnings active');
+        return null;
+    }
+    
+    // Prevent duplicate persistent warnings (check DOM existence)
+    if (persistent) {
+        if (type === 'WARNING' && title.includes('Period Conflict') && readingPeriodConflictNoticeId) {
+            return readingPeriodConflictNoticeId;
+        }
+        if (type === 'WARNING' && title.includes('Invalid Usage') && negativeUsageNoticeId) {
+            return negativeUsageNoticeId;
+        }
+    }
+    
+    // Show notification based on type
+    if (type === 'ERROR') {
+        showError(message); // SweetAlert (blocking)
+        return null;
+    } else if (type === 'WARNING') {
+        return showWarning(title, message, persistent); // Stacks with other warnings
+    } else if (type === 'INFO') {
+        showSuccess(title, message); // Uses success styling
+        return null;
+    } else if (type === 'SUCCESS') {
+        showSuccess(title, message);
+        return null;
+    }
+}
+
+// Stacked notification positioning
+function showWarning(title, subtitle = '', persistent = false) {
+    // Create notification element...
+    const existingWarnings = document.querySelectorAll('[id^="warning-"]');
+    const warningCount = existingWarnings.length;
+    
+    if (warningCount === 0) {
+        notification.classList.add('notification-stack-position-1');
+    } else if (warningCount === 1) {
+        notification.classList.add('notification-stack-position-2');
+    }
+    
+    document.body.appendChild(notification);
+    
+    if (warningCount === 1) {
+        addWarningCountBadge(); // Show "2 Issues" badge
+    }
+    
+    return notificationId;
+}
+
+// Update stack positions when notifications are removed
+function updateNotificationStack() {
+    const remainingWarnings = document.querySelectorAll('[id^="warning-"]');
+    remainingWarnings.forEach((notification, index) => {
+        notification.classList.remove('notification-stack-position-1', 'notification-stack-position-2');
+        if (index === 0) { notification.classList.add('notification-stack-position-1'); }
+        else if (index === 1) { notification.classList.add('notification-stack-position-2'); }
+    });
+    if (remainingWarnings.length >= 2) { addWarningCountBadge(); }
+    else { removeWarningCountBadge(); }
+}
+```
+
+#### **Visual Stacking CSS**
+```css
+.notification-stack-position-1 {
+    top: 20px !important;
+    z-index: 10001 !important;
+    box-shadow: rgb(62 37 0 / 30%) 0px 4px 20px !important;
+    transition: top 0.3s ease-out, box-shadow 0.3s ease-out;
+}
+
+.notification-stack-position-2 {
+    top: 90px !important; /* 70px offset from position-1 */
+    z-index: 10000 !important;
+    box-shadow: rgb(62 37 0 / 30%) 0px 4px 20px !important;
+    transition: top 0.3s ease-out, box-shadow 0.3s ease-out;
+}
+
+.notification-stack-position-2::before {
+    content: '';
+    position: absolute;
+    top: -6px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 95%;
+    height: 4px;
+    background: linear-gradient(180deg, rgba(0, 0, 0, 0.1), transparent);
+    border-radius: 8px 8px 0 0;
+    z-index: -1;
+}
+
+.notification-warning-count {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    color: white;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 4px 8px;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(239, 68, 68, 0.4);
+    animation: pulseWarning 2s ease-in-out infinite;
+}
+```
+
 ### **Cross-Phase Notification Mapping**
 
 **📊 Data Management (Phase 17 & Future)**
 - `showSuccess('Reading Created Successfully!', 'Manual entry saved to system')`
 - `showSuccess('Batch Operation Completed!', 'Success: X, Errors: Y')`
-- `showWarning('Invoice Protection Active', 'Reading cannot be modified')`
+- `showWarning('Invoice Protection Active', 'Reading cannot be modified', true)` - Persistent
 
 **📱 QR Scanner Operations (Existing)**
 - `showProgress('Syncing offline readings...')`
@@ -165,7 +336,7 @@ function hideNotification(id) {
 
 **💳 Invoice Management (Future Phases)**
 - `showSuccess('Invoice Generated Successfully!', 'Sent to X tenants')`
-- `showWarning('Invoice Constraint', 'Cannot modify invoiced data')`
+- `showWarning('Invoice Constraint', 'Cannot modify invoiced data', true)` - Persistent
 - `showProgress('Generating invoices...')`
 
 **📈 Reporting & Analytics (Future Phases)**
@@ -176,11 +347,21 @@ function hideNotification(id) {
 ### **Phase Implementation Guidelines**
 
 **🔧 For Each New Phase:**
-1. **Copy notification functions** from Phase 17 implementation
-2. **Replace existing alerts** with appropriate notification types
-3. **Implement progress notifications** for long-running operations
-4. **Add contextual subtitles** for better user understanding
-5. **Test animation performance** on target devices (Samsung A15, iPhone 14 Pro Max)
+1. **Implement Smart Notification Manager** - Use the priority-based system for all notifications
+2. **Copy notification functions** from Phase 17 implementation (`tenant-readings-management.js`)
+3. **Replace existing alerts** with `showSmartNotification()` calls
+4. **Implement stacking CSS** for visual depth when multiple warnings appear
+5. **Add contextual subtitles** for better user understanding
+6. **Track persistent notifications** with global IDs and DOM existence checks
+7. **Test animation performance** on target devices (Samsung A15, iPhone 14 Pro Max)
+
+**📋 Smart Notification Manager Requirements:**
+- **Always use `showSmartNotification()`** instead of direct `showSuccess()` or `showWarning()` calls
+- **Implement `hasActiveValidationWarnings()`** helper to check for active ERROR/WARNING notifications
+- **Track global notification IDs** for persistent warnings (e.g., `readingPeriodConflictNoticeId`)
+- **Check DOM existence** before creating duplicate warnings
+- **Call `updateNotificationStack()`** when notifications are removed
+- **Clear notifications on modal close** using `hidden.bs.modal` event listeners
 
 **✅ Quality Checklist:**
 - [ ] All success actions show green notification
@@ -190,6 +371,12 @@ function hideNotification(id) {
 - [ ] Animations smooth on mobile devices
 - [ ] Auto-dismiss timing appropriate
 - [ ] Subtitles provide helpful context
+- [ ] Multiple warnings stack visually with depth indicators
+- [ ] "2 Issues" badge appears when 2+ warnings active
+- [ ] Validation warnings persist until resolved
+- [ ] Success/Info messages suppressed when warnings active
+- [ ] `hasActiveValidationWarnings()` helper function implemented
+- [ ] `updateNotificationStack()` called on notification removal
 
 ## 📱 RESPONSIVE DESIGN STANDARDS
 
